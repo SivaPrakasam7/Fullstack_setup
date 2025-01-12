@@ -1,5 +1,17 @@
 import { executeQuery } from 'src/handler/db.ts';
 
+//
+export const getUserByIDandSecretKeyRepo = async (
+    userId: string,
+    secretKey: string
+) => {
+    const query = `SELECT * FROM users WHERE userId=? AND secretKey=? AND isDeleted=0`;
+
+    const queryResponse = await executeQuery(query, [userId, secretKey]);
+
+    return queryResponse[0];
+};
+
 export const createUserRepo = async ({
     userId,
     name,
@@ -30,7 +42,7 @@ export const createUserRepo = async ({
     return queryResponse.insertId && verificationQueryResponse.insertId;
 };
 
-export const updateVerification = async (source: string) => {
+export const updateVerificationRepo = async (source: string) => {
     const query = `UPDATE verifications SET verified=1 WHERE source=?`;
 
     const queryResponse = await executeQuery(query, [source]);
@@ -62,13 +74,31 @@ export const getUserByIdRepo = async (userId: string) => {
     return queryResponse[0];
 };
 
-export const updatePasswordRepo = async (
-    passwordHash: string,
+export const updateResetPasswordKeyRepo = async (
+    resetPasswordKey: string,
     userId: string
 ) => {
-    const query = `UPDATE users SET passwordHash=? WHERE userId=?`;
+    const query = `UPDATE users SET resetPasswordKey=? WHERE userId=? AND isDeleted=0`;
 
-    const queryResponse = await executeQuery(query, [passwordHash, userId]);
+    const queryResponse = await executeQuery(query, [resetPasswordKey, userId]);
+
+    return queryResponse.affectedRows;
+};
+
+export const updatePasswordRepo = async (
+    passwordHash: string,
+    userId: string,
+    secretKey: string,
+    resetPasswordKey: string
+) => {
+    const query = `UPDATE users SET passwordHash=?, secretKey=?, resetPasswordKey='' WHERE userId=? AND resetPasswordKey=?  AND isDeleted=0`;
+
+    const queryResponse = await executeQuery(query, [
+        passwordHash,
+        secretKey,
+        userId,
+        resetPasswordKey,
+    ]);
 
     return queryResponse.affectedRows;
 };

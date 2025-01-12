@@ -11,10 +11,13 @@
         "tokenExpired": "Token expired",
         "unauthorized": "Unauthorized",
         "verified": "Account verified",
-        "mailSent": "Mail sent successfully!",
         "passwordChanged": "Password changed successfully",
         "passwordChangeFailed": "Password change failed",
         "previousPasswordError": "New password cannot be the same as the old password",
-        "success": "Success"
+        "success": "Success",
+        "failed": "Failed",
+        "expired": "Expired",
+        "notFound": "Not found",
+        "mailSent": "Mail sent successfully!"
     }
 }

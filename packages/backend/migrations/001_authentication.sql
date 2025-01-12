@@ -12,6 +12,7 @@ CREATE TABLE
         `passwordHash` VARCHAR(255), -- Store password hash
         `providerId` VARCHAR(255), -- For google authentication
         `secretKey` VARCHAR(100) NOT NULL, -- Attach secret to token, It is used for handle logout from all devices
+        `resetPasswordKey` VARCHAR(100) DEFAULT NULL,
         `isDeleted` INT (11) NOT NULL DEFAULT 0,
         `createdAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
         `updatedAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP,

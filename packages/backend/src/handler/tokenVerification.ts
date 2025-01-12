@@ -1,3 +1,6 @@
+import { Response } from 'express';
+
+//
 import { IMiddleWare } from 'src/handler/middleware';
 // import { getAuth } from 'src/libraries/firebase';
 import { generateToken, verifyToken } from 'src/libraries/tokenGenerator';
@@ -5,56 +8,102 @@ import { createError } from 'src/handler/error';
 
 //
 import messages from 'src/utils/messages.json';
+import { getUserByIDandSecretKeyRepo } from 'src/repository/user';
 
 //
-export const tokenChecker: IMiddleWare = async (req, res, next) => {
+const clearCookies = (res: Response) => {
+    res.cookie('refreshToken', '', {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'strict',
+    });
+    res.cookie('accessToken', '', {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'strict',
+    });
+};
+
+export const tokenChecker: IMiddleWare = async (
+    req,
+    res,
+    next,
+    optional = false
+) => {
     try {
         const refreshToken = req.cookies.refreshToken;
         const accessToken = req.cookies.accessToken;
 
-        if (!refreshToken || !accessToken)
+        if (!optional && !refreshToken && !accessToken) {
+            clearCookies(res);
             return next(createError(401, messages.responses.unauthorized));
+        }
 
         let result;
         try {
             result = await verifyToken(accessToken);
         } catch {
-            result = await verifyToken(refreshToken);
+            if (refreshToken || optional) {
+                result = await verifyToken(refreshToken);
 
-            const newAccessTokenToken = await generateToken(result, true);
-            res.cookie('accessToken', newAccessTokenToken, {
-                httpOnly: true,
-                secure: process.env.MODE === 'production',
-                sameSite: 'strict',
-            });
+                const payload = JSON.parse(atob(accessToken.split('.')?.[1]));
+
+                const now = Date.now();
+
+                if (
+                    now - payload.lastUsed <=
+                    +process.env.REFRESH_TOKEN_EXPIRES_IN!
+                ) {
+                    const newAccessTokenToken = await generateToken(
+                        { ...result, lastUsed: now },
+                        true
+                    );
+                    res.cookie('accessToken', newAccessTokenToken, {
+                        httpOnly: true,
+                        secure: true,
+                        sameSite: 'strict',
+                        maxAge: +process.env.REFRESH_TOKEN_EXPIRES_IN!,
+                    });
+                } else {
+                    clearCookies(res);
+                    return next(
+                        createError(401, messages.responses.unauthorized)
+                    );
+                }
+            }
         }
 
-        const newRefreshToken = await generateToken(result);
+        const {
+            iat: _,
+            exp: __,
+            lastUsed: ___,
+            ...data
+        } = result as Record<string, string>;
+
+        if (data.secretKey) {
+            const isUserAvailable = await getUserByIDandSecretKeyRepo(
+                data.userId,
+                data.secretKey
+            );
+
+            if (!isUserAvailable) {
+                clearCookies(res);
+                return next(createError(401, messages.responses.unauthorized));
+            }
+        }
 
         req.body = {
-            ...result,
+            ...data,
             ...req.body,
         };
 
-        res.cookie('refreshToken', newRefreshToken, {
-            httpOnly: true,
-            secure: process.env.MODE === 'production',
-            sameSite: 'strict',
-        });
-
         next();
     } catch {
-        res.cookie('refreshToken', '', {
-            httpOnly: true,
-            secure: process.env.MODE === 'production',
-            sameSite: 'strict',
-        });
-        res.cookie('accessToken', '', {
-            httpOnly: true,
-            secure: process.env.MODE === 'production',
-            sameSite: 'strict',
-        });
-        return next(createError(401, messages.responses.unauthorized));
+        if (optional) return next();
+        else {
+            clearCookies(res);
+            return next(createError(401, messages.responses.unauthorized));
+        }
     }
 };
 

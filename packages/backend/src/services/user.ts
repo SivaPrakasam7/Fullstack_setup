@@ -11,7 +11,8 @@ import {
     getUserByIdRepo,
     getUserBySourceRepo,
     updatePasswordRepo,
-    updateVerification,
+    updateResetPasswordKeyRepo,
+    updateVerificationRepo,
 } from 'src/repository/user';
 import { generateSecretKey, generateUserId } from 'src/utils';
 import { sendMail } from 'src/utils/mail';
@@ -134,7 +135,7 @@ export const verificationService = async (payload: {
     userId: string;
     email: string;
 }) => {
-    await updateVerification(payload.email);
+    await updateVerificationRepo(payload.email);
 
     return messages.responses.verified;
 };
@@ -152,13 +153,21 @@ export const forgotPasswordService: IService<string> = async (data) => {
         throw createError(400, messages.responses.unverifiedUser);
 
     const verification = true;
+    const resetPasswordKey = generateSecretKey();
     const token = await generateToken(
         {
             userId: user.userId,
-            email: user.email,
+            resetPasswordKey,
         },
         verification
     );
+
+    const result = await updateResetPasswordKeyRepo(
+        resetPasswordKey,
+        user.userId
+    );
+
+    if (!result) throw createError(400, messages.responses.failed);
 
     const resetPasswordLink = `${process.env.PROTOCOL}://${process.env.DOMAIN}/${process.env.RESET_PASSWORD_URL}${token}`;
 
@@ -182,6 +191,7 @@ export const forgotPasswordService: IService<string> = async (data) => {
 
 export const changePasswordService: IService<string> = async (data) => {
     const user = await getUserByIdRepo(data.userId);
+    const secretKey = generateSecretKey();
 
     if (!user) throw createError(400, messages.responses.userNotFound);
 
@@ -195,7 +205,12 @@ export const changePasswordService: IService<string> = async (data) => {
     if (isPasswordVerified)
         throw createError(400, messages.responses.previousPasswordError);
 
-    const result = await updatePasswordRepo(passwordHash, user.userId);
+    const result = await updatePasswordRepo(
+        passwordHash,
+        user.userId,
+        secretKey,
+        data.resetPasswordKey
+    );
 
     if (!result)
         throw createError(400, messages.responses.passwordChangeFailed);
