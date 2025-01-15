@@ -18,9 +18,7 @@
 
 The project includes ready-to-use bash scripts to streamline setup, database management, and testing. These scripts simplify the process, but if you're using an unsupported OS, you can execute the commands manually as outlined in the script files.
 
-## Setup and Test
-
-<video src="doc/setup_and_test.mp4" autoplay loop muted width="600"></video>
+<img src="doc/setup_and_test.gif" alt="Demo of Application Feature" width="700"/>
 
 1. **Setup and Initialization**  
    Run `init.sh` to install dependencies and set up the backend database migrations:
