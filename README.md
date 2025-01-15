@@ -2,6 +2,7 @@
 
 [![Lerna](https://img.shields.io/badge/Maintained%20with-Lerna-cc00ff.svg)](https://lerna.js.org/)
 [![Vite](https://img.shields.io/badge/Created%20with-Vite-ddbb00.svg)](https://vitejs.dev/)
+[![React](https://img.shields.io/badge/Developed%20with-React-61DAFB.svg)](https://reactjs.org/)
 [![Vue](https://img.shields.io/badge/Developed%20with-Vue-42b883.svg)](https://vuejs.org/)
 [![Typescript](https://img.shields.io/badge/Support-Typescript-3178c6.svg)](https://vitejs.dev/)
 [![Cypress](https://img.shields.io/badge/Tested%20with-Cypress-007780.svg)](https://www.cypress.io/)
@@ -17,7 +18,9 @@
 
 The project includes ready-to-use bash scripts to streamline setup, database management, and testing. These scripts simplify the process, but if you're using an unsupported OS, you can execute the commands manually as outlined in the script files.
 
-<img src="doc/setup_and_test.gif" alt="Demo of Application Feature" width="700"/>
+## Setup and Test
+
+<video src="doc/setup_and_test.mp4" autoplay loop muted width="600"></video>
 
 1. **Setup and Initialization**  
    Run `init.sh` to install dependencies and set up the backend database migrations:
@@ -76,13 +79,13 @@ Below is a demonstration of the Cypress End-to-End (E2E) Test Execution, showcas
 
 ## Project Setup
 
-This repository provides a **common project setup** for web apps using **Vue**, **Node.js**, and essential tools for frontend and backend development, testing, and automation.
+This repository provides a **common project setup** for web apps using **React**, **Vue**, **Node.js**, and essential tools for frontend and backend development, testing, and automation.
 
 ## Technologies
 
 ### Frontend
 
--   **Vue**: Popular frontend framework for building user interfaces.
+-   **React & Vue**: Popular frontend framework for building user interfaces.
 -   **Vite**: Fast build tool for modern web development with support for hot module replacement.
 -   **TypeScript**: Superset of JavaScript providing static typing for better code quality.
 -   **Tailwind CSS**: Utility-first CSS framework for quickly styling components.
