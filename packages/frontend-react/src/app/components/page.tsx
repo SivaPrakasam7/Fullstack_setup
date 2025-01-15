@@ -10,7 +10,7 @@ export const CommonPage = ({ content }: { content: string }) => {
 
     return (
         <div className="flex flex-col gap-5 items-center justify-center h-screen w-screen">
-            <h1 data-testId="INIT" className="text-3xl font-bold">
+            <h1 data-testid="INIT" className="text-3xl font-bold">
                 {content}
             </h1>
             <button className="app-button" onClick={goToHome}>

@@ -1,7 +1,11 @@
-import { ReactNode, useEffect, useState } from 'react';
+import { FormEvent, ReactNode, useEffect, useState } from 'react';
+
+//
+import { getTagValues } from 'src/constants';
 
 //
 import { IFieldChange, IFormField } from './form.types';
+import { TextField } from './textField';
 
 //
 export const FormBuilder = ({
@@ -15,11 +19,11 @@ export const FormBuilder = ({
 }: {
     form: Record<string, IFormField>;
     call: (...args: ILargeRecord) => Promise<boolean>;
-    buttonText: string;
-    buttonClass: string;
-    layoutClass: string;
-    formTop: ReactNode;
-    formBottom: ReactNode;
+    buttonText?: string;
+    buttonClass?: string;
+    layoutClass?: string;
+    formTop?: ReactNode;
+    formBottom?: ReactNode;
 }) => {
     const [data, setData] = useState<Record<string, IFormField>>({});
     const [initialData, setInitialData] = useState<Record<string, IFormField>>(
@@ -29,21 +33,6 @@ export const FormBuilder = ({
     const [debounceTimer, setDebounceTimer] = useState(0);
 
     //
-    useEffect(() => {
-        setData(form);
-        setInitialData(form);
-    }, [JSON.stringify(form)]);
-
-    //
-    const getTagValues = (v: string) => {
-        return [
-            ...new Set(
-                `${v}`
-                    .split(/( |;|,)/g)
-                    .filter((t) => !!t.replaceAll(/(\s|;|,)/g, '').trim())
-            ),
-        ];
-    };
 
     const getPayload = () => {
         const payload: Record<string, ILargeRecord> = {};
@@ -148,7 +137,8 @@ export const FormBuilder = ({
         return !Object.values(data).filter((f) => Boolean(f.error)).length;
     };
 
-    const onSubmit = async () => {
+    const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
         setLoading(true);
         const payload = getPayload();
         if (await validate()) {
@@ -157,6 +147,12 @@ export const FormBuilder = ({
         }
         setLoading(false);
     };
+
+    //
+    useEffect(() => {
+        setData(form);
+        setInitialData(form);
+    }, [JSON.stringify(form)]);
 
     return (
         <form
@@ -172,7 +168,6 @@ export const FormBuilder = ({
                         className={`w-full ${field.alignClass}`}
                     >
                         <FormElements
-                            form={data}
                             fieldName={fieldName}
                             field={field}
                             onFieldChange={onFieldChange}
@@ -185,7 +180,7 @@ export const FormBuilder = ({
                 <button
                     disabled={loading}
                     type="submit"
-                    data-testId="SUBMIT"
+                    data-testid="SUBMIT"
                     className={`app-button ${loading ? 'text-gray-400' : ''} ${buttonClass}`}
                     onContextMenu={() => {
                         return false;
@@ -204,32 +199,28 @@ export const FormBuilder = ({
 };
 
 export const FormElements = ({
-    form,
     fieldName,
     field,
     onFieldChange,
 }: {
-    form: Record<string, IFormField>;
     fieldName: string;
     field: IFormField;
     onFieldChange: (field: IFieldChange) => void;
 }) => {
-    console.log(form, fieldName, field, onFieldChange);
-    return <></>;
-    // if (field.type === 'custom') return field.element;
-    // else if (field.type === 'label')
-    //     return (
-    //         <label className={field.layoutClass}>
-    //             {field.label}
-    //             <span
-    //                 v-show="field.label && field.required"
-    //                 className="text-red-400 font-bold text-xs"
-    //             >
-    //                 *
-    //             </span>
-    //             {field.icon}
-    //         </label>
-    //     );
+    if (field.type === 'custom') return field.element;
+    else if (field.type === 'label')
+        return (
+            <label className={field.layoutClass}>
+                {field.label}
+                <span
+                    v-show="field.label && field.required"
+                    className="text-red-400 font-bold text-xs"
+                >
+                    *
+                </span>
+                {field.icon}
+            </label>
+        );
     // else if (field.type === 'calendar')
     //     return (
     //         <Calendar
@@ -351,29 +342,31 @@ export const FormElements = ({
     //             onChange={onFieldChange}
     //         />
     //     );
-    // else
-    //     return (
-    //         <TextField
-    //             name={fieldName}
-    //             label={field.label}
-    //             value={field.value}
-    //             options={field.options || []}
-    //             error={field.error}
-    //             required={field.required}
-    //             disabled={field.disabled}
-    //             placeHolder={field.placeHolder}
-    //             helperText={field.helperText}
-    //             type={field.type}
-    //             size={field.size}
-    //             rows={field.rows}
-    //             min={field.min}
-    //             max={field.max}
-    //             className={field.class}
-    //             layoutClass={field.layoutClass}
-    //             format={field.format}
-    //             onChange={onFieldChange}
-    //             startIcon={field.startIcon}
-    //             endIcon={field.endIcon}
-    //         />
-    //     );
+    else
+        return (
+            <TextField
+                name={fieldName}
+                label={field.label}
+                value={field.value}
+                options={field.options || []}
+                error={field.error}
+                required={field.required}
+                disabled={field.disabled}
+                placeHolder={field.placeHolder}
+                helperText={field.helperText}
+                type={field.type!}
+                size={field.size}
+                rows={field.rows}
+                min={field.min}
+                max={field.max}
+                className={field.className}
+                layoutClass={field.layoutClass}
+                format={field.format}
+                onChange={onFieldChange}
+                startIcon={field.startIcon}
+                endIcon={field.endIcon}
+                noError={false}
+                length={0}
+            />
+        );
 };

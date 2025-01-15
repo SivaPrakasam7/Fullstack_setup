@@ -52,7 +52,7 @@ jobs:
                   rm: true
                   strip_components: 3
 
-    build-frontend:
+    build-react-frontend:
         runs-on: ubuntu-latest
         if: ${{ github.event.head_commit.modified && contains(github.event.head_commit.modified, 'packages/frontend/') }}
 
@@ -73,11 +73,11 @@ jobs:
                       ${{ runner.os }}-node-
 
             - name: Install Dependencies
-              working-directory: packages/frontend
+              working-directory: packages/frontend-react
               run: npm ci
 
             - name: Build Frontend
-              working-directory: packages/frontend
+              working-directory: packages/frontend-react
               run: |
                   echo "${{ secrets.PRODUCTION_FRONTEND_ENV }}" > .env
                   npm run build
@@ -89,7 +89,49 @@ jobs:
                   username: ${{ secrets.PROD_SSH_USERNAME }}
                   key: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
                   port: ${{ secrets.PROD_SSH_PORT }}
-                  source: 'packages/frontend/dist/'
+                  source: 'packages/frontend-react/dist/'
+                  target: ${{ secrets.PROD_REMOTE_DIRECTORY_PATH }}
+                  rm: true
+                  strip_components: 3
+
+    build-vue-frontend:
+        runs-on: ubuntu-latest
+        if: ${{ github.event.head_commit.modified && contains(github.event.head_commit.modified, 'packages/frontend/') }}
+
+        steps:
+            - name: Checkout Repository
+              uses: actions/checkout@v4
+
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: '20.14.0'
+
+            - name: Cache npm dependencies
+              uses: actions/cache@v4
+              with:
+                  path: ~/.npm
+                  key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+                  restore-keys: |
+                      ${{ runner.os }}-node-
+
+            - name: Install Dependencies
+              working-directory: packages/frontend-vue
+              run: npm ci
+
+            - name: Build Frontend
+              working-directory: packages/frontend-vue
+              run: |
+                  echo "${{ secrets.PRODUCTION_FRONTEND_ENV }}" > .env
+                  npm run build
+
+            - name: Upload to Server
+              uses: appleboy/scp-action@v0.1.7
+              with:
+                  host: ${{ secrets.PROD_SSH_HOST }}
+                  username: ${{ secrets.PROD_SSH_USERNAME }}
+                  key: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
+                  port: ${{ secrets.PROD_SSH_PORT }}
+                  source: 'packages/frontend-vue/dist/'
                   target: ${{ secrets.PROD_REMOTE_DIRECTORY_PATH }}
                   rm: true
                   strip_components: 3

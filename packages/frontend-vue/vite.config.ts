@@ -1,6 +1,6 @@
 import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
-import react from '@vitejs/plugin-react';
+import vue from '@vitejs/plugin-vue';
 import removeAttribute from 'remove-attr';
 import { svgIconsPlugin } from './plugins/vite-svg-plugin';
 
@@ -11,11 +11,11 @@ export default defineConfig(({ mode }) => {
             port: 3000,
         },
         plugins: [
-            react(),
+            vue(),
             svgIconsPlugin('./public/icons/svg'),
             !['test', 'development'].includes(mode)
                 ? removeAttribute({
-                      extensions: ['react'],
+                      extensions: ['vue'],
                       attributes: ['data-testid'],
                   })
                 : null,

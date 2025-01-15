@@ -39,15 +39,15 @@ export interface IFormField {
         | 'custom';
     placeHolder?: string;
     helperText?: string;
-    rows?: string;
+    rows?: number;
     alignClass?: string;
-    class?: string;
+    className?: string;
     layoutClass?: string;
     imageSize?: string;
     size?: string;
     disabled?: boolean;
     multiple?: boolean;
-    min?: string;
+    min?: number;
     max?: string;
     accept?: string;
     format?: string;
@@ -62,10 +62,11 @@ export interface IFormField {
     cropper?: boolean;
 
     //
-    startIcon: ReactNode;
-    endIcon: ReactNode;
-    element: ReactNode;
-    icon: ReactNode;
+    startIcon?: ReactNode;
+    endIcon?: ReactNode;
+    element?: ReactNode;
+    icon?: ReactNode;
+    onChange?: (field: IFieldChange) => void;
 }
 
 export type IFieldChange = {
