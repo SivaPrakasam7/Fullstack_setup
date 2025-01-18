@@ -196,7 +196,7 @@ jobs:
                   path: |
                       packages/frontend-react/cypress/screenshots
 
-    cypress-vue-react-mobile:
+    cypress-react-e2e-mobile:
         runs-on: ubuntu-latest
 
         services:
