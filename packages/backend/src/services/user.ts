@@ -1,10 +1,10 @@
-import { createError } from 'src/handler/error';
-import { IService } from 'src/handler/middleware';
+import { createError } from '../../src/handler/error';
+import { IService } from '../../src/handler/middleware';
 import {
     generatePasswordHash,
     verifyPassword,
-} from 'src/libraries/passwordGenerator';
-import { generateToken } from 'src/libraries/tokenGenerator';
+} from '../../src/libraries/passwordGenerator';
+import { generateToken } from '../../src/libraries/tokenGenerator';
 import {
     checkUserVerifiedRepo,
     createUserRepo,
@@ -13,12 +13,12 @@ import {
     updatePasswordRepo,
     updateResetPasswordKeyRepo,
     updateVerificationRepo,
-} from 'src/repository/user';
-import { generateSecretKey, generateUserId } from 'src/utils';
-import { sendMail } from 'src/utils/mail';
+} from '../../src/repository/user';
+import { generateSecretKey, generateUserId } from '../../src/utils';
+import { sendMail } from '../../src/utils/mail';
 
 //
-import messages from 'src/utils/messages.json';
+import messages from '../../src/utils/messages.json';
 
 //
 export const createUserService: IService<string> = async (data) => {

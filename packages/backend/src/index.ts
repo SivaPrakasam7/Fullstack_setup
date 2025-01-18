@@ -9,12 +9,12 @@ import swaggerUI from 'swagger-ui-express';
 dotenv.config();
 
 // Files imports here
-import { errorHandler } from 'src/handler/error';
-import { logAccess } from 'src/handler/logger';
-import { swaggerSpec } from 'src/swagger';
-import userRotes from 'src/routes/user';
-import securityRoutes from 'src/routes/security';
-import { decryptPayload } from './handler/security';
+import { errorHandler } from '../src/handler/error';
+import { logAccess } from '../src/handler/logger';
+import { swaggerSpec } from '../src/swagger';
+import userRotes from '../src/routes/user';
+import securityRoutes from '../src/routes/security';
+import { decryptPayload } from '../src/handler/security';
 
 //
 const app = express();

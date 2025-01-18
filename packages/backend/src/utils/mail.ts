@@ -1,6 +1,6 @@
-import { readFileData } from 'src/libraries/fileSystem';
-import { testTransporter, transporter } from 'src/libraries/mail';
-import { renderHTML } from 'src/libraries/renderer';
+import { readFileData } from '../../src/libraries/fileSystem';
+import { testTransporter, transporter } from '../../src/libraries/mail';
+import { renderHTML } from '../../src/libraries/renderer';
 
 export const sendMail: ISendMail = async (templatePath, data, config) => {
     const mailConfigurations = {

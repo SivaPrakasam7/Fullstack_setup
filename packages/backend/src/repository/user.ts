@@ -1,4 +1,4 @@
-import { executeQuery } from 'src/handler/db.ts';
+import { executeQuery } from '../../src/handler/db.ts';
 
 //
 export const getUserByIDandSecretKeyRepo = async (

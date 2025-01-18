@@ -1,7 +1,7 @@
 import express from 'express';
 
 //
-import { decryptPayload, getPublicKey } from 'src/handler/security';
+import { decryptPayload, getPublicKey } from '../../src/handler/security';
 
 //
 const router = express.Router();

@@ -8,18 +8,18 @@ import {
     requestVerifyController,
     verifyController,
     logoutController,
-} from 'src/controller/user';
+} from '../../src/controller/user';
 import {
     headerTokenChecker,
     tokenChecker,
-} from 'src/handler/tokenVerification';
-import { validator } from 'src/handler/validator';
+} from '../../src/handler/tokenVerification';
+import { validator } from '../../src/handler/validator';
 import {
     createUserValidation,
     forgotPasswordValidation,
     loginValidation,
     resetPasswordValidation,
-} from 'src/validations/user';
+} from '../../src/validations/user';
 
 const router = express.Router();
 
@@ -218,6 +218,37 @@ router.route('/login').post(validator(loginValidation), loginController);
 
 router.route('/profile').get(tokenChecker, userController);
 
+// Request email verification mail
+/**
+ * @swagger
+ * /v1/user/request-verification:
+ *   get:
+ *     summary: Request a email verification
+ *     security:
+ *       - cookieAuth: []  # Assuming you are using cookies for authentication
+ *     responses:
+ *       200:
+ *         description: Mail sent successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Mail sent successfully!"
+ *       401:
+ *         description: Unauthorized, invalid or missing token
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Unauthorized"
+ */
+
 router.route('/request-verification').get(requestVerifyController);
 
 // Email verification API
@@ -227,7 +258,7 @@ router.route('/request-verification').get(requestVerifyController);
  *   get:
  *     summary: Verify user account
  *     security:
- *       - bearerAuth: []  # Assuming you are using Bearer token for authentication
+ *       - cookieAuth: []  # Assuming you are using cookies for authentication
  *     parameters:
  *       - in: header
  *         name: Authorization
@@ -267,6 +298,8 @@ router.route('/verify').get(headerTokenChecker, verifyController);
  * /v1/user/request-reset-password:
  *   post:
  *     summary: Request a password reset
+ *     security:
+ *       - cookieAuth: []  # Assuming you are using cookies for authentication
  *     requestBody:
  *       required: true
  *       content:
@@ -315,7 +348,7 @@ router
  *   post:
  *     summary: Change the user's password
  *     security:
- *       - bearerAuth: []  # Assuming you are using Bearer token for authorization
+ *       - cookieAuth: []  # Assuming you are using cookies for authentication
  *     requestBody:
  *       required: true
  *       content:
@@ -366,6 +399,28 @@ router
         validator(resetPasswordValidation),
         changePasswordController
     );
+
+// Logout user
+/**
+ * @swagger
+ * /v1/user/logout:
+ *   get:
+ *     summary: Logout user
+ *     security:
+ *       - cookieAuth: []  # Assuming you are using cookies for authentication
+ *     responses:
+ *       200:
+ *         description: Logout user
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Success"
+ */
+
 router.route('/logout').get(logoutController);
 
 export default router;

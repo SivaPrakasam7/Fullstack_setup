@@ -1,7 +1,7 @@
 import request from 'supertest';
 import nodemailerMock from 'nodemailer-mock';
 import app from 'src';
-import { executeQuery, MYSQLConnection } from 'src/handler/db.ts';
+import { executeQuery, MYSQLConnection } from '../src/handler/db.ts';
 import { user } from './data';
 import { waitForEmail } from './utils';
 

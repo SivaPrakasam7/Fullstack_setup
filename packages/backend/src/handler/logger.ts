@@ -1,7 +1,10 @@
 import fs from 'fs';
 import path from 'path';
-import { IError, IMiddleWare } from 'src/handler/middleware';
 
+//
+import { IError, IMiddleWare } from '../../src/handler/middleware';
+
+//
 const logFilePath = path.join(__dirname, '../../logs', 'error.log');
 
 export const logErrorToFile = (error: IError) => {

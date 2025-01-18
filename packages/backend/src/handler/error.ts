@@ -1,5 +1,5 @@
-import { logErrorToFile } from 'src/handler/logger';
-import { IErrorHandler } from 'src/handler/middleware';
+import { logErrorToFile } from '../../src/handler/logger';
+import { IErrorHandler } from '../../src/handler/middleware';
 
 export const createError = (code: number, message: string) => {
     const error = new Error(message);

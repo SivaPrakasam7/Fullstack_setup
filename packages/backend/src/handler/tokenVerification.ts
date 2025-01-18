@@ -1,14 +1,14 @@
 import { Response } from 'express';
 
 //
-import { IMiddleWare } from 'src/handler/middleware';
-// import { getAuth } from 'src/libraries/firebase';
-import { generateToken, verifyToken } from 'src/libraries/tokenGenerator';
-import { createError } from 'src/handler/error';
+import { IMiddleWare } from '../../src/handler/middleware';
+// import { getAuth } from '../../src/libraries/firebase';
+import { generateToken, verifyToken } from '../../src/libraries/tokenGenerator';
+import { createError } from '../../src/handler/error';
+import { getUserByIDandSecretKeyRepo } from '../../src/repository/user';
 
 //
-import messages from 'src/utils/messages.json';
-import { getUserByIDandSecretKeyRepo } from 'src/repository/user';
+import messages from '../../src/utils/messages.json';
 
 //
 const clearCookies = (res: Response) => {

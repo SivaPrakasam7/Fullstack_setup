@@ -1,8 +1,12 @@
 //
+import { generateClientId } from '../../src/utils';
 import { IMiddleWare } from './middleware';
 
 //
-let privateKey: ArrayBuffer;
+const userKeys: Record<
+    string,
+    { publicKey: ArrayBuffer; privateKey: ArrayBuffer }
+> = {};
 
 export const getPublicKey: IMiddleWare = async (req, res, _) => {
     const keyPair = await crypto.subtle.generateKey(
@@ -17,13 +21,26 @@ export const getPublicKey: IMiddleWare = async (req, res, _) => {
     );
 
     const publicKey = await crypto.subtle.exportKey('spki', keyPair.publicKey);
-    privateKey = await crypto.subtle.exportKey('pkcs8', keyPair.privateKey);
+    const privateKey = await crypto.subtle.exportKey(
+        'pkcs8',
+        keyPair.privateKey
+    );
+    const clientId = generateClientId();
+
+    userKeys[clientId] = { publicKey, privateKey };
+
+    res.cookie('clientId', clientId, {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'strict',
+        maxAge: +process.env.REFRESH_TOKEN_EXPIRES_IN!,
+    });
     res.status(200).json({
         publicKey: Buffer.from(publicKey).toString('base64'),
     });
 };
 
-export const getPrivateKey = async () => {
+export const getPrivateKey = async (privateKey: ArrayBuffer) => {
     const privateKeyObject = await crypto.subtle.importKey(
         'pkcs8',
         privateKey,
@@ -54,7 +71,9 @@ export const decryptData = async (
 
 export const decryptPayload: IMiddleWare = async (req, _, next) => {
     try {
-        const privateKeyObject = await getPrivateKey();
+        const clientId = req.cookies.clientId;
+        const privateKey = userKeys[clientId].privateKey;
+        const privateKeyObject = await getPrivateKey(privateKey);
 
         const decryptedData = await decryptData(
             privateKeyObject,

@@ -1,4 +1,4 @@
-import type { IError, IMiddleWare } from 'src/handler/middleware';
+import type { IError, IMiddleWare } from '../../src/handler/middleware';
 import {
     changePasswordService,
     createUserService,
@@ -7,10 +7,10 @@ import {
     loginService,
     requestVerificationService,
     verificationService,
-} from 'src/services/user';
+} from '../../src/services/user';
 
 //
-import messages from 'src/utils/messages.json';
+import messages from '../../src/utils/messages.json';
 
 //
 export const createUserController: IMiddleWare = async (req, res, next) => {
@@ -33,11 +33,13 @@ export const loginController: IMiddleWare = async (req, res, next) => {
             httpOnly: true,
             secure: process.env.MODE === 'production',
             sameSite: 'strict',
+            maxAge: +process.env.REFRESH_TOKEN_EXPIRES_IN!,
         });
         res.cookie('accessToken', result.accessToken, {
             httpOnly: true,
             secure: process.env.MODE === 'production',
             sameSite: 'strict',
+            maxAge: +process.env.REFRESH_TOKEN_EXPIRES_IN!,
         });
 
         res.status(200).json({ data: result });
