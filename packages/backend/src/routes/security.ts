@@ -6,7 +6,7 @@ import { decryptPayload, getPublicKey } from '../../src/handler/security';
 //
 const router = express.Router();
 
-router.route('/get-publicKey').get(getPublicKey);
+router.route('/publicKey').get(getPublicKey);
 
 router.route('/decryptPayload').post(decryptPayload);
 

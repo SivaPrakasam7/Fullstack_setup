@@ -10,7 +10,7 @@ import {
 } from '../../src/services/user';
 
 //
-import messages from '../../src/utils/messages.json';
+import messages from '../utils/messages';
 
 //
 export const createUserController: IMiddleWare = async (req, res, next) => {

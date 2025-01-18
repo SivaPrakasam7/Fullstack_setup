@@ -1,9 +1,6 @@
 <template>
     <div>
-        <div
-            class="fixed top-2 right-2 z-50 flex flex-col gap-2"
-            data-testid="TOAST"
-        >
+        <div class="fixed top-2 right-2 z-50 flex flex-col gap-2">
             <Toast
                 v-for="toast in toasts"
                 :key="toast.timestamp"
@@ -18,7 +15,6 @@
 import { RouterView } from 'vue-router';
 
 //
-import { Request } from 'src/libraries/api';
 import { appStore } from 'src/store';
 
 //
@@ -39,13 +35,6 @@ export default {
     created() {
         document.getElementsByTagName('title')[0]!.innerText =
             import.meta.env.VITE_APP_NAME;
-
-        Request({
-            method: 'get',
-            url: `v1/security/get-publicKey`,
-        }).then((data) => {
-            window.encryptionKey = data.publicKey;
-        });
     },
 };
 </script>

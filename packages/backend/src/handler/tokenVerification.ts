@@ -8,7 +8,7 @@ import { createError } from '../../src/handler/error';
 import { getUserByIDandSecretKeyRepo } from '../../src/repository/user';
 
 //
-import messages from '../../src/utils/messages.json';
+import messages from '../utils/messages';
 
 //
 const clearCookies = (res: Response) => {

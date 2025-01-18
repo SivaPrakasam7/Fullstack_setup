@@ -1,6 +1,7 @@
 <template>
     <div
         v-if="show"
+        data-testid="TOAST"
         class="flex items-center max-w-[400px] w-full p-2 mb-4 rounded-lg shadow-2xl"
         :class="[
             toast.type === 'success'

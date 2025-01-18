@@ -103,6 +103,27 @@ export const updatePasswordRepo = async (
     return queryResponse.affectedRows;
 };
 
+export const increaseFailedAttemptRepo = async (userId: string) => {
+    const query = `UPDATE users SET failedAttempts = failedAttempts+1, isSuspended = CASE WHEN failedAttempts >= 3 THEN 1 ELSE 0 END, suspendedAt = CASE WHEN failedAttempts >= 3 THEN CURRENT_TIMESTAMP ELSE NULL END WHERE userId=? AND isDeleted=0`;
+
+    const queryResponse = await executeQuery(query, [userId]);
+
+    return queryResponse.affectedRows;
+};
+
+export const updateUserRepo = async ({ userId, ...user }: Partial<IUser>) => {
+    const query = `UPDATE users SET ${Object.entries(user)
+        .map(
+            ([key, value]) =>
+                `${key}=${key === 'lastLoginTime' ? 'CURRENT_TIMESTAMP' : `'${value}'`}`
+        )
+        .join(', ')} WHERE userId='${userId}' AND isDeleted=0`;
+
+    const queryResponse = await executeQuery(query, []);
+
+    return queryResponse.affectedRows;
+};
+
 export interface IUser {
     userId: string;
     name: string | null;

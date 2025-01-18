@@ -1,6 +1,7 @@
 export const encrypt = async (data: ILargeRecord) => {
-    if (window.encryptionKey) {
-        const binaryString = atob(window.encryptionKey);
+    const encryptionKey = localStorage.getItem('publicKey');
+    if (encryptionKey) {
+        const binaryString = atob(encryptionKey);
         const binaryData = Uint8Array.from(binaryString, (char) =>
             char.charCodeAt(0)
         );

@@ -25,3 +25,14 @@ export const logAccess: IMiddleWare = (req, res, next) => {
     fs.appendFileSync(accessLogFilePath, logMessage, 'utf8');
     next();
 };
+
+const mailLogFilePath = path.join(__dirname, '../../logs', 'mail.log');
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const logMail = (data: Record<string, any>) => {
+    const logMessage = `[${new Date().toISOString()}] Config : ${JSON.stringify(data.config)} , Error : ${JSON.stringify(data.error)} , Result: ${JSON.stringify(data.data || {})}\n`;
+    if (!fs.existsSync(path.dirname(mailLogFilePath))) {
+        fs.mkdirSync(path.dirname(mailLogFilePath), { recursive: true });
+    }
+    fs.appendFileSync(mailLogFilePath, logMessage, 'utf8');
+};

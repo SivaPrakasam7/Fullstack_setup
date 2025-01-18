@@ -1,14 +1,18 @@
 //
 import { generateClientId } from '../../src/utils';
+import { createError } from './error';
 import { IMiddleWare } from './middleware';
+
+//
+import messages from '../utils/messages';
 
 //
 const userKeys: Record<
     string,
-    { publicKey: ArrayBuffer; privateKey: ArrayBuffer }
+    { publicKey: ArrayBuffer; privateKey: ArrayBuffer; createdAt: number }
 > = {};
 
-export const getPublicKey: IMiddleWare = async (req, res, _) => {
+export const getPublicKey: IMiddleWare = async (__, res, _) => {
     const keyPair = await crypto.subtle.generateKey(
         {
             name: 'RSA-OAEP',
@@ -25,15 +29,16 @@ export const getPublicKey: IMiddleWare = async (req, res, _) => {
         'pkcs8',
         keyPair.privateKey
     );
-    const clientId = generateClientId();
 
-    userKeys[clientId] = { publicKey, privateKey };
+    const newClientId = generateClientId();
 
-    res.cookie('clientId', clientId, {
+    userKeys[newClientId] = { publicKey, privateKey, createdAt: Date.now() };
+
+    res.cookie('clientId', newClientId, {
         httpOnly: true,
         secure: true,
         sameSite: 'strict',
-        maxAge: +process.env.REFRESH_TOKEN_EXPIRES_IN!,
+        maxAge: +process.env.KEY_ROTATION_INTERVAL!,
     });
     res.status(200).json({
         publicKey: Buffer.from(publicKey).toString('base64'),
@@ -72,18 +77,30 @@ export const decryptData = async (
 export const decryptPayload: IMiddleWare = async (req, _, next) => {
     try {
         const clientId = req.cookies.clientId;
-        const privateKey = userKeys[clientId].privateKey;
-        const privateKeyObject = await getPrivateKey(privateKey);
 
-        const decryptedData = await decryptData(
-            privateKeyObject,
-            req.body.encryptedData
-        );
+        if (req.path.includes('publicKey')) return next();
 
-        req.body = JSON.parse(decryptedData);
+        if (
+            !userKeys[clientId] ||
+            Date.now() - userKeys[clientId]?.createdAt >
+                +process.env.KEY_ROTATION_INTERVAL!
+        ) {
+            return next(createError(401, messages.responses.keyExpired));
+        }
 
+        if (req.body.encryptedData) {
+            const privateKey = userKeys[clientId].privateKey;
+            const privateKeyObject = await getPrivateKey(privateKey);
+
+            const decryptedData = await decryptData(
+                privateKeyObject,
+                req.body.encryptedData
+            );
+
+            req.body = JSON.parse(decryptedData);
+        }
         next();
     } catch {
-        next();
+        next(createError(401, messages.responses.keyExpired));
     }
 };

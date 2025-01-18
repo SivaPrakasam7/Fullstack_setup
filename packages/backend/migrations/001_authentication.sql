@@ -13,6 +13,9 @@ CREATE TABLE
         `providerId` VARCHAR(255), -- For google authentication
         `secretKey` VARCHAR(100) NOT NULL, -- Attach secret to token, It is used for handle logout from all devices
         `resetPasswordKey` VARCHAR(100) DEFAULT NULL,
+        `failedAttempts` INT (11) NOT NULL DEFAULT 0,
+        `isSuspended` INT (11) NOT NULL DEFAULT 0,
+        `suspendedAt` TIMESTAMP,
         `isDeleted` INT (11) NOT NULL DEFAULT 0,
         `createdAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
         `updatedAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP,

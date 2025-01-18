@@ -10,6 +10,7 @@ import {
     createUserRepo,
     getUserByIdRepo,
     getUserBySourceRepo,
+    increaseFailedAttemptRepo,
     updatePasswordRepo,
     updateResetPasswordKeyRepo,
     updateVerificationRepo,
@@ -18,7 +19,7 @@ import { generateSecretKey, generateUserId } from '../../src/utils';
 import { sendMail } from '../../src/utils/mail';
 
 //
-import messages from '../../src/utils/messages.json';
+import messages from '../utils/messages';
 
 //
 export const createUserService: IService<string> = async (data) => {
@@ -67,12 +68,27 @@ export const loginService: IService<{
     if (!user.passwordHash)
         throw createError(400, messages.responses.noPasswordAuth);
 
+    if (user.isSuspended) {
+        const suspendTime = +process.env.ACCOUNT_SUSPEND_MINUTE! || 5;
+        const suspendedAt = new Date(user.suspendedAt).getTime();
+        const now = Date.now();
+        const timeDiff = Math.floor((now - suspendedAt) / (1000 * 60));
+        const remainingTime = suspendTime - timeDiff;
+        if (timeDiff < suspendTime)
+            throw createError(
+                400,
+                messages.responses.accountSuspended(remainingTime)
+            );
+    }
+
     const isPasswordVerified = await verifyPassword(
         data.password,
         user.passwordHash
     );
-    if (!isPasswordVerified)
+    if (!isPasswordVerified) {
+        await increaseFailedAttemptRepo(user.userId);
         throw createError(400, messages.responses.invalidCred);
+    }
 
     const isSourceVerified = await checkUserVerifiedRepo(data.email);
     if (!isSourceVerified)

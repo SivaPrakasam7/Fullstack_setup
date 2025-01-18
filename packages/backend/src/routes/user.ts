@@ -163,7 +163,7 @@ router
  *                   properties:
  *                     message:
  *                       type: string
- *                       example: "Invalid credentials"
+ *                       example: "Invalid credential"
  *                 - type: object
  *                   properties:
  *                     message:

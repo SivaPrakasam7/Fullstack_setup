@@ -11,6 +11,7 @@ const Toast = ({
     close: () => void;
 }) => (
     <div
+        data-testid="TOAST"
         className={`flex items-center max-w-[400px] w-full p-2 mb-4 rounded-lg shadow-2xl ${
             type === 'success'
                 ? 'bg-green-100'

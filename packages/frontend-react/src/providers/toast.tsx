@@ -16,9 +16,11 @@ export const ToastProvider = ({ children }: { children: ReactNode }) => (
 );
 
 export const showToast = (props: IToast) => {
-    const root = createRoot(document.getElementById('handle-toast')!);
-    const handelClose = () => root.render(<></>);
-    root.render(<Toast {...props} close={handelClose} />);
+    const handelClose = () =>
+        createRoot(document.getElementById('handle-toast')!).render(<></>);
+    createRoot(document.getElementById('handle-toast')!).render(
+        <Toast {...props} close={handelClose} />
+    );
     setTimeout(() => {
         handelClose();
     }, 5000);
