@@ -9,8 +9,8 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     const [update, setUpdate] = useState(false);
 
     useEffect(() => {
-        getUserDetail().then((user) => {
-            setUser(user);
+        getUserDetail().then((data) => {
+            setUser({ ...data, signedIn: !!data.userId });
             setLoading(false);
         });
     }, [update]);
@@ -20,9 +20,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     };
 
     return (
-        <UserContext.Provider
-            value={{ ...user, signedIn: !!user?.email, loading, updateUser }}
-        >
+        <UserContext.Provider value={{ ...user, loading, updateUser }}>
             {children}
         </UserContext.Provider>
     );

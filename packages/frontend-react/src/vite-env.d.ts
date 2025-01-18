@@ -29,6 +29,7 @@ interface Window {
         matchAll: (arg0: { type: string }) => Promise<any>;
         openWindow: (arg0: string) => any;
     };
+    encryptionKey: string;
 }
 
 interface Event {

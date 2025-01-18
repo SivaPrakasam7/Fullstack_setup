@@ -1,23 +1,26 @@
 import * as Axios from 'axios';
 import { baseURL } from 'src/constants';
+import { encrypt } from 'src/repository/utils';
 
 const client = Axios.default.create({
     baseURL,
     withCredentials: true,
 });
 
-export const Request = (
+export const Request = async (
     options: Axios.AxiosRequestConfig,
     data?: object,
     headers?: Axios.RawAxiosRequestHeaders
 ): Promise<ILargeRecord & { error: boolean }> => {
+    const encryptedData = await encrypt(data);
+
     return client({
         ...options,
         headers: {
             'Content-Type': 'application/json',
             ...headers,
         },
-        data,
+        data: { encryptedData },
     })
         .then((res) => res.data)
         .catch((e) => {

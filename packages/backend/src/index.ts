@@ -11,8 +11,10 @@ dotenv.config();
 // Files imports here
 import { errorHandler } from 'src/handler/error';
 import { logAccess } from 'src/handler/logger';
-import userRotes from 'src/routes/user';
 import { swaggerSpec } from 'src/swagger';
+import userRotes from 'src/routes/user';
+import securityRoutes from 'src/routes/security';
+import { decryptPayload } from './handler/security';
 
 //
 const app = express();
@@ -27,6 +29,7 @@ app.use(helmet());
 app.use(helmet.xssFilter());
 app.use(helmet.noSniff());
 app.use(helmet.hidePoweredBy());
+app.use(decryptPayload);
 app.use(logAccess);
 
 app.get('/', (_, res) => {
@@ -36,6 +39,7 @@ app.get('/', (_, res) => {
 app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerSpec));
 
 app.use('/v1/user', userRotes);
+app.use('/v1/security', securityRoutes);
 
 app.use(errorHandler);
 

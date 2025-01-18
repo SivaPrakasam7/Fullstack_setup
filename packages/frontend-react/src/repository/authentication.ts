@@ -1,4 +1,5 @@
 import { Request } from 'src/libraries/api';
+import { showToast } from 'src/providers/toast';
 
 export const login = (payload: { email: string; password: string }) =>
     Request(
@@ -8,12 +9,12 @@ export const login = (payload: { email: string; password: string }) =>
         },
         payload
     ).then(async (res) => {
-        // if (res.error) {
-        //     appStore.commit('setToast', {
-        //         type: 'error',
-        //         message: res.message,
-        //     });
-        // }
+        if (res.error) {
+            showToast({
+                type: 'error',
+                message: res.message,
+            });
+        }
         return res;
     });
 
@@ -29,10 +30,10 @@ export const register = (payload: {
         },
         payload
     ).then((res) => {
-        // appStore.commit('setToast', {
-        //     type: res.error ? 'error' : 'success',
-        //     message: res.message,
-        // });
+        showToast({
+            type: res.error ? 'error' : 'success',
+            message: res.message,
+        });
         return res;
     });
 
@@ -44,10 +45,10 @@ export const requestResetPassword = (payload: { email: string }) =>
         },
         payload
     ).then((res) => {
-        // appStore.commit('setToast', {
-        //     type: res.error ? 'error' : 'success',
-        //     message: res.message,
-        // });
+        showToast({
+            type: res.error ? 'error' : 'success',
+            message: res.message,
+        });
         return res;
     });
 
@@ -62,10 +63,10 @@ export const changePassword = (payload: { password: string }, token: string) =>
             Authorization: `Bearer ${token}`,
         }
     ).then((res) => {
-        // appStore.commit('setToast', {
-        //     type: res.error ? 'error' : 'success',
-        //     message: res.message,
-        // });
+        showToast({
+            type: res.error ? 'error' : 'success',
+            message: res.message,
+        });
         return res;
     });
 
@@ -85,6 +86,5 @@ export const getUserDetail = () =>
 
 export const logout = () =>
     Request({ method: 'get', url: `v1/user/logout` }).then((res) => {
-        // store.commit('clearUser');
         return res.error ? res : res?.data?.user;
     });

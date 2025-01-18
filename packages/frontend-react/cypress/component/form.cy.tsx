@@ -25,8 +25,7 @@ describe('Form component', () => {
                         requiredLabel: 'Please enter your email',
                     },
                 }}
-                call={async (payload) => {
-                    console.log(payload);
+                call={async (_) => {
                     return false;
                 }}
                 buttonText="Login"

@@ -18,7 +18,10 @@
 import { RouterView } from 'vue-router';
 
 //
+import { Request } from 'src/libraries/api';
 import { appStore } from 'src/store';
+
+//
 import Toast from 'src/app/components/toast.vue';
 
 //
@@ -36,6 +39,13 @@ export default {
     created() {
         document.getElementsByTagName('title')[0]!.innerText =
             import.meta.env.VITE_APP_NAME;
+
+        Request({
+            method: 'get',
+            url: `v1/security/get-publicKey`,
+        }).then((data) => {
+            window.encryptionKey = data.publicKey;
+        });
     },
 };
 </script>

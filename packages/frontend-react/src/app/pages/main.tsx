@@ -18,18 +18,23 @@ export default () => {
         navigate('/sign-up');
     };
 
+    const _logout = async () => {
+        await logout();
+        user.updateUser();
+    };
+
     return (
         <div className="flex flex-col gap-5 items-center justify-center h-screen w-screen">
             <h1 data-testid="INIT" className="text-3xl font-bold">
                 {import.meta.env.VITE_APP_NAME}
             </h1>
             <p>
-                {user?.signedId
+                {user?.signedIn
                     ? `${user?.name} logged in successfully`
                     : 'User need to login'}
             </p>
-            {user?.signedId ? (
-                <button className="app-button" onClick={logout}>
+            {user?.signedIn ? (
+                <button className="app-button" onClick={_logout}>
                     Logout
                 </button>
             ) : (
