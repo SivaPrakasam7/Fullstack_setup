@@ -183,7 +183,7 @@
             class="block max-h-20 overflow-y-auto no-scrollbar"
         >
             <p
-                v-for="tag in getTagValues(handleInput)"
+                v-for="tag in getTagValues(handleInput as string)"
                 :key="tag"
                 class="text-xs rounded-full border border-gray-300 w-fit px-2 pb-0.5 m-0.5 truncate max-w-[250px] float-left"
             >
@@ -195,6 +195,9 @@
 
 <script lang="ts">
 import type { PropType } from 'vue';
+
+//
+import { getTagValues } from 'services/constants';
 
 //
 import SvgIcon from '../svg.vue';
@@ -285,6 +288,7 @@ export default {
                 ['date', 'datetime-local', 'time'].includes(this.type) || false,
             showMenu: false,
             otp: [] as string[],
+            getTagValues,
         };
     },
     computed: {
@@ -366,15 +370,6 @@ export default {
                     event.preventDefault();
                 }
             }
-        },
-        getTagValues(v: string | number) {
-            return [
-                ...new Set(
-                    `${v}`
-                        .split(/( |;|,)/g)
-                        .filter((t) => !!t.replaceAll(/(\s|;|,)/g, '').trim())
-                ),
-            ];
         },
         focus() {
             if (['date', 'datetime-local', 'time'].includes(this.type))

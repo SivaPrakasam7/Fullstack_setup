@@ -1,6 +1,6 @@
-import { Request } from 'src/libraries/api';
-import { showToast } from 'src/providers/toast';
+import { Request } from '../libraries/api';
 
+//
 export const login = (payload: { email: string; password: string }) =>
     Request(
         {
@@ -10,7 +10,7 @@ export const login = (payload: { email: string; password: string }) =>
         payload
     ).then(async (res) => {
         if (res.error) {
-            showToast({
+            window.showToast({
                 type: 'error',
                 message: res.message,
             });
@@ -30,7 +30,7 @@ export const register = (payload: {
         },
         payload
     ).then((res) => {
-        showToast({
+        window.showToast({
             type: res.error ? 'error' : 'success',
             message: res.message,
         });
@@ -45,7 +45,7 @@ export const requestResetPassword = (payload: { email: string }) =>
         },
         payload
     ).then((res) => {
-        showToast({
+        window.showToast({
             type: res.error ? 'error' : 'success',
             message: res.message,
         });
@@ -63,7 +63,7 @@ export const changePassword = (payload: { password: string }, token: string) =>
             Authorization: `Bearer ${token}`,
         }
     ).then((res) => {
-        showToast({
+        window.showToast({
             type: res.error ? 'error' : 'success',
             message: res.message,
         });
@@ -86,5 +86,6 @@ export const getUserDetail = () =>
 
 export const logout = () =>
     Request({ method: 'get', url: `v1/user/logout` }).then((res) => {
+        window.logout();
         return res.error ? res : res?.data?.user;
     });

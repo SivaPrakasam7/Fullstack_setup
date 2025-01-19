@@ -1,7 +1,7 @@
 import Vuex from 'vuex';
 
 //
-import { getUserDetail } from 'src/repository/authentication';
+import { getUserDetail } from 'services/repository/authentication';
 
 //
 import type { IAppStoreProps, IStoreProps, IToast } from './index.types';
@@ -17,12 +17,14 @@ export const mutations: Vuex.MutationTree<IStoreProps> = {
             return;
         }
         state.user = await getUserDetail();
+        window.signedIn = !!state.user?.userId;
 
         localStorage.setItem('lastAccessedDomain', window.location.host);
         callback?.();
     },
     clearUser: async (state) => {
         state.user = null;
+        window.signedIn = false;
     },
 };
 

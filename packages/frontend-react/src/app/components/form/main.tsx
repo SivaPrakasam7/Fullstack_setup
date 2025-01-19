@@ -1,7 +1,7 @@
 import { FormEvent, ReactNode, useEffect, useState } from 'react';
 
 //
-import { getTagValues } from 'src/constants';
+import { getTagValues } from 'services/constants';
 
 //
 import { IFieldChange, IFormField } from './form.types';

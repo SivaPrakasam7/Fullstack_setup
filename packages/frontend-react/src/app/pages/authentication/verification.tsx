@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+
+//
+import { routes } from 'services/constants/routes';
+import { verifyAccount } from 'services/repository/authentication';
 import SvgIcon from 'src/app/components/svg';
-import { routes } from 'src/constants/routes';
-import { verifyAccount } from 'src/repository/authentication';
 
 //
 export default () => {

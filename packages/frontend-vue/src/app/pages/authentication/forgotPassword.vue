@@ -22,8 +22,8 @@
 
 <script lang="ts">
 //
-import { requestResetPassword } from 'src/repository/authentication';
-import { emailRegex } from 'src/constants/regex';
+import { requestResetPassword } from 'services/repository/authentication';
+import { emailRegex } from 'services/constants/regex';
 import { IFormField } from 'src/app/components/form/form.types';
 
 //

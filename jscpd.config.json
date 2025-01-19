@@ -1,6 +1,6 @@
 {
-    "threshold": 10,
-    "languages": ["javascript", "typescript", "vue", "html", "css"],
+    "threshold": 5,
+    "languages": ["javascript", "typescript", "react", "vue", "html", "css"],
     "reporters": ["console"],
     "absolute": true,
     "gitignore": true

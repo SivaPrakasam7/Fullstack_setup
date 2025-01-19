@@ -16,8 +16,9 @@
 
 <script lang="ts">
 //
-import { changePassword } from 'src/repository/authentication';
-import { passwordRegex } from 'src/constants/regex';
+import { changePassword } from 'services/repository/authentication';
+import { passwordRegex } from 'services/constants/regex';
+import { routes } from 'services/constants/routes';
 import { IFormField } from 'src/app/components/form/form.types';
 
 //
@@ -70,7 +71,7 @@ export default {
     },
     mounted() {
         if (!this.$router.currentRoute.value.query.token) {
-            this.$router.push({ name: 'main' });
+            this.$router.push({ path: routes.root });
         }
     },
     methods: {
@@ -79,7 +80,7 @@ export default {
                 payload,
                 this.$router.currentRoute.value.query.token as string
             );
-            if (!res.error) this.$router.push({ name: 'signIn' });
+            if (!res.error) this.$router.push({ path: routes.signIn });
             return !res.error;
         },
     },

@@ -22,8 +22,12 @@
 
 <script lang="ts">
 //
-import { register } from 'src/repository/authentication';
-import { emailRegex, fullNameRegex, passwordRegex } from 'src/constants/regex';
+import { register } from 'services/repository/authentication';
+import {
+    emailRegex,
+    fullNameRegex,
+    passwordRegex,
+} from 'services/constants/regex';
 import { IFormField } from 'src/app/components/form/form.types';
 
 //

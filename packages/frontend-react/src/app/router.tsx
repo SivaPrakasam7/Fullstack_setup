@@ -2,9 +2,9 @@ import { lazy, ReactNode, useContext } from 'react';
 import { Navigate, useRoutes } from 'react-router-dom';
 
 //
+import { routes } from 'services/constants/routes';
 import { UserContext } from 'src/providers/context';
-import { CommonPage } from './components/page';
-import { routes } from 'src/constants/routes';
+import { CommonPage } from 'src/app/components/page';
 
 //
 const Private = ({

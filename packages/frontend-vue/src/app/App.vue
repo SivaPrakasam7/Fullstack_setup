@@ -15,7 +15,9 @@
 import { RouterView } from 'vue-router';
 
 //
-import { appStore } from 'src/store';
+import { routes } from 'services/constants/routes';
+import { appStore, store } from 'src/store';
+import router from 'src/app/router';
 
 //
 import Toast from 'src/app/components/toast.vue';
@@ -35,6 +37,13 @@ export default {
     created() {
         document.getElementsByTagName('title')[0]!.innerText =
             import.meta.env.VITE_APP_NAME;
+        window.logout = () => {
+            store.commit('clearUser');
+            router.push({ path: routes.root });
+        };
+        window.showToast = (toast) => {
+            appStore.commit('setToast', toast);
+        };
     },
 };
 </script>

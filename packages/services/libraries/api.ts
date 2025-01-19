@@ -1,8 +1,6 @@
 import * as Axios from 'axios';
-import { baseURL } from 'src/constants';
-import { store } from 'src/store';
-import router from 'src/app/router';
-import { encrypt } from 'src/repository/utils';
+import { baseURL } from '../constants';
+import { encrypt } from '../repository/utils';
 
 const client = Axios.default.create({
     baseURL,
@@ -46,10 +44,9 @@ export const Request = async (
                 if (
                     e.config.baseURL == baseURL &&
                     e.response.status === 401 &&
-                    store.state.user?.id
+                    window.signedIn
                 ) {
-                    store.commit('clearUser');
-                    router.push({ name: 'main' });
+                    window.logout();
                     return {
                         error: true,
                         message: 'Token expired please login',

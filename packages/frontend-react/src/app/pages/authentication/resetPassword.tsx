@@ -1,10 +1,12 @@
 import { useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+
+//
+import { passwordRegex } from 'services/constants/regex';
+import { routes } from 'services/constants/routes';
+import { changePassword } from 'services/repository/authentication';
 import { IFormField } from 'src/app/components/form/form.types';
 import { FormBuilder } from 'src/app/components/form/main';
-import { passwordRegex } from 'src/constants/regex';
-import { routes } from 'src/constants/routes';
-import { changePassword } from 'src/repository/authentication';
 
 //
 const form = {

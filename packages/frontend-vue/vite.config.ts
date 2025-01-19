@@ -58,7 +58,7 @@ export default defineConfig(({ mode }) => {
                     lang: 'en',
                 },
                 srcDir: 'src',
-                filename: 'sw.ts',
+                filename: 'services/sw.ts',
                 strategies: 'injectManifest',
                 registerType: 'autoUpdate',
                 injectManifest: {

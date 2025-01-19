@@ -8,7 +8,7 @@ import {
 } from 'react';
 
 //
-import { getTagValues } from 'src/constants';
+import { getTagValues } from 'services/constants';
 
 //
 import SvgIcon from '../svg';

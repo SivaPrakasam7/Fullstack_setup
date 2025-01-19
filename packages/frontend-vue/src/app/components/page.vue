@@ -10,6 +10,9 @@
 </template>
 
 <script lang="ts">
+import { routes } from 'services/constants/routes';
+
+//
 export default {
     name: 'CommonPage',
     props: {
@@ -20,7 +23,7 @@ export default {
     },
     methods: {
         goToHome() {
-            this.$router.push({ name: 'main' });
+            this.$router.push({ path: routes.root });
         },
     },
 };

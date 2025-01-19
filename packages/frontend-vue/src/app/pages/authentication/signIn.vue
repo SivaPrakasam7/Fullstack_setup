@@ -27,8 +27,9 @@
 
 <script lang="ts">
 //
-import { login } from 'src/repository/authentication';
-import { emailRegex } from 'src/constants/regex';
+import { login } from 'services/repository/authentication';
+import { emailRegex } from 'services/constants/regex';
+import { routes } from 'services/constants/routes';
 import { store } from 'src/store';
 import { IFormField } from 'src/app/components/form/form.types';
 
@@ -75,7 +76,7 @@ export default {
             const res = await login(payload);
             if (!res.error) {
                 await store.commit('getProfile', () => {
-                    this.$router.push({ name: 'main' });
+                    this.$router.push({ path: routes.root });
                 });
             }
             return !res.error;

@@ -1,0 +1,9 @@
+{
+    "compilerOptions": {
+        "module": "esnext", // Use a compatible module format
+        "target": "esnext", // Optional: Set a compatible target for modern JavaScript
+        "moduleResolution": "node", // Optional: Node resolution for modules
+        "strict": true, // Enforce strict type checking
+        "resolveJsonModule": true // Allow importing .json files if needed
+    }
+}

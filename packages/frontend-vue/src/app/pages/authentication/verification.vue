@@ -17,9 +17,13 @@
 </template>
 
 <script lang="ts">
-import { verifyAccount } from 'src/repository/authentication';
+import { verifyAccount } from 'services/repository/authentication';
+import { routes } from 'services/constants/routes';
+
+//
 import SvgIcon from 'src/app/components/svg.vue';
 
+//
 export default {
     name: 'VerificationPage',
     components: { SvgIcon },
@@ -31,7 +35,7 @@ export default {
     },
     mounted() {
         if (!this.$router.currentRoute.value.query.token) {
-            this.$router.push({ name: 'main' });
+            this.$router.push({ path: routes.root });
         } else
             verifyAccount(
                 this.$router.currentRoute.value.query.token as string
@@ -42,7 +46,7 @@ export default {
     },
     methods: {
         goToHome() {
-            this.$router.push({ name: 'main' });
+            this.$router.push({ path: routes.root });
         },
     },
 };

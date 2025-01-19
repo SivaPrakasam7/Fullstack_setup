@@ -146,24 +146,24 @@ This repository provides a **common project setup** for web apps using **React**
 
 4. **Start the development server** (optional, if applicable):
     ```bash
-    npx lerna run dev --stream --scope=frontend --scope=backend
+    npx lerna run dev --stream --scope=frontend-react --scope=backend
     ```
 
 ## Development Workflow
 
 -   Start the frontend and backend:
     ```bash
-    npx lerna run dev --stream --scope=frontend --scope=backend
+    npx lerna run dev --stream --scope=frontend-react --scope=backend
     ```
 -   Run tests:
 
     ```bash
     npx lerna run test --stream --scope=backend
-    npx lerna run cy:run --stream --scope=frontend -- --component --browser chrome
+    npx lerna run cy:run --stream --scope=frontend-react -- --component --browser chrome
 
     # Need to run the app before end to end test
-    npx lerna run dev --stream --scope=frontend --scope=backend -- --mode test
-    npx lerna run cy:run --stream --scope=frontend -- --e2e --browser chrome
+    npx lerna run dev --stream --scope=frontend-react --scope=backend -- --mode test
+    npx lerna run cy:run --stream --scope=frontend-react -- --e2e --browser chrome
     ```
 
 ## Deployment
@@ -171,7 +171,7 @@ This repository provides a **common project setup** for web apps using **React**
 1. **Build**:
 
     ```bash
-    npx lerna run build --stream --scope=frontend --scope=backend
+    npx lerna run build --stream --scope=frontend-react --scope=backend
     ```
 
 2. **Deploy**:
@@ -184,39 +184,10 @@ This repository provides a **common project setup** for web apps using **React**
     pm2 start INITIAL_FILE --name APP_NAME --time
     ```
 
-3. **Nginx** configuration:
+3. **Server configuration**
 
-    ```nginx
-    server {
-        listen 443;
-        server_name domain.com;
-
-        # SSL configurations
-        ssl_certificate      /path_to_ssl_certificate.crt;
-        ssl_certificate_key  /path_to_ssl_certificate_key.key;
-
-        # Proxy configurations
-        # Backend API
-        location /api/ {
-            proxy_pass http://localhost:3006/;
-            proxy_http_version 1.1;
-            proxy_set_header Host $host;
-            proxy_set_header X-Real-IP $remote_addr;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_set_header X-Forwarded-Proto $scheme;
-        }
-
-        # Frontend
-        location / {
-            proxy_pass http://localhost:3000/;
-            proxy_http_version 1.1;
-            proxy_set_header Host $host;
-            proxy_set_header X-Real-IP $remote_addr;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_set_header X-Forwarded-Proto $scheme;
-        }
-    }
-    ```
+-   Nginx: `setup/config/nginx.conf`
+-   Apache: `setup/config/apache.conf`
 
 ## GitHub Actions Workflow
 
@@ -267,7 +238,7 @@ The workflow includes four jobs:
     - **Frontend Deployment**:
 
         - **Environment Setup**: Installs dependencies and configures the frontend environment using `.env` variables.
-        - **Build and Deploy**: Builds the frontend using `npm run build` in the `packages/frontend` directory and deploys the built files to the production server using `scp`.
+        - **Build and Deploy**: Builds the frontend using `npm run build` in the `packages/frontend-react` directory and deploys the built files to the production server using `scp`.
 
     - **Selective Deployment**: The workflow is triggered for the `master` branch, deploying only the changed parts (frontend or backend) based on file paths.
 

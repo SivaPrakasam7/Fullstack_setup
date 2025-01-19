@@ -1,11 +1,13 @@
 import { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
+
+//
+import { emailRegex } from 'services/constants/regex';
+import { routes } from 'services/constants/routes';
+import { login } from 'services/repository/authentication';
 import { IFormField } from 'src/app/components/form/form.types';
 import { FormBuilder } from 'src/app/components/form/main';
-import { emailRegex } from 'src/constants/regex';
-import { routes } from 'src/constants/routes';
 import { UserContext } from 'src/providers/context';
-import { login } from 'src/repository/authentication';
 
 //
 const form = {

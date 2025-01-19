@@ -23,9 +23,11 @@
 </template>
 
 <script lang="ts">
+import { logout } from 'services/repository/authentication';
+import { routes } from 'services/constants/routes';
 import { store } from 'src/store';
-import { logout } from 'src/repository/authentication';
 
+//
 export default {
     name: 'MainPage',
     data() {
@@ -45,10 +47,10 @@ export default {
 
     methods: {
         goToSignIn() {
-            this.$router.push({ name: 'signIn' });
+            this.$router.push({ path: routes.signIn });
         },
         goToSignUp() {
-            this.$router.push({ name: 'signUp' });
+            this.$router.push({ path: routes.signUp });
         },
     },
 };

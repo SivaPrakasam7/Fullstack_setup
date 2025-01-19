@@ -190,6 +190,7 @@ import type { PropType } from 'vue';
 
 //
 import type { IFieldChange, IFormField } from './form.types';
+import { getTagValues } from 'services/constants';
 
 //
 import Calendar from './calendar.vue';
@@ -261,19 +262,10 @@ export default {
                 } else
                     payload[key] =
                         this.data[key].type === 'tag'
-                            ? this.getTagValues(this.data[key].value)
+                            ? getTagValues(this.data[key].value)
                             : this.data[key].value;
             }
             return payload;
-        },
-        getTagValues(v: string) {
-            return [
-                ...new Set(
-                    `${v}`
-                        .split(/( |;|,)/g)
-                        .filter((t) => !!t.replaceAll(/(\s|;|,)/g, '').trim())
-                ),
-            ];
         },
         onFieldChange(field: IFieldChange) {
             this.data[field.name] = field.ref

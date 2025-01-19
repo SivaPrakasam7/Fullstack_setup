@@ -1,7 +1,7 @@
+import { emailRegex } from 'services/constants/regex';
+import { requestResetPassword } from 'services/repository/authentication';
 import { IFormField } from 'src/app/components/form/form.types';
 import { FormBuilder } from 'src/app/components/form/main';
-import { emailRegex } from 'src/constants/regex';
-import { requestResetPassword } from 'src/repository/authentication';
 
 //
 const form = {

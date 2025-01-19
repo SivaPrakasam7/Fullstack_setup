@@ -30,6 +30,12 @@ interface Window {
         openWindow: (arg0: string) => any;
     };
     encryptionKey: string;
+    signedIn: boolean;
+    logout: () => void;
+    showToast: (toast: {
+        type: 'info' | 'error' | 'warning' | 'success';
+        message: string;
+    }) => void;
 }
 
 interface Event {

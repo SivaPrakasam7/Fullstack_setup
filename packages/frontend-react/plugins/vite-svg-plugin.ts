@@ -2,7 +2,7 @@ import { Plugin } from 'vite';
 import { readFileSync, readdirSync, statSync } from 'fs';
 import { resolve, basename, join } from 'path';
 
-function getAllSvgFiles(dir: string): Record<string, string> {
+const getAllSvgFiles = (dir: string): Record<string, string> => {
     const svgMap: Record<string, string> = {};
 
     function readDirectory(directory: string) {
@@ -27,9 +27,9 @@ function getAllSvgFiles(dir: string): Record<string, string> {
 
     readDirectory(dir);
     return svgMap;
-}
+};
 
-export function svgIconsPlugin(svgDir: string): Plugin {
+export const svgIconsPlugin = (svgDir: string): Plugin => {
     const svgMap = getAllSvgFiles(svgDir);
 
     return {
@@ -49,4 +49,4 @@ export function svgIconsPlugin(svgDir: string): Plugin {
             }
         },
     };
-}
+};

@@ -2,8 +2,9 @@ import { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 //
+import { routes } from 'services/constants/routes';
+import { logout } from 'services/repository/authentication';
 import { UserContext } from 'src/providers/context';
-import { logout } from 'src/repository/authentication';
 
 //
 export default () => {
@@ -11,11 +12,11 @@ export default () => {
     const navigate = useNavigate();
 
     const goToSignIn = () => {
-        navigate('/sign-in');
+        navigate(routes.signIn);
     };
 
     const goToSignUp = () => {
-        navigate('/sign-up');
+        navigate(routes.signUp);
     };
 
     const _logout = async () => {

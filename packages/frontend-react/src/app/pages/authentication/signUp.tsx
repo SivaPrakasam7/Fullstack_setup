@@ -1,7 +1,11 @@
+import {
+    emailRegex,
+    fullNameRegex,
+    passwordRegex,
+} from 'services/constants/regex';
+import { register } from 'services/repository/authentication';
 import { IFormField } from 'src/app/components/form/form.types';
 import { FormBuilder } from 'src/app/components/form/main';
-import { emailRegex, fullNameRegex, passwordRegex } from 'src/constants/regex';
-import { register } from 'src/repository/authentication';
 
 //
 const form = {
