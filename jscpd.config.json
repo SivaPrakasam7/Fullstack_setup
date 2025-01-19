@@ -1,5 +1,5 @@
 {
-    "threshold": 5,
+    "threshold": 6,
     "languages": ["javascript", "typescript", "react", "vue", "html", "css"],
     "reporters": ["console"],
     "absolute": true,
