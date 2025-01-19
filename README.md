@@ -61,19 +61,19 @@ Below is a demonstration of the Cypress End-to-End (E2E) Test Execution, showcas
 
 ## Table of Contents
 
--   [Project Setup](#project-setup)
--   [Technologies](#technologies)
-    -   [Frontend](#frontend)
-    -   [Backend](#backend)
-    -   [Database](#database)
-    -   [Additional Tools](#additional-tools)
-    -   [Testing and CI/CD](#testing-and-cicd)
--   [Key Features](#key-features)
--   [Code Architecture Flow Diagram](#code-architecture-flow-diagram)
--   [Installation](#installation)
--   [Development Workflow](#development-workflow)
--   [Deployment](#deployment)
--   [GitHub Actions Workflow](#github-actions-workflow)
+- [Project Setup](#project-setup)
+- [Technologies](#technologies)
+    - [Frontend](#frontend)
+    - [Backend](#backend)
+    - [Database](#database)
+    - [Additional Tools](#additional-tools)
+    - [Testing and CI/CD](#testing-and-cicd)
+- [Key Features](#key-features)
+- [Code Architecture Flow Diagram](#code-architecture-flow-diagram)
+- [Installation](#installation)
+- [Development Workflow](#development-workflow)
+- [Deployment](#deployment)
+- [GitHub Actions Workflow](#github-actions-workflow)
 
 ## Project Setup
 
@@ -83,44 +83,44 @@ This repository provides a **common project setup** for web apps using **React**
 
 ### Frontend
 
--   **React & Vue**: Popular frontend framework for building user interfaces.
--   **Vite**: Fast build tool for modern web development with support for hot module replacement.
--   **TypeScript**: Superset of JavaScript providing static typing for better code quality.
--   **Tailwind CSS**: Utility-first CSS framework for quickly styling components.
--   **Service Worker**: Enables background tasks and improves performance in Progressive Web Apps (PWA).
--   **Vite Plugins**: Added for optimizing PWA features and removing unnecessary test case IDs in production builds.
+- **React & Vue**: Popular frontend framework for building user interfaces.
+- **Vite**: Fast build tool for modern web development with support for hot module replacement.
+- **TypeScript**: Superset of JavaScript providing static typing for better code quality.
+- **Tailwind CSS**: Utility-first CSS framework for quickly styling components.
+- **Service Worker**: Enables background tasks and improves performance in Progressive Web Apps (PWA).
+- **Vite Plugins**: Added for optimizing PWA features and removing unnecessary test case IDs in production builds.
 
 ### Backend
 
--   **Node.js**: JavaScript runtime for building scalable backend services.
--   **Error/Security Middlewares**: Handles error responses, security measures, and logs access/errors for auditing.
--   **Swagger**: Used for API documentation, providing a user-friendly interface to explore and test API endpoints.
+- **Node.js**: JavaScript runtime for building scalable backend services.
+- **Error/Security Middlewares**: Handles error responses, security measures, and logs access/errors for auditing.
+- **Swagger**: Used for API documentation, providing a user-friendly interface to explore and test API endpoints.
 
 ### Database
 
--   **MySQL**: Relational database used for storing and managing data.
+- **MySQL**: Relational database used for storing and managing data.
 
 ### Additional Tools
 
--   **Lerna**: Monorepo tool to manage multiple projects and dependencies.
--   **Prettier**: Code formatter that ensures consistent coding styles.
--   **ESLint**: Linter for identifying and fixing code quality issues.
--   **JSCPD**: Tool for detecting duplicate code across the codebase.
--   **Husky**: Git hooks tool used for running automated tasks such as code formatting with Prettier and linting with ESLint during pre-commit.
+- **Lerna**: Monorepo tool to manage multiple projects and dependencies.
+- **Prettier**: Code formatter that ensures consistent coding styles.
+- **ESLint**: Linter for identifying and fixing code quality issues.
+- **JSCPD**: Tool for detecting duplicate code across the codebase.
+- **Husky**: Git hooks tool used for running automated tasks such as code formatting with Prettier and linting with ESLint during pre-commit.
 
 ### Testing and CI/CD
 
--   **Cypress**: Component and End-to-End testing framework for frontend applications.
--   **Jest**: Used in backend services for unit and integration testing.
--   **GitHub Actions**: CI/CD tool used to automate code quality checks, run Cypress tests, and manage workflows for pull requests and pushes.
+- **Cypress**: Component and End-to-End testing framework for frontend applications.
+- **Jest**: Used in backend services for unit and integration testing.
+- **GitHub Actions**: CI/CD tool used to automate code quality checks, run Cypress tests, and manage workflows for pull requests and pushes.
 
 ## Key Features
 
--   **Monorepo Architecture**: Efficiently manage frontend and backend within a single repository using Lerna.
--   **Comprehensive Testing**: Includes unit, integration, component, and end-to-end tests with Jest and Cypress.
--   **Performance Optimization**: Utilizes Vite for fast builds and Service Workers for PWA capabilities.
--   **Automated Workflows**: GitHub Actions ensure code quality and testing on every pull request.
--   **Seamless Deployment**: Easy deployment process with Nginx and PM2.
+- **Monorepo Architecture**: Efficiently manage frontend and backend within a single repository using Lerna.
+- **Comprehensive Testing**: Includes unit, integration, component, and end-to-end tests with Jest and Cypress.
+- **Performance Optimization**: Utilizes Vite for fast builds and Service Workers for PWA capabilities.
+- **Automated Workflows**: GitHub Actions ensure code quality and testing on every pull request.
+- **Seamless Deployment**: Easy deployment process with Nginx and PM2.
 
 ## Code Architecture Flow Diagram
 
@@ -151,11 +151,11 @@ This repository provides a **common project setup** for web apps using **React**
 
 ## Development Workflow
 
--   Start the frontend and backend:
+- Start the frontend and backend:
     ```bash
     npx lerna run dev --stream --scope=frontend-react --scope=backend
     ```
--   Run tests:
+- Run tests:
 
     ```bash
     npx lerna run test --stream --scope=backend
@@ -186,8 +186,8 @@ This repository provides a **common project setup** for web apps using **React**
 
 3. **Server configuration**
 
--   Nginx: `setup/config/nginx.conf`
--   Apache: `setup/config/apache.conf`
+- Nginx: `setup/config/nginx.conf`
+- Apache: `setup/config/apache.conf`
 
 ## GitHub Actions Workflow
 
@@ -197,8 +197,8 @@ This repository includes a GitHub Actions workflow for automating code quality c
 
 The workflow is triggered on:
 
--   Pull requests targeting the `master` branch (on open, synchronize, and reopen events).
--   Push events to the `master` branch.
+- Pull requests targeting the `master` branch (on open, synchronize, and reopen events).
+- Push events to the `master` branch.
 
 The workflow includes four jobs:
 
