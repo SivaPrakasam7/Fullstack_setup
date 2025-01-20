@@ -7,6 +7,7 @@ require('dotenv').config();
 
 const databaseName = process.env.DATABASE_NAME;
 const logDatabaseName = process.env.LOG_DATABASE_NAME;
+const keyDatabaseName = process.env.KEY_DATABASE_NAME;
 
 // MySQL connection setup
 const connection = mysql.createConnection({
@@ -31,7 +32,16 @@ const ensureDatabaseExists = (databaseName) => {
                         console.log(
                             `Database ${logDatabaseName} ensured to exist.`
                         );
-                        resolve();
+                        connection.query(
+                            `CREATE DATABASE IF NOT EXISTS \`${keyDatabaseName}\`;`,
+                            (err) => {
+                                if (err) return reject(err);
+                                console.log(
+                                    `Database ${keyDatabaseName} ensured to exist.`
+                                );
+                                resolve();
+                            }
+                        );
                     }
                 );
             }

@@ -23,14 +23,17 @@ export const Request = async (
     headers?: Axios.RawAxiosRequestHeaders
 ): Promise<ILargeRecord & { error: boolean }> => {
     const _call = async () => {
-        const encryptedData = await encrypt(data);
+        const encryptedData =
+            headers?.['Content-Type'] === 'multipart/form-data'
+                ? data
+                : await encrypt(data);
         const response = await client({
             ...options,
             headers: {
                 'Content-Type': 'application/json',
                 ...headers,
             },
-            data: { encryptedData },
+            data: encryptedData,
         })
             .then((res) => res.data)
             .catch((e) => {

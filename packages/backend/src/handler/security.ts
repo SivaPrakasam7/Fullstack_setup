@@ -4,6 +4,7 @@ import { createError } from './error';
 import { IMiddleWare } from './middleware';
 
 //
+import { addKeyPairRepo, getKeysRepo } from '../../src/repository/security';
 import messages from '../utils/messages';
 
 //
@@ -30,22 +31,50 @@ export const getPublicKey: IMiddleWare = async (__, res, _) => {
         keyPair.privateKey
     );
 
-    const newClientId = generateClientId();
+    const clientId = generateClientId();
+    const createdAt = Date.now();
 
-    userKeys[newClientId] = { publicKey, privateKey, createdAt: Date.now() };
+    const privateKeyString = btoa(
+        String.fromCharCode(...new Uint8Array(privateKey))
+    );
+    const publicKeyString = btoa(
+        String.fromCharCode(...new Uint8Array(publicKey))
+    );
+    await addKeyPairRepo({
+        clientId,
+        publicKey: publicKeyString,
+        privateKey: privateKeyString,
+        createdAt: createdAt.toString(),
+    });
 
-    res.cookie('clientId', newClientId, {
+    userKeys[clientId] = { publicKey, privateKey, createdAt };
+
+    res.cookie('clientId', clientId, {
         httpOnly: true,
         secure: true,
         sameSite: 'strict',
         maxAge: +process.env.KEY_ROTATION_INTERVAL!,
     });
     res.status(200).json({
-        publicKey: Buffer.from(publicKey).toString('base64'),
+        publicKey: publicKeyString,
     });
 };
 
-export const getPrivateKey = async (privateKey: ArrayBuffer) => {
+export const getPrivateKey = async (clientId: string) => {
+    if (!userKeys[clientId]?.privateKey) {
+        const { publicKey, privateKey, createdAt } =
+            await getKeysRepo(clientId);
+        userKeys[clientId] = {
+            publicKey: Uint8Array.from(Buffer.from(publicKey, 'base64')),
+            privateKey: Uint8Array.from(Buffer.from(privateKey, 'base64')),
+            createdAt: +createdAt,
+        };
+    }
+
+    const privateKey = userKeys[clientId]?.privateKey;
+
+    if (!privateKey) return;
+
     const privateKeyObject = await crypto.subtle.importKey(
         'pkcs8',
         privateKey,
@@ -57,48 +86,50 @@ export const getPrivateKey = async (privateKey: ArrayBuffer) => {
     return privateKeyObject;
 };
 
-export const decryptData = async (
-    privateKey: CryptoKey,
-    encryptedDataBase64: string
-) => {
-    const encryptedData = Uint8Array.from(
-        Buffer.from(encryptedDataBase64, 'base64')
-    );
-
-    const decryptedData = await crypto.subtle.decrypt(
-        { name: 'RSA-OAEP' },
-        privateKey,
-        encryptedData
-    );
-
-    return new TextDecoder().decode(decryptedData);
-};
-
 export const decryptPayload: IMiddleWare = async (req, _, next) => {
     try {
-        const clientId = req.cookies.clientId;
+        if (req.method === 'GET') return next();
 
-        if (req.path.includes('publicKey')) return next();
+        const clientId = req.cookies.clientId;
+        const privateKey = await getPrivateKey(clientId);
 
         if (
-            !userKeys[clientId] ||
+            !clientId ||
+            !privateKey ||
             Date.now() - userKeys[clientId]?.createdAt >
                 +process.env.KEY_ROTATION_INTERVAL!
         ) {
             return next(createError(401, messages.responses.keyExpired));
         }
 
-        if (req.body.encryptedData) {
-            const privateKey = userKeys[clientId].privateKey;
-            const privateKeyObject = await getPrivateKey(privateKey);
+        const { encryptedSymmetricKey, encryptedData, iv } = req.body;
 
-            const decryptedData = await decryptData(
-                privateKeyObject,
-                req.body.encryptedData
-            );
+        if (!encryptedSymmetricKey || !encryptedData || !iv) return next();
 
-            req.body = JSON.parse(decryptedData);
-        }
+        const symmetricKeyRaw = await crypto.subtle.decrypt(
+            { name: 'RSA-OAEP' },
+            privateKey,
+            Uint8Array.from(Buffer.from(encryptedSymmetricKey, 'base64'))
+        );
+
+        const symmetricKey = await crypto.subtle.importKey(
+            'raw',
+            symmetricKeyRaw,
+            { name: 'AES-GCM' },
+            false,
+            ['decrypt']
+        );
+
+        const decryptedData = await crypto.subtle.decrypt(
+            {
+                name: 'AES-GCM',
+                iv: Uint8Array.from(Buffer.from(iv, 'base64')),
+            },
+            symmetricKey,
+            Uint8Array.from(Buffer.from(encryptedData, 'base64'))
+        );
+
+        req.body = JSON.parse(new TextDecoder().decode(decryptedData));
         next();
     } catch {
         next(createError(401, messages.responses.keyExpired));

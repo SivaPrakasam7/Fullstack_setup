@@ -14,35 +14,53 @@ export const encrypt = async (data: Record<string, string>) => {
         const binaryData = Uint8Array.from(binaryString, (char) =>
             char.charCodeAt(0)
         );
-
         const publicKey = await crypto.subtle.importKey(
             'spki',
             binaryData,
-            {
-                name: 'RSA-OAEP',
-                hash: 'SHA-256',
-            },
+            { name: 'RSA-OAEP', hash: 'SHA-256' },
             false,
             ['encrypt']
         );
 
+        const symmetricKey = await crypto.subtle.generateKey(
+            { name: 'AES-GCM', length: 256 },
+            true,
+            ['encrypt', 'decrypt']
+        );
+
+        const symmetricKeyRaw = await crypto.subtle.exportKey(
+            'raw',
+            symmetricKey
+        );
+
+        const encryptedSymmetricKey = await crypto.subtle.encrypt(
+            { name: 'RSA-OAEP' },
+            publicKey,
+            symmetricKeyRaw
+        );
+
         const encoder = new TextEncoder();
         const encodedData = encoder.encode(JSON.stringify(data));
+        const iv = crypto.getRandomValues(new Uint8Array(12));
+        const encryptedData = await crypto.subtle.encrypt(
+            { name: 'AES-GCM', iv },
+            symmetricKey,
+            encodedData
+        );
 
-        try {
-            const encryptedData = await crypto.subtle.encrypt(
-                { name: 'RSA-OAEP' },
-                publicKey,
-                encodedData
-            );
-            const encryptedBase64 = btoa(
-                String.fromCharCode(...new Uint8Array(encryptedData))
-            );
+        const encryptedSymmetricKeyBase64 = btoa(
+            String.fromCharCode(...new Uint8Array(encryptedSymmetricKey))
+        );
+        const encryptedDataBase64 = btoa(
+            String.fromCharCode(...new Uint8Array(encryptedData))
+        );
+        const ivBase64 = btoa(String.fromCharCode(...iv));
 
-            return { encryptedData: encryptedBase64 };
-        } catch {
-            return {};
-        }
+        return {
+            encryptedSymmetricKey: encryptedSymmetricKeyBase64,
+            encryptedData: encryptedDataBase64,
+            iv: ivBase64,
+        };
     }
     return data;
 };

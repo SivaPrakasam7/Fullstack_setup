@@ -67,8 +67,17 @@ describe('Authentication', () => {
         cy.get('[data-testid="SUBMIT"]').click();
 
         cy.wait('@createAccount').then((interception) => {
-            token = interception.response?.body?.message;
-            expect(interception.response?.statusCode).to.equal(200);
+            if (interception.response?.statusCode === 401) {
+                cy.wait('@createAccount').then((interception) => {
+                    token = interception.response?.body?.message;
+
+                    expect(interception.response?.statusCode).to.equal(200);
+                });
+            } else {
+                token = interception.response?.body?.message;
+
+                expect(interception.response?.statusCode).to.equal(200);
+            }
         });
     });
 
@@ -120,7 +129,11 @@ describe('Authentication', () => {
         cy.get('[data-testid="SUBMIT"]').click();
 
         cy.wait('@loginAccount').then((interception) => {
-            expect(interception.response?.statusCode).to.equal(200);
+            if (interception.response?.statusCode === 401) {
+                cy.wait('@loginAccount').then((interception) => {
+                    expect(interception.response?.statusCode).to.equal(200);
+                });
+            } else expect(interception.response?.statusCode).to.equal(200);
         });
         cy.wait('@profileCall').then((interception) => {
             expect(interception.response?.statusCode).to.equal(200);
@@ -158,8 +171,15 @@ describe('Authentication', () => {
         cy.get('[data-testid="SUBMIT"]').click();
 
         cy.wait('@forgotPassword').then((interception) => {
-            token = interception.response?.body?.message;
-            expect(interception.response?.statusCode).to.equal(200);
+            if (interception.response?.statusCode === 401) {
+                cy.wait('@forgotPassword').then((interception) => {
+                    token = interception.response?.body?.message;
+                    expect(interception.response?.statusCode).to.equal(200);
+                });
+            } else {
+                token = interception.response?.body?.message;
+                expect(interception.response?.statusCode).to.equal(200);
+            }
         });
     });
 
@@ -205,7 +225,11 @@ describe('Authentication', () => {
         cy.get('[data-testid="SUBMIT"]').click();
 
         cy.wait('@changePassword').then((interception) => {
-            expect(interception.response?.statusCode).to.equal(200);
+            if (interception.response?.statusCode === 401) {
+                cy.wait('@changePassword').then((interception) => {
+                    expect(interception.response?.statusCode).to.equal(200);
+                });
+            } else expect(interception.response?.statusCode).to.equal(200);
         });
     });
 
@@ -228,10 +252,19 @@ describe('Authentication', () => {
         cy.get('[data-testId="SUBMIT"]').click();
 
         cy.wait('@changePassword').then((interception) => {
-            expect(interception.response?.statusCode).to.equal(400);
-            expect(interception.response?.body?.message).to.equal(
-                'Password change failed'
-            );
+            if (interception.response?.statusCode === 401) {
+                cy.wait('@changePassword').then((interception) => {
+                    expect(interception.response?.statusCode).to.equal(400);
+                    expect(interception.response?.body?.message).to.equal(
+                        'Password change failed'
+                    );
+                });
+            } else {
+                expect(interception.response?.statusCode).to.equal(400);
+                expect(interception.response?.body?.message).to.equal(
+                    'Password change failed'
+                );
+            }
         });
     });
 
@@ -245,7 +278,11 @@ describe('Authentication', () => {
             cy.get('[data-testId="SUBMIT"]').click();
 
             cy.wait('@loginAccount').then((interception) => {
-                expect(interception.response?.statusCode).to.equal(400);
+                if (interception.response?.statusCode === 401) {
+                    cy.wait('@loginAccount').then((interception) => {
+                        expect(interception.response?.statusCode).to.equal(400);
+                    });
+                } else expect(interception.response?.statusCode).to.equal(400);
             });
             cy.get('[data-testId="TOAST"]').should(
                 'include.text',
