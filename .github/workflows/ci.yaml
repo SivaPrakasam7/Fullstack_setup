@@ -9,6 +9,7 @@ on:
                 'packages/backend/**',
                 'packages/frontend-react/**',
                 'packages/frontend-vue/**',
+                'packages/services/**',
             ]
 
     push:
@@ -18,6 +19,7 @@ on:
                 'packages/backend/**',
                 'packages/frontend-react/**',
                 'packages/frontend-vue/**',
+                'packages/services/**',
             ]
 
 concurrency:

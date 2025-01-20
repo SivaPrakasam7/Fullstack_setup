@@ -29,14 +29,14 @@ app.use(helmet());
 app.use(helmet.xssFilter());
 app.use(helmet.noSniff());
 app.use(helmet.hidePoweredBy());
-app.use(decryptPayload);
-app.use(logAccess);
 
 app.get('/', (_, res) => {
     res.send('API running successfully!');
 });
-
 app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerSpec));
+
+app.use(decryptPayload);
+app.use(logAccess);
 
 app.use('/v1/user', userRotes);
 app.use('/v1/security', securityRoutes);

@@ -2,7 +2,7 @@
 
 [![Lerna](https://img.shields.io/badge/Maintained%20with-Lerna-cc00ff.svg)](https://lerna.js.org/)
 [![Vite](https://img.shields.io/badge/Created%20with-Vite-ddbb00.svg)](https://vitejs.dev/)
-[![React](https://img.shields.io/badge/Developed%20with-React-61DAFB.svg)](https://reactjs.org/)
+[![React](https://img.shields.io/badge/Developed%20with-React-61DAFB.svg)](https://react.dev/)
 [![Vue](https://img.shields.io/badge/Developed%20with-Vue-42b883.svg)](https://vuejs.org/)
 [![Typescript](https://img.shields.io/badge/Support-Typescript-3178c6.svg)](https://vitejs.dev/)
 [![Cypress](https://img.shields.io/badge/Tested%20with-Cypress-007780.svg)](https://www.cypress.io/)

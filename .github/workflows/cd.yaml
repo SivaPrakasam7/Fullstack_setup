@@ -3,7 +3,13 @@ name: Production deployment CD
 on:
     push:
         branches: [production]
-        paths: ['packages/frontend/**', 'packages/backend/**']
+        paths:
+            [
+                'packages/backend/**',
+                'packages/frontend-react/**',
+                'packages/frontend-vue/**',
+                'packages/services/**',
+            ]
 
 concurrency:
     group: ${{ github.ref }}

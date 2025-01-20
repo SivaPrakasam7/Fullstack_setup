@@ -130,7 +130,7 @@ export const requestVerificationService = async (userId: string) => {
     const emailVerificationLink = `${process.env.PROTOCOL}://${process.env.DOMAIN}/${process.env.VERIFICATION_URL}${verificationToken}`;
 
     await sendMail(
-        '../templates/verification.ejs',
+        `${process.env.MAIN_PATH}/templates/verification.ejs`,
         {
             title: 'Email verification',
             name: user.name,
@@ -188,7 +188,7 @@ export const forgotPasswordService: IService<string> = async (data) => {
     const resetPasswordLink = `${process.env.PROTOCOL}://${process.env.DOMAIN}/${process.env.RESET_PASSWORD_URL}${token}`;
 
     await sendMail(
-        '../templates/reset-password.ejs',
+        `${process.env.MAIN_PATH}/templates/reset-password.ejs`,
         {
             title: 'Reset your password',
             name: user.name,
