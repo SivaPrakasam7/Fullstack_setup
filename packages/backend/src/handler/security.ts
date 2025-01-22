@@ -88,7 +88,11 @@ export const getPrivateKey = async (clientId: string) => {
 
 export const decryptPayload: IMiddleWare = async (req, _, next) => {
     try {
-        if (req.method === 'GET') return next();
+        if (
+            req.method === 'GET' ||
+            req.headers['content-type']?.includes('multipart/form-data')
+        )
+            return next();
 
         const clientId = req.cookies.clientId;
         const privateKey = await getPrivateKey(clientId);
@@ -104,7 +108,8 @@ export const decryptPayload: IMiddleWare = async (req, _, next) => {
 
         const { encryptedSymmetricKey, encryptedData, iv } = req.body;
 
-        if (!encryptedSymmetricKey || !encryptedData || !iv) return next();
+        if (!encryptedSymmetricKey || !encryptedData || !iv)
+            return next(createError(400, messages.responses.invalidRequest));
 
         const symmetricKeyRaw = await crypto.subtle.decrypt(
             { name: 'RSA-OAEP' },

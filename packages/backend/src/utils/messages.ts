@@ -21,6 +21,7 @@ export default {
         notFound: 'Not found',
         mailSent: 'Mail sent successfully!',
         keyExpired: 'KEY_EXPIRED',
+        invalidRequest: 'Invalid request',
         accountSuspended: (time: number) =>
             `Your account is suspended. It will be resumed in ${time} minutes due to 3 invalid credential attempts`,
     },
