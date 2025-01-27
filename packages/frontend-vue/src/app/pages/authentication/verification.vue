@@ -17,7 +17,7 @@
 </template>
 
 <script lang="ts">
-import { verifyAccount } from 'services/repository/authentication';
+import { verifyEmailAccount } from 'services/repository/authentication';
 import { routes } from 'services/constants/routes';
 
 //
@@ -37,7 +37,7 @@ export default {
         if (!this.$router.currentRoute.value.query.token) {
             this.$router.push({ path: routes.root });
         } else
-            verifyAccount(
+            verifyEmailAccount(
                 this.$router.currentRoute.value.query.token as string
             ).then((res) => {
                 this.error = res.error;

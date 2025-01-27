@@ -16,46 +16,87 @@ export const createUserRepo = async ({
     userId,
     name,
     email,
+    phoneNumber,
     profileURL,
     passwordHash,
     providerId,
     secretKey,
 }: IUser) => {
-    const query = `INSERT INTO users (userId, name, email, profileURL, passwordHash, providerId, secretKey) VALUES(?, ?, ?, ?, ?, ?, ?)`;
+    const query = `INSERT INTO users (userId, name, email, phoneNumber, profileURL, passwordHash, providerId, secretKey) VALUES(?, ?, ?, ?, ?, ?, ?, ?)`;
 
     const queryResponse = await executeQuery(query, [
         userId,
         name,
         email,
+        phoneNumber,
         profileURL,
         passwordHash,
         providerId,
         secretKey,
     ]);
 
-    const verificationQuery = `INSERT INTO verifications (source) VALUES(?)`;
-
-    const verificationQueryResponse = await executeQuery(verificationQuery, [
-        email,
-    ]);
-
-    return queryResponse.insertId && verificationQueryResponse.insertId;
+    return queryResponse.insertId;
 };
 
-export const updateVerificationRepo = async (source: string) => {
-    const query = `UPDATE verifications SET verified=1 WHERE source=?`;
+export const updateEmailVerification = async (email: string) => {
+    const query = `INSERT INTO verifications (source) VALUES (?)`;
 
-    const queryResponse = await executeQuery(query, [source]);
+    const queryResponse = await executeQuery(query, [email]);
 
     return queryResponse.affectedRows;
 };
 
-export const getUserBySourceRepo = async ({ email }: Pick<IUser, 'email'>) => {
-    const query = `SELECT * FROM users WHERE email=? AND isDeleted=0`;
+export const updateVerificationOTP = async (
+    phoneNumber: string,
+    otp: string
+) => {
+    const query = `INSERT INTO verifications (source, code) VALUES (?, ?) ON DUPLICATE KEY UPDATE code = VALUES(code)`;
 
-    const queryResponse = await executeQuery(query, [email]);
+    const queryResponse = await executeQuery(query, [phoneNumber, otp]);
 
-    return queryResponse[0];
+    return queryResponse.affectedRows;
+};
+
+export const updateVerificationRepo = async (
+    source: string,
+    type: 'email' | 'phone',
+    otp?: string
+) => {
+    if (type === 'email') {
+        const query = `UPDATE verifications SET verified=1 WHERE source=?`;
+
+        const queryResponse = await executeQuery(query, [source]);
+
+        return queryResponse.affectedRows;
+    } else if (type === 'phone') {
+        const query = `UPDATE verifications SET verified=1, code='' WHERE source=? AND code=?`;
+
+        const queryResponse = await executeQuery(query, [source, otp]);
+
+        return queryResponse.affectedRows;
+    }
+};
+
+export const getUserBySourceRepo = async ({
+    email,
+    phoneNumber,
+}: {
+    email?: string;
+    phoneNumber?: string;
+}) => {
+    if (email) {
+        const query = `SELECT * FROM users WHERE email=? AND status='active' AND isDeleted=0`;
+
+        const queryResponse = await executeQuery(query, [email]);
+
+        return queryResponse[0];
+    } else {
+        const query = `SELECT * FROM users WHERE phoneNumber=? AND status='active' AND isDeleted=0`;
+
+        const queryResponse = await executeQuery(query, [phoneNumber]);
+
+        return queryResponse[0];
+    }
 };
 
 export const checkUserVerifiedRepo = async (source: string) => {
@@ -67,7 +108,15 @@ export const checkUserVerifiedRepo = async (source: string) => {
 };
 
 export const getUserByIdRepo = async (userId: string) => {
-    const query = `SELECT * FROM users WHERE userId=? AND isDeleted=0`;
+    const query = `SELECT userId, name, email, phoneNumber, profileURL FROM users WHERE userId=? AND status='active' AND isDeleted=0`;
+
+    const queryResponse = await executeQuery(query, [userId]);
+
+    return queryResponse[0];
+};
+
+export const getLocalUserByIdRepo = async (userId: string) => {
+    const query = `SELECT * FROM users WHERE userId=? AND status='active' AND isDeleted=0`;
 
     const queryResponse = await executeQuery(query, [userId]);
 
@@ -85,7 +134,7 @@ export const updateResetPasswordKeyRepo = async (
     return queryResponse.affectedRows;
 };
 
-export const updatePasswordRepo = async (
+export const updatePasswordByKeyRepo = async (
     passwordHash: string,
     userId: string,
     secretKey: string,
@@ -103,6 +152,17 @@ export const updatePasswordRepo = async (
     return queryResponse.affectedRows;
 };
 
+export const updatePasswordRepo = async (
+    passwordHash: string,
+    userId: string
+) => {
+    const query = `UPDATE users SET passwordHash=? WHERE userId=? AND isDeleted=0`;
+
+    const queryResponse = await executeQuery(query, [passwordHash, userId]);
+
+    return queryResponse.affectedRows;
+};
+
 export const increaseFailedAttemptRepo = async (userId: string) => {
     const query = `UPDATE users SET failedAttempts = failedAttempts+1, isSuspended = CASE WHEN failedAttempts >= 3 THEN 1 ELSE 0 END, suspendedAt = CASE WHEN failedAttempts >= 3 THEN CURRENT_TIMESTAMP ELSE NULL END WHERE userId=? AND isDeleted=0`;
 
@@ -111,7 +171,7 @@ export const increaseFailedAttemptRepo = async (userId: string) => {
     return queryResponse.affectedRows;
 };
 
-export const updateUserRepo = async ({ userId, ...user }: Partial<IUser>) => {
+export const updateUserRepo = async (userId: string, user: Partial<IUser>) => {
     const query = `UPDATE users SET ${Object.entries(user)
         .map(
             ([key, value]) =>
@@ -124,10 +184,23 @@ export const updateUserRepo = async ({ userId, ...user }: Partial<IUser>) => {
     return queryResponse.affectedRows;
 };
 
+export const updateSecretKeyRepo = async (
+    secretKey: string,
+    userId: string
+) => {
+    const query = `UPDATE users SET secretKey=? WHERE userId=? AND isDeleted=0`;
+
+    const queryResponse = await executeQuery(query, [secretKey, userId]);
+
+    return queryResponse.affectedRows;
+};
+
+//
 export interface IUser {
     userId: string;
     name: string | null;
     email: string | null;
+    phoneNumber: string | null;
     profileURL: string | null;
     passwordHash: string | null;
     providerId: string | null;

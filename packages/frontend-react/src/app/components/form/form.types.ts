@@ -47,11 +47,11 @@ export interface IFormField {
     size?: string;
     disabled?: boolean;
     multiple?: boolean;
-    min?: number;
+    min?: string;
     max?: string;
     accept?: string;
     format?: string;
-    options?: string[];
+    options?: { id: string; label: string }[];
     buttonText?: string;
     buttonSize?: string;
     ref?: string;
@@ -60,6 +60,8 @@ export interface IFormField {
     customField?: boolean;
     fileSize?: number;
     cropper?: boolean;
+    length?: number;
+    noError?: boolean;
 
     //
     startIcon?: ReactNode;

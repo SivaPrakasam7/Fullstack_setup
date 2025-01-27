@@ -89,6 +89,11 @@
                     size,
                 ]"
                 autocomplete="off"
+                :value="
+                    ['autocomplete', 'select'].includes(type)
+                        ? options.find((o) => o.id === value)?.label
+                        : value
+                "
                 @input="limitInput($event)"
                 @keypress="filterNumericInput"
                 @paste="filterPaste"
@@ -147,9 +152,9 @@
                     :key="index"
                     :data-testid="option"
                     class="app-button !border-none !rounded-none !justify-start !w-full capitalize"
-                    @click="selectOption(option)"
+                    @click="selectOption(option.id)"
                 >
-                    {{ option }}
+                    {{ option.label }}
                 </li>
                 <li
                     v-if="filterOptions.length === 0"
@@ -273,7 +278,7 @@ export default {
         },
         options: {
             default: () => [],
-            type: Array as PropType<string[]>,
+            type: Array as PropType<{ id: string; label: string }[]>,
         },
         length: {
             default: 4,
@@ -295,11 +300,11 @@ export default {
         filterOptions() {
             return this.type === 'select'
                 ? this.options
-                : this.options.filter((option) =>
-                      option
+                : this.options?.filter((option) =>
+                      `${option.id} ${option.label}`
                           .toLowerCase()
                           .includes(`${this.handleInput}`.toLowerCase())
-                  );
+                  ) || [];
         },
     },
     watch: {

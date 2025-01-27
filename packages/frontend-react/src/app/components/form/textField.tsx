@@ -60,8 +60,8 @@ export const TextField = ({
 > &
     Required<Pick<IFormField, 'type'>> & {
         name: string;
-        noError: boolean;
-        length: number;
+        noError?: boolean;
+        length?: number;
         onChange: (field: IFieldChange) => void;
     }) => {
     const [show, setShow] = useState(
@@ -76,9 +76,11 @@ export const TextField = ({
             type === 'select'
                 ? options || []
                 : options?.filter((option) =>
-                      option.toLowerCase().includes(`${value}`.toLowerCase())
+                      `${option.id} ${option.label}`
+                          .toLowerCase()
+                          .includes(`${value}`.toLowerCase())
                   ) || [],
-        []
+        [options?.length, value]
     );
 
     //
@@ -256,10 +258,10 @@ export const TextField = ({
                             type={type}
                             disabled={disabled}
                             placeholder={placeHolder}
-                            className={`text-md w-full rounded-xl outline-none bg-transparent ${size} ${
+                            className={`text-md rounded-xl outline-none bg-transparent text-center w-10 h-10 ${size} ${
                                 disabled
                                     ? 'bg-gray-400 text-gray-400 dark:text-gray-300'
-                                    : ''
+                                    : 'border hover:border-gray-500'
                             }`}
                             maxLength={1}
                             onInput={(e) => handleInputChange(e, i)}
@@ -269,19 +271,19 @@ export const TextField = ({
                 </div>
             ) : (
                 <div
-                    className={`flex text-md border border-gray-300 hover:border-gray-500 text-md w-full rounded-xl relative items-center gap-1 transition-border duration-300 ${layoutClass} ${disabled ? 'bg-gray-200 text-gray-400 dark:text-gray-300' : ''}`}
+                    className={`flex text-md border hover:border-gray-500 text-md w-full rounded-xl relative items-center gap-1 transition-border duration-300 ${layoutClass} ${disabled ? 'bg-gray-200 dark:bg-gray-600 text-gray-400 dark:text-gray-300' : ''}`}
                 >
                     {startIcon}
                     {['date', 'datetime-local'].includes(type) && (
                         <SvgIcon
-                            path="/images/svg/calendar.svg"
-                            className="!w-6 !h-6 m-auto ml-2 !text-gray-400"
+                            path="/icons/svg/calendar.svg"
+                            className="!w-6 !h-6 m-auto ml-2 !text-current"
                         ></SvgIcon>
                     )}
                     {type === 'time' && (
                         <SvgIcon
-                            path="/images/svg/time.svg"
-                            className="!w-6 !h-6 m-auto ml-2 !text-gray-400"
+                            path="/icons/svg/time.svg"
+                            className="!w-6 !h-6 m-auto ml-2 !text-current"
                         ></SvgIcon>
                     )}
                     {type === 'textarea' ? (
@@ -294,6 +296,7 @@ export const TextField = ({
                             className={`w-full rounded-xl outline-none bg-transparent ${size}`}
                             style={{ resize: 'none' }}
                             onChange={handleInput}
+                            value={value}
                         />
                     ) : (
                         <input
@@ -320,6 +323,11 @@ export const TextField = ({
                             onBlur={blur}
                             onClick={toggleMenu}
                             onChange={handleInput}
+                            value={
+                                ['autocomplete', 'select'].includes(type)
+                                    ? options.find((o) => o.id === value)?.label
+                                    : value
+                            }
                         />
                     )}
                     {type === 'select' && (
@@ -340,12 +348,12 @@ export const TextField = ({
                         >
                             {show ? (
                                 <SvgIcon
-                                    path="/images/svg/visibility.svg"
+                                    path="/icons/svg/visibility.svg"
                                     className="!h-5 !w-5 !text-current"
                                 ></SvgIcon>
                             ) : (
                                 <SvgIcon
-                                    path="/images/svg/visibility_off.svg"
+                                    path="/icons/svg/visibility_off.svg"
                                     className="!h-5 !w-5 !text-current"
                                 ></SvgIcon>
                             )}
@@ -361,7 +369,7 @@ export const TextField = ({
                             onClick={toggleMenu}
                         >
                             <SvgIcon
-                                path="/images/svg/arrow.svg"
+                                path="/icons/svg/arrow.svg"
                                 className={`!h-3 !w-3 !text-current transition-transform duration-300 ${showMenu ? '' : 'rotate-180'}`}
                             ></SvgIcon>
                         </button>
@@ -370,19 +378,18 @@ export const TextField = ({
                     {['autocomplete', 'select'].includes(type) && showMenu && (
                         <ul
                             data-testid={`${name}-menu`}
-                            className="absolute bg-white dark:bg-black border border-gray-300 shadow-[0_0_5px_#00000050] dark:shadow-[#ffffff] rounded-lg w-full max-h-32 h-fit overflow-auto z-10 top-[100%] max-md:fixed max-md:left-[50%] max-md:top-[50%] max-md:-translate-x-[50%] max-md:-translate-y-[50%] max-md:max-w-sm max-sm:w-[90%]"
+                            className="absolute bg-white dark:bg-black border shadow-[0_0_5px_#00000050] dark:shadow-[#ffffff50] rounded-lg w-full max-h-32 h-fit overflow-auto z-10 top-[100%] max-md:fixed max-md:left-[50%] max-md:top-[50%] max-md:-translate-x-[50%] max-md:-translate-y-[50%] max-md:max-w-sm max-sm:w-[90%]"
                         >
                             {filterOptions.map((option, index) => (
                                 <li
                                     key={index}
                                     data-testid={option}
                                     className="app-button !border-none !rounded-none !justify-start !w-full capitalize"
-                                    onClick={() => selectOption(option)}
+                                    onClick={() => selectOption(option.id)}
                                 >
-                                    {option}
+                                    {option.label}
                                 </li>
                             ))}
-
                             {filterOptions.length === 0 && (
                                 <li
                                     className="app-button !border-none !rounded-none !justify-start !w-full"
@@ -420,7 +427,7 @@ export const TextField = ({
                     {getTagValues(value).map((tag) => (
                         <p
                             key={tag}
-                            className="text-xs rounded-full border border-gray-300 w-fit px-2 pb-0.5 m-0.5 truncate max-w-[250px] float-left"
+                            className="text-xs rounded-full border w-fit px-2 pb-0.5 m-0.5 truncate max-w-[250px] float-left"
                         >
                             {tag}
                         </p>

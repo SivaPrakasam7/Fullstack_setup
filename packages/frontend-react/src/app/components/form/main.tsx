@@ -64,9 +64,13 @@ export const FormBuilder = ({
 
             setDebounceTimer(
                 setTimeout(() => {
-                    const fieldData = data[field.name];
-                    validateField(field.name, fieldData);
-                })
+                    setData((currentData) => {
+                        const fieldData = currentData[field.name];
+                        validateField(field.name, fieldData);
+
+                        return currentData;
+                    });
+                }, 500)
             );
         }
     };
@@ -342,7 +346,7 @@ export const FormElements = ({
     //             onChange={onFieldChange}
     //         />
     //     );
-    else
+    else {
         return (
             <TextField
                 name={fieldName}
@@ -365,8 +369,9 @@ export const FormElements = ({
                 onChange={onFieldChange}
                 startIcon={field.startIcon}
                 endIcon={field.endIcon}
-                noError={false}
-                length={0}
+                noError={field.noError}
+                length={field.length}
             />
         );
+    }
 };

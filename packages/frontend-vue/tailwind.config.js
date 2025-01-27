@@ -90,9 +90,9 @@ module.exports = {
         },
         borderColor: ({ theme }) => ({
             ...theme('colors'),
-            DEFAULT: theme('colors.gray.200', 'currentColor'),
+            DEFAULT: theme('colors.gray.300', 'currentColor'),
         }),
-        borderOpacity: ({ theme }) => theme('opacity'),
+        borderOpacity: ({ theme }) => theme('opacity.50'),
         borderRadius: {
             none: '0px',
             sm: '0.125rem',
@@ -110,6 +110,7 @@ module.exports = {
         borderWidth: {
             DEFAULT: '1px',
             0: '0px',
+            1: '1px',
             2: '2px',
             4: '4px',
             8: '8px',
@@ -1085,7 +1086,15 @@ module.exports = {
         function ({ addUtilities }) {
             addUtilities({
                 '.app-button': {
-                    '@apply px-4 py-2 rounded-xl w-fit flex items-center border justify-center hover:bg-black hover:text-white hover:dark:bg-white hover:dark:text-black transition-all duration-300':
+                    '@apply px-4 py-2 rounded-xl w-fit flex items-center border justify-center hover:bg-black hover:text-white hover:dark:bg-white hover:dark:text-black hover:shadow-[0_0_10px_5px_#ffffff50] transition-all duration-300':
+                        {},
+                },
+                '.app-menu': {
+                    '@apply origin-top-right absolute right-1 rounded-md shadow-xl bg-white dark:bg-black border overflow-hidden z-10':
+                        {},
+                },
+                '.app-menu-item': {
+                    '@apply flex gap-2 justify-between items-center w-full p-2 px-4 text-gray-700 dark:text-gray-300 hover:bg-gray-100 hover:dark:text-black':
                         {},
                 },
             });

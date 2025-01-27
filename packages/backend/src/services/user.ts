@@ -1,5 +1,5 @@
-import { createError } from '../../src/handler/error';
 import { IService } from '../../src/handler/middleware';
+import { createError } from '../../src/handler/error';
 import {
     generatePasswordHash,
     verifyPassword,
@@ -8,28 +8,55 @@ import { generateToken } from '../../src/libraries/tokenGenerator';
 import {
     checkUserVerifiedRepo,
     createUserRepo,
+    getLocalUserByIdRepo,
     getUserByIdRepo,
     getUserBySourceRepo,
     increaseFailedAttemptRepo,
+    IUser,
+    updateEmailVerification,
+    updatePasswordByKeyRepo,
     updatePasswordRepo,
     updateResetPasswordKeyRepo,
+    updateSecretKeyRepo,
+    updateUserRepo,
+    updateVerificationOTP,
     updateVerificationRepo,
 } from '../../src/repository/user';
-import { generateSecretKey, generateUserId } from '../../src/utils';
+import { generateSecretKey, generateId } from '../../src/utils';
 import { sendMail } from '../../src/utils/mail';
+import { sendOTP } from '../../src/libraries/otp';
 
 //
 import messages from '../utils/messages';
 
 //
 export const createUserService: IService<string> = async (data) => {
-    const user = await getUserBySourceRepo({
+    if (data.phoneNumber) {
+        const userPhone = await getUserBySourceRepo({
+            phoneNumber: data.phoneNumber,
+        });
+
+        if (userPhone)
+            throw createError(400, messages.responses.userPhoneAlreadyExist);
+    }
+
+    const userEmail = await getUserBySourceRepo({
         email: data.email,
     });
 
-    if (user) throw createError(400, messages.responses.userAlreadyExist);
+    if (userEmail)
+        throw createError(400, messages.responses.userEmailAlreadyExist);
 
-    const userId = generateUserId();
+    // const verificationResult = await updateVerificationRepo(
+    //     data.phoneNumber,
+    //     'phone',
+    //     data.otp
+    // );
+
+    // if (!verificationResult)
+    //     throw createError(400, messages.responses.otpVerificationFailed);
+
+    const userId = `USR-${generateId()}`;
     const secretKey = generateSecretKey();
     let passwordHash = null;
     if (data.password) {
@@ -42,17 +69,28 @@ export const createUserService: IService<string> = async (data) => {
         passwordHash,
         name: data.name,
         email: data.email,
+        phoneNumber: data.phoneNumber,
         profileURL: data.profileURL,
         providerId: data.providerId,
     });
 
     if (!result) throw createError(400, messages.responses.failedToCreateUser);
 
-    const token = await requestVerificationService(userId);
+    // const payload = {
+    //     userId,
+    //     secretKey,
+    // };
 
-    return process.env.MODE === 'development'
-        ? token
-        : messages.responses.userCreated;
+    // const newRefreshToken = await generateToken({
+    //     ...payload,
+    //     lastUsed: Date.now(),
+    // });
+
+    // const newAccessToken = await generateToken(payload);
+
+    // return { refreshToken: newRefreshToken, accessToken: newAccessToken };
+
+    return messages.responses.userCreated;
 };
 
 export const loginService: IService<{
@@ -90,9 +128,8 @@ export const loginService: IService<{
         throw createError(400, messages.responses.invalidCred);
     }
 
-    const isSourceVerified = await checkUserVerifiedRepo(data.email);
-    if (!isSourceVerified)
-        throw createError(400, messages.responses.unverifiedUser);
+    const isVerified = await checkUserVerified(user);
+    if (!isVerified) throw createError(400, messages.responses.unverifiedUser);
 
     const payload = {
         userId: user.userId,
@@ -116,42 +153,80 @@ export const getUserService: IService<Record<string, string>> = async (
     return userDetail;
 };
 
-export const requestVerificationService = async (userId: string) => {
-    const user = await getUserByIdRepo(userId);
-    const verification = true;
+export const requestVerificationService: IService<string> = async (data) => {
+    const response = { email: '', phoneNumber: '' };
+    const user = await getUserBySourceRepo({
+        email: data.email,
+    });
+    if (data.email) {
+        const verification = true;
 
-    const verificationToken = await generateToken(
-        {
-            userId,
-            email: user.email,
-        },
-        verification
-    );
-    const emailVerificationLink = `${process.env.PROTOCOL}://${process.env.DOMAIN}/${process.env.VERIFICATION_URL}${verificationToken}`;
+        const result = await updateEmailVerification(data.email);
 
-    await sendMail(
-        `${process.env.MAIN_PATH}/templates/verification.ejs`,
-        {
-            title: 'Email verification',
-            name: user.name,
-            verificationLink: emailVerificationLink,
-        },
-        {
-            to: user.email,
-            subject: `Welcome to ${process.env.APP_NAME}`,
+        if (!result) throw createError(400, messages.responses.mailFailed);
+
+        const verificationToken = await generateToken(
+            {
+                userId: user.userId,
+                email: data.email,
+            },
+            verification
+        );
+        const emailVerificationLink = `${process.env.PROTOCOL}://${process.env.DOMAIN}/${process.env.VERIFICATION_URL}${verificationToken}`;
+
+        await sendMail(
+            `${process.env.MAIN_PATH}/templates/verification.ejs`,
+            {
+                title: 'Email verification',
+                name: user.name,
+                verificationLink: emailVerificationLink,
+            },
+            {
+                to: user.email,
+                subject: `Welcome to ${process.env.APP_NAME}`,
+            }
+        );
+
+        response.email =
+            process.env.MODE === 'development'
+                ? verificationToken
+                : messages.responses.mailSent;
+    }
+    if (data.phoneNumber) {
+        const otp = Math.random().toString().substring(2, 8);
+
+        if (process.env.MODE !== 'development') {
+            const res = await sendOTP(data.phoneNumber, otp);
+
+            if (!res) throw createError(400, messages.responses.otpFailed);
         }
-    );
 
-    return process.env.MODE === 'development'
-        ? verificationToken
-        : messages.responses.mailSent;
+        const result = await updateVerificationOTP(data.phoneNumber, otp);
+
+        if (!result) throw createError(400, messages.responses.otpFailed);
+
+        return process.env.MODE === 'development'
+            ? otp
+            : messages.responses.otpSent;
+    }
+
+    return JSON.stringify(response);
 };
 
-export const verificationService = async (payload: {
+export const verificationEmailService = async (payload: {
     userId: string;
     email: string;
 }) => {
-    await updateVerificationRepo(payload.email);
+    await updateVerificationRepo(payload.email, 'email');
+
+    return messages.responses.verified;
+};
+
+export const verificationPhoneService = async (payload: {
+    phoneNumber: string;
+    otp: string;
+}) => {
+    await updateVerificationRepo(payload.phoneNumber, 'phone', payload.otp);
 
     return messages.responses.verified;
 };
@@ -163,10 +238,8 @@ export const forgotPasswordService: IService<string> = async (data) => {
 
     if (!user) throw createError(400, messages.responses.userNotFound);
 
-    const isSourceVerified = await checkUserVerifiedRepo(data.email);
-
-    if (!isSourceVerified)
-        throw createError(400, messages.responses.unverifiedUser);
+    const isVerified = await checkUserVerified(user);
+    if (!isVerified) throw createError(400, messages.responses.unverifiedUser);
 
     const verification = true;
     const resetPasswordKey = generateSecretKey();
@@ -206,12 +279,10 @@ export const forgotPasswordService: IService<string> = async (data) => {
 };
 
 export const changePasswordService: IService<string> = async (data) => {
-    const user = await getUserByIdRepo(data.userId);
+    const user = await getLocalUserByIdRepo(data.userId);
     const secretKey = generateSecretKey();
 
     if (!user) throw createError(400, messages.responses.userNotFound);
-
-    const passwordHash = await generatePasswordHash(data.password);
 
     const isPasswordVerified = await verifyPassword(
         data.password,
@@ -221,7 +292,9 @@ export const changePasswordService: IService<string> = async (data) => {
     if (isPasswordVerified)
         throw createError(400, messages.responses.previousPasswordError);
 
-    const result = await updatePasswordRepo(
+    const passwordHash = await generatePasswordHash(data.password);
+
+    const result = await updatePasswordByKeyRepo(
         passwordHash,
         user.userId,
         secretKey,
@@ -232,4 +305,62 @@ export const changePasswordService: IService<string> = async (data) => {
         throw createError(400, messages.responses.passwordChangeFailed);
 
     return messages.responses.passwordChanged;
+};
+
+export const updatePasswordService: IService<string> = async (data) => {
+    const user = await getLocalUserByIdRepo(data.userId);
+
+    if (!user) throw createError(400, messages.responses.userNotFound);
+
+    const isPasswordVerified = await verifyPassword(
+        data.currentPassword,
+        user.passwordHash
+    );
+
+    if (!isPasswordVerified)
+        throw createError(400, messages.responses.passwordDoesNotMatch);
+
+    const passwordHash = await generatePasswordHash(data.password);
+
+    const result = await updatePasswordRepo(passwordHash, user.userId);
+
+    if (!result)
+        throw createError(400, messages.responses.passwordChangeFailed);
+
+    return messages.responses.passwordChanged;
+};
+
+export const logoutService: IService<string> = async (data) => {
+    const secretKey = generateSecretKey();
+
+    await updateSecretKeyRepo(secretKey, data.userId);
+
+    return '';
+};
+
+export const updateUserService: IService<string> = async (data) => {
+    const result = await updateUserRepo(data.userId, {
+        name: data.name,
+        profileURL: data.profileURL,
+    });
+
+    if (!result) throw createError(400, messages.responses.userUpdateFailed);
+
+    return messages.responses.userUpdated;
+};
+
+// Utils
+export const checkUserVerified = async (user: IUser) => {
+    let emailVerified = false;
+    let phoneNumberVerified = false;
+
+    if (user.email) {
+        emailVerified = await checkUserVerifiedRepo(user.email);
+    }
+
+    if (user.phoneNumber) {
+        phoneNumberVerified = await checkUserVerifiedRepo(user.phoneNumber);
+    }
+
+    return emailVerified || phoneNumberVerified;
 };

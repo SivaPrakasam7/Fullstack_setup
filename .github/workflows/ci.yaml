@@ -3,7 +3,7 @@ name: Code quality check and Testing
 on:
     pull_request:
         types: [opened, synchronize, reopened]
-        branches: [master]
+        branches: [production]
         paths:
             [
                 'packages/backend/**',

@@ -22,7 +22,10 @@
 
 <script lang="ts">
 //
-import { register } from 'services/repository/authentication';
+import {
+    register,
+    requestVerification,
+} from 'services/repository/authentication';
 import {
     emailRegex,
     fullNameRegex,
@@ -101,6 +104,7 @@ export default {
     methods: {
         async call(payload: ILargeRecord) {
             const res = await register(payload);
+            if (!res.error) await requestVerification({ email: payload.email });
             return !res.error;
         },
     },

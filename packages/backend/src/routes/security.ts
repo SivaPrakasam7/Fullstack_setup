@@ -1,11 +1,20 @@
 import express from 'express';
 
 //
-import { getPublicKey } from '../../src/handler/security';
+import { tokenChecker } from '../../src/handler/tokenVerification';
+import {
+    getClientPublicKeyController,
+    getKeyPairsController,
+} from '../../src/controller/security';
 
 //
 const router = express.Router();
 
-router.route('/publicKey').get(getPublicKey);
+router.route('/keyPair').get((req, res, next) => {
+    const optional = true;
+    tokenChecker(req, res, next, optional);
+}, getKeyPairsController);
+
+router.route('/client-publicKey').get(getClientPublicKeyController);
 
 export default router;

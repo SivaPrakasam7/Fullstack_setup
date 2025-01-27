@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 
 //
 import { routes } from 'services/constants/routes';
-import { verifyAccount } from 'services/repository/authentication';
+import { verifyEmailAccount } from 'services/repository/authentication';
 import SvgIcon from 'src/app/components/svg';
 
 //
@@ -21,7 +21,7 @@ export default () => {
         if (!token) {
             navigate(routes.root);
         } else
-            verifyAccount(token).then((res) => {
+            verifyEmailAccount(token).then((res) => {
                 setResponse(res);
             });
     }, [searchParams.get('token')]);

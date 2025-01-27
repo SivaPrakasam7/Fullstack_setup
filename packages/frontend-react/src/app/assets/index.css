@@ -1,5 +1,6 @@
 :root {
     font-family: Inter, system-ui, Helvetica, Arial, sans-serif;
+    scroll-behavior: smooth;
 }
 
 /* Chrome, Safari, Edge, Opera */
@@ -133,3 +134,11 @@ input[type='datetime-local']::-webkit-calendar-picker-indicator {
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+    *,
+    ::before,
+    ::after {
+        @apply dark:border-gray-700;
+    }
+}

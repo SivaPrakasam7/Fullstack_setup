@@ -55,6 +55,7 @@ export default [
         rules: {
             'no-unused-vars': 'off',
             'vue/html-indent': 'off',
+            '@typescript-eslint/no-explicit-any': 'warn',
             '@typescript-eslint/no-unused-vars': [
                 'warn',
                 { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },

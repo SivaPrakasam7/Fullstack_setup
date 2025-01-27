@@ -14,20 +14,20 @@
         <div class="flex flex-wrap gap-2 mt-2">
             <button
                 v-for="option in options"
-                :key="option"
-                :name="option"
+                :key="option.id"
+                :name="option.id"
                 :data-testid="option"
                 type="button"
                 :class="{
                     'text-gray-400 border-gray-300 hover:border-gray-500':
-                        option !== value,
-                    'border-green-500 text-green-500': option === value,
+                        option.id !== value,
+                    'border-green-500 text-green-500': option.id === value,
                 }"
                 class="rounded-full py-2 px-4 transition duration-300 ease-out border capitalize"
                 oncontextmenu="return false;"
-                @click="handleInput(option)"
+                @click="handleInput(option.id)"
             >
-                {{ option }}
+                {{ option.label }}
             </button>
         </div>
         <p
@@ -82,7 +82,7 @@ export default {
         },
         options: {
             required: true,
-            type: Array as PropType<string[]>,
+            type: Array as PropType<{ id: string; label: string }[]>,
         },
     },
     emits: ['onchange'],

@@ -10,7 +10,7 @@ const client = Axios.default.create({
 export const updatePublicKey = async () => {
     await Request({
         method: 'get',
-        url: `v1/security/publicKey`,
+        url: `v1/security/keyPair`,
     }).then((data) => {
         localStorage.setItem('publicKey', data.publicKey);
         return data;
@@ -41,6 +41,14 @@ export const Request = async (
                     return { error: true, message: 'No internet connection' };
                 }
 
+                if (e.response.status === 429) {
+                    window.showToast({
+                        type: 'error',
+                        message: e.response?.data,
+                    });
+                    return { error: true, message: e.response?.data };
+                }
+
                 if (e.response?.data?.message === 'KEY_EXPIRED')
                     return { error: true, message: e.response?.data?.message };
 
@@ -56,7 +64,11 @@ export const Request = async (
                     };
                 }
 
-                return e.response?.data;
+                return {
+                    error: true,
+                    message: e.response?.data?.message,
+                    code: e.response?.status,
+                };
             });
 
         if (response.message === 'KEY_EXPIRED') {

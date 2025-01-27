@@ -17,7 +17,7 @@
             <div
                 v-if="show"
                 :class="[
-                    'w-full h-auto rounded-2xl relative bg-white dark:bg-black border',
+                    'w-full h-auto rounded-2xl relative bg-white dark:bg-black',
                     contentClass,
                 ]"
             >

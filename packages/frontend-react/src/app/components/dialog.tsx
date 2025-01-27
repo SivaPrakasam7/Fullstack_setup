@@ -12,12 +12,11 @@ export const DialogView = ({
     children: ReactNode;
     open: boolean;
     close: () => void;
-    contentClass: string;
-    hideClose: boolean;
+    contentClass?: string;
+    hideClose?: boolean;
 }) => {
     return (
         <div
-            ref="dialog"
             data-testid="DIALOG_BACKGROUND"
             className={`fixed bottom-0 left-1/2 -translate-x-1/2 no-scrollbar flex items-center justify-center overflow-hidden duration-500 ${
                 open
@@ -27,12 +26,12 @@ export const DialogView = ({
             onClick={close}
         >
             <div
-                className="no-scrollbar rounded max-h-[calc(100vh-50px)]"
+                className="no-scrollbar rounded-md max-h-[calc(100vh-50px)]"
                 onClick={(e) => e.stopPropagation()}
             >
                 <div
                     v-if="show"
-                    className={`w-full h-auto rounded-2xl relative bg-white dark:bg-black border ${contentClass}`}
+                    className={`w-full h-auto rounded-2xl relative bg-white dark:bg-black ${contentClass}`}
                 >
                     {!hideClose && (
                         <button

@@ -20,7 +20,8 @@ export interface IError {
 export type IMiddleWare = (
     req: Request,
     res: Response,
-    next: IErrorCallback
+    next: IErrorCallback,
+    optional?: boolean
 ) => void;
 
 export type IValidator = (validation: ObjectSchema<any>) => IMiddleWare;

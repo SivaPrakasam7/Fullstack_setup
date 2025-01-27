@@ -49,7 +49,7 @@ export interface IFormField {
     max?: string;
     accept?: string;
     format?: string;
-    options?: string[];
+    options?: { id: string; label: string }[];
     buttonText?: string;
     buttonSize?: string;
     ref?: string;
@@ -58,6 +58,8 @@ export interface IFormField {
     customField?: boolean;
     fileSize?: number;
     cropper?: boolean;
+    length?: number;
+    noError?: boolean;
 }
 
 export type IFieldChange = {

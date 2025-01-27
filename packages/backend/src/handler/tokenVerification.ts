@@ -31,6 +31,8 @@ export const tokenChecker: IMiddleWare = async (
     optional = false
 ) => {
     try {
+        req.body.userId = req.cookies.browserId;
+
         const refreshToken = req.cookies.refreshToken;
         const accessToken = req.cookies.accessToken;
 
@@ -43,7 +45,7 @@ export const tokenChecker: IMiddleWare = async (
         try {
             result = await verifyToken(accessToken);
         } catch {
-            if (refreshToken || optional) {
+            if (refreshToken) {
                 result = await verifyToken(refreshToken);
 
                 const payload = JSON.parse(atob(accessToken.split('.')?.[1]));
@@ -93,8 +95,8 @@ export const tokenChecker: IMiddleWare = async (
         }
 
         req.body = {
-            ...data,
             ...req.body,
+            ...data,
         };
 
         next();

@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/no-v-html -->
 <template>
     <div class="w-full">
         <label
@@ -9,7 +10,7 @@
         <div :class="['flex flex-wrap gap-3 mt-2', layoutClass]">
             <div
                 v-for="(option, index) in options"
-                :key="option"
+                :key="option.id"
                 class="flex flex-row items-center"
             >
                 <input
@@ -17,21 +18,23 @@
                     :name="name"
                     :data-testid="name"
                     :value="option"
-                    :checked="value?.includes(option)"
+                    :checked="value?.includes(option.id)"
                     class="text-left mr-2"
-                    @change="handleInput(option)"
+                    @change="handleInput(option.id)"
                 />
-                <!--  eslint-disable-next-line vue/no-v-html -->
-                <span class="text-sm md:whitespace-nowrap" v-html="option" />
+                <span
+                    class="text-sm md:whitespace-nowrap"
+                    v-html="option.label"
+                />
                 <input
                     v-if="customField && index === options.length - 1"
                     type="text"
                     class="outline-none border-b-[1px] bg-blue-500 w-full"
-                    :disabled="!value?.includes(option)"
+                    :disabled="!value?.includes(option.id)"
                     @change="
                         (e) => {
-                            value?.includes(option) &&
-                                handleCustomField(e, option);
+                            value?.includes(option.id) &&
+                                handleCustomField(e, option.id);
                         }
                     "
                 />
@@ -89,7 +92,7 @@ export default {
         },
         options: {
             required: true,
-            type: Array as PropType<string[]>,
+            type: Array as PropType<{ id: string; label: string }[]>,
         },
         customField: {
             default: false,

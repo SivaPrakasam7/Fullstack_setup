@@ -1,77 +1,42 @@
 //
-import { generateClientId } from '../../src/utils';
+import { generateId } from '../../src/utils';
 import { createError } from './error';
 import { IMiddleWare } from './middleware';
+import { getKeysRepo } from '../../src/repository/security';
 
 //
-import { addKeyPairRepo, getKeysRepo } from '../../src/repository/security';
 import messages from '../utils/messages';
 
 //
-const userKeys: Record<
-    string,
-    { publicKey: ArrayBuffer; privateKey: ArrayBuffer; createdAt: number }
-> = {};
+(global as any).userKeys = {};
 
-export const getPublicKey: IMiddleWare = async (__, res, _) => {
-    const keyPair = await crypto.subtle.generateKey(
-        {
-            name: 'RSA-OAEP',
-            modulusLength: 2048,
-            publicExponent: new Uint8Array([1, 0, 1]),
-            hash: 'SHA-256',
-        },
-        true,
-        ['encrypt', 'decrypt']
-    );
+export const clientHandler: IMiddleWare = async (req, res, next) => {
+    if (req.cookies.browserId) return next();
 
-    const publicKey = await crypto.subtle.exportKey('spki', keyPair.publicKey);
-    const privateKey = await crypto.subtle.exportKey(
-        'pkcs8',
-        keyPair.privateKey
-    );
+    const browserId = `BRWS-${generateId()}`;
 
-    const clientId = generateClientId();
-    const createdAt = Date.now();
-
-    const privateKeyString = btoa(
-        String.fromCharCode(...new Uint8Array(privateKey))
-    );
-    const publicKeyString = btoa(
-        String.fromCharCode(...new Uint8Array(publicKey))
-    );
-    await addKeyPairRepo({
-        clientId,
-        publicKey: publicKeyString,
-        privateKey: privateKeyString,
-        createdAt: createdAt.toString(),
-    });
-
-    userKeys[clientId] = { publicKey, privateKey, createdAt };
-
-    res.cookie('clientId', clientId, {
+    res.cookie('browserId', browserId, {
         httpOnly: true,
         secure: true,
         sameSite: 'strict',
         maxAge: +process.env.KEY_ROTATION_INTERVAL!,
     });
-    res.status(200).json({
-        publicKey: publicKeyString,
-    });
+
+    next();
 };
 
 export const getPrivateKey = async (clientId: string) => {
-    if (!userKeys[clientId]?.privateKey) {
+    if (!(global as any).userKeys[clientId]) {
         const { publicKey, privateKey, createdAt } =
             await getKeysRepo(clientId);
-        userKeys[clientId] = {
+        (global as any).userKeys[clientId] = {
             publicKey: Uint8Array.from(Buffer.from(publicKey, 'base64')),
             privateKey: Uint8Array.from(Buffer.from(privateKey, 'base64')),
             createdAt: +createdAt,
         };
     }
 
-    const privateKey = userKeys[clientId]?.privateKey;
+    const privateKey = (global as any).userKeys[clientId]?.privateKey;
 
     if (!privateKey) return;
 
@@ -100,16 +65,16 @@ export const decryptPayload: IMiddleWare = async (req, _, next) => {
         if (
             !clientId ||
             !privateKey ||
-            Date.now() - userKeys[clientId]?.createdAt >
+            Date.now() - (global as any).userKeys[clientId]?.createdAt >
                 +process.env.KEY_ROTATION_INTERVAL!
         ) {
-            return next(createError(401, messages.responses.keyExpired));
+            return next(createError(403, messages.responses.keyExpired));
         }
 
         const { encryptedSymmetricKey, encryptedData, iv } = req.body;
 
         if (!encryptedSymmetricKey || !encryptedData || !iv)
-            return next(createError(400, messages.responses.invalidRequest));
+            return next(createError(403, messages.responses.keyExpired));
 
         const symmetricKeyRaw = await crypto.subtle.decrypt(
             { name: 'RSA-OAEP' },
@@ -137,6 +102,6 @@ export const decryptPayload: IMiddleWare = async (req, _, next) => {
         req.body = JSON.parse(new TextDecoder().decode(decryptedData));
         next();
     } catch {
-        next(createError(401, messages.responses.keyExpired));
+        next(createError(403, messages.responses.keyExpired));
     }
 };

@@ -4,8 +4,8 @@ import { BrowserRouter } from 'react-router-dom';
 //
 import { ErrorBoundaryProvider } from 'src/providers/errorBoundary';
 import { UserProvider } from 'src/providers/userContext';
-import RouteMain from 'src/app/router';
 import { ToastProvider } from 'src/providers/toast';
+import RouteMain from 'src/app/router';
 
 //
 function App() {

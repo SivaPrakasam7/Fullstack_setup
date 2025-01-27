@@ -3,7 +3,10 @@ import {
     fullNameRegex,
     passwordRegex,
 } from 'services/constants/regex';
-import { register } from 'services/repository/authentication';
+import {
+    register,
+    requestVerification,
+} from 'services/repository/authentication';
 import { IFormField } from 'src/app/components/form/form.types';
 import { FormBuilder } from 'src/app/components/form/main';
 
@@ -68,6 +71,7 @@ const form = {
 export default () => {
     const call = async (payload: ILargeRecord) => {
         const res = await register(payload);
+        if (!res.error) await requestVerification({ email: payload.email });
         return !res.error;
     };
 
