@@ -13,7 +13,7 @@ on:
             ]
 
     push:
-        branches: [master]
+        branches: [production]
         paths:
             [
                 'packages/backend/**',

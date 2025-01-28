@@ -31,7 +31,7 @@ export const DialogView = ({
             >
                 <div
                     v-if="show"
-                    className={`w-full h-auto rounded-2xl relative bg-white dark:bg-black ${contentClass}`}
+                    className={`w-full h-auto rounded-2xl relative bg-white dark:bg-black border ${contentClass}`}
                 >
                     {!hideClose && (
                         <button

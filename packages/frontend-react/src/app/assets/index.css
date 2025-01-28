@@ -142,3 +142,19 @@ input[type='datetime-local']::-webkit-calendar-picker-indicator {
         @apply dark:border-gray-700;
     }
 }
+
+* {
+    padding: 0;
+    margin: 0;
+    font-family: 'Roboto', serif !important;
+    scroll-behavior: initial !important;
+    touch-action: manipulation;
+    outline: none;
+    @apply transition-all duration-300;
+}
+
+svg,
+path {
+    pointer-events: none;
+    @apply !transition-none !duration-0;
+}
