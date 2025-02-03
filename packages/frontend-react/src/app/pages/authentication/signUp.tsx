@@ -1,8 +1,10 @@
+import { useNavigate } from 'react-router-dom';
 import {
     emailRegex,
     fullNameRegex,
     passwordRegex,
 } from 'services/constants/regex';
+import { routes } from 'services/constants/routes';
 import {
     register,
     requestVerification,
@@ -69,6 +71,8 @@ const form = {
 } as Record<string, IFormField>;
 
 export default () => {
+    const navigate = useNavigate();
+
     const call = async (payload: ILargeRecord) => {
         const res = await register(payload);
         if (!res.error) await requestVerification({ email: payload.email });
@@ -86,12 +90,12 @@ export default () => {
                     layoutClass="gap-1"
                 />
                 <div className="w-full border-t border-gray-600"></div>
-                <a
-                    href="/sign-in"
+                <div
+                    onClick={() => navigate(routes.signIn)}
                     className="text-md underline text-gray-500 hover:text-current"
                 >
                     Already have an account?
-                </a>
+                </div>
             </div>
         </div>
     );

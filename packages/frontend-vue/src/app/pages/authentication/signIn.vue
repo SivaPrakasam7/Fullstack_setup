@@ -10,16 +10,18 @@
             />
             <div class="w-full border-t border-gray-600"></div>
             <div class="flex flex-row justify-between">
-                <a
-                    href="/sign-up"
+                <div
                     class="text-md underline text-gray-500 hover:text-current"
-                    >Create new account</a
+                    @click="$router.push({ name: 'signUp' })"
                 >
-                <a
-                    href="/forgot-password"
+                    Create new account
+                </div>
+                <div
                     class="text-md underline text-gray-500 hover:text-current"
-                    >Forgot password?</a
+                    @click="$router.push({ name: 'forgotPassword' })"
                 >
+                    Forgot password?
+                </div>
             </div>
         </div>
     </div>

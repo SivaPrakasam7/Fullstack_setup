@@ -12,7 +12,7 @@ import { getTagValues } from 'services/constants';
 
 //
 import SvgIcon from '../svg';
-import { IFieldChange, IFormField } from './form.types';
+import { IFormField } from './form.types';
 
 //
 export const TextField = ({
@@ -57,13 +57,11 @@ export const TextField = ({
     | 'startIcon'
     | 'endIcon'
     | 'className'
+    | 'noError'
+    | 'length'
+    | 'onChange'
 > &
-    Required<Pick<IFormField, 'type'>> & {
-        name: string;
-        noError?: boolean;
-        length?: number;
-        onChange: (field: IFieldChange) => void;
-    }) => {
+    Required<Pick<IFormField, 'name' | 'type' | 'onChange'>>) => {
     const [show, setShow] = useState(
         ['date', 'datetime-local', 'time'].includes(type) || false
     );
@@ -174,10 +172,10 @@ export const TextField = ({
 
     const filterNumericInput = (event: KeyboardEvent<HTMLInputElement>) => {
         if (type === 'number') {
-            const char = String.fromCharCode(event.keyCode);
+            const char = String.fromCharCode(event.charCode);
             if (
                 !/[0-9]/.test(char) &&
-                ![8, 9, 13, 37, 39].includes(event.keyCode)
+                ![8, 9, 13, 37, 39].includes(event.charCode)
             ) {
                 event.preventDefault();
             }
@@ -384,7 +382,7 @@ export const TextField = ({
                                 <li
                                     key={index}
                                     data-testid={option}
-                                    className="app-button !border-none !rounded-none !justify-start !w-full capitalize"
+                                    className="app-menu-item capitalize"
                                     onClick={() => selectOption(option.id)}
                                 >
                                     {option.label}
@@ -392,7 +390,7 @@ export const TextField = ({
                             ))}
                             {filterOptions.length === 0 && (
                                 <li
-                                    className="app-button !border-none !rounded-none !justify-start !w-full"
+                                    className="app-menu-item"
                                     onClick={() => selectOption('')}
                                 >
                                     No options found

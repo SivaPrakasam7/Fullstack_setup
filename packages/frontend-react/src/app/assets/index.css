@@ -150,7 +150,7 @@ input[type='datetime-local']::-webkit-calendar-picker-indicator {
     scroll-behavior: initial !important;
     touch-action: manipulation;
     outline: none;
-    @apply transition-all duration-300;
+    /* @apply transition-all duration-300; */
 }
 
 svg,

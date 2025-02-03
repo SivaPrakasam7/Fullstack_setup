@@ -1,4 +1,6 @@
+import { useNavigate } from 'react-router-dom';
 import { emailRegex } from 'services/constants/regex';
+import { routes } from 'services/constants/routes';
 import { requestResetPassword } from 'services/repository/authentication';
 import { IFormField } from 'src/app/components/form/form.types';
 import { FormBuilder } from 'src/app/components/form/main';
@@ -23,6 +25,8 @@ const form = {
 } as Record<string, IFormField>;
 
 export default () => {
+    const navigate = useNavigate();
+
     const call = async (payload: ILargeRecord) => {
         const res = await requestResetPassword(payload);
         return !res.error;
@@ -39,12 +43,12 @@ export default () => {
                     layoutClass="gap-1"
                 />
                 <div className="w-full border-t border-gray-600"></div>
-                <a
-                    href="/sign-in"
+                <div
+                    onClick={() => navigate(routes.signIn)}
                     className="text-md underline text-gray-500 hover:text-current"
                 >
                     Back to login
-                </a>
+                </div>
             </div>
         </div>
     );

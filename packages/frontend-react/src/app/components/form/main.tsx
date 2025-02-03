@@ -6,6 +6,7 @@ import { getTagValues } from 'services/constants';
 //
 import { IFieldChange, IFormField } from './form.types';
 import { TextField } from './textField';
+import { CheckBox } from './checkBox';
 
 //
 export const FormBuilder = ({
@@ -154,9 +155,9 @@ export const FormBuilder = ({
 
     //
     useEffect(() => {
-        setData(form);
-        setInitialData(form);
-    }, [JSON.stringify(form)]);
+        setData({ ...form });
+        setInitialData({ ...form });
+    }, [form]);
 
     return (
         <form
@@ -237,22 +238,22 @@ export const FormElements = ({
     //             onChange={onFieldChange}
     //         />
     //     );
-    // else if (field.type === 'checkbox')
-    //     return (
-    //         <CheckBox
-    //             name={fieldName}
-    //             label={field.label}
-    //             value={field.value}
-    //             error={field.error}
-    //             required={field.required}
-    //             disabled={field.disabled}
-    //             helperText={field.helperText}
-    //             layoutClass={field.layoutClass}
-    //             options={field.options || []}
-    //             customField={field.customField}
-    //             onChange={onFieldChange}
-    //         />
-    //     );
+    else if (field.type === 'checkbox')
+        return (
+            <CheckBox
+                name={fieldName}
+                label={field.label}
+                value={field.value}
+                error={field.error}
+                required={field.required}
+                disabled={field.disabled}
+                helperText={field.helperText}
+                layoutClass={field.layoutClass}
+                options={field.options || []}
+                customField={field.customField}
+                onChange={onFieldChange}
+            />
+        );
     // else if (field.type === 'chip')
     //     return (
     //         <ChipMenu

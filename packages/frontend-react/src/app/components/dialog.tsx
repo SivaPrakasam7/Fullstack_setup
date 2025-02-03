@@ -18,9 +18,9 @@ export const DialogView = ({
     return (
         <div
             data-testid="DIALOG_BACKGROUND"
-            className={`fixed bottom-0 left-1/2 -translate-x-1/2 no-scrollbar flex items-center justify-center overflow-hidden duration-500 ${
+            className={`fixed bottom-0 left-1/2 -translate-x-1/2 no-scrollbar flex items-center justify-center overflow-hidden duration-500 bg-black bg-opacity-50 ${
                 open
-                    ? '!w-screen !h-dvh opacity-100 z-10 backdrop-blur-sm'
+                    ? '!w-screen !h-dvh opacity-100 z-40 backdrop-blur-sm'
                     : '!w-0 !h-0 !opacity-0 -z-0'
             }`}
             onClick={close}
@@ -31,7 +31,7 @@ export const DialogView = ({
             >
                 <div
                     v-if="show"
-                    className={`w-full h-auto rounded-2xl relative bg-white dark:bg-black border ${contentClass}`}
+                    className={`w-full max-sm:w-[90dvw] h-auto rounded-2xl relative bg-white dark:bg-black border ${contentClass}`}
                 >
                     {!hideClose && (
                         <button

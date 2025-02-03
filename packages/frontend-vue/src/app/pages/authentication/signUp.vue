@@ -11,11 +11,12 @@
                 layout-class="gap-1"
             />
             <div class="w-full border-t border-gray-600"></div>
-            <a
-                href="/sign-in"
+            <div
                 class="text-md underline text-gray-500 hover:text-current"
-                >Already have an account?</a
+                @click="$router.push({ name: 'signIn' })"
             >
+                Already have an account?
+            </div>
         </div>
     </div>
 </template>
