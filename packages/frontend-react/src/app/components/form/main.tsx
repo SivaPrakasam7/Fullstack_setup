@@ -364,14 +364,19 @@ export const FormElements = ({
                 rows={field.rows}
                 min={field.min}
                 max={field.max}
+                maxLength={field.maxLength}
                 className={field.className}
                 layoutClass={field.layoutClass}
                 format={field.format}
-                onChange={onFieldChange}
+                onChange={(data) => {
+                    onFieldChange(data);
+                    field?.onChange?.(data);
+                }}
                 startIcon={field.startIcon}
                 endIcon={field.endIcon}
                 noError={field.noError}
                 length={field.length}
+                disableFilter={field.disableFilter}
             />
         );
     }

@@ -1,437 +1,383 @@
-import {
-    ChangeEvent,
-    ClipboardEvent,
-    KeyboardEvent,
-    FormEvent,
-    useMemo,
-    useState,
-} from 'react';
+import { FormEvent, ReactNode, useEffect, useState } from 'react';
 
 //
 import { getTagValues } from 'services/constants';
 
 //
-import SvgIcon from '../svg';
-import { IFormField } from './form.types';
+import { IFieldChange, IFormField } from './form.types';
+import { TextField } from './textField';
+import { CheckBox } from './checkBox';
 
 //
-export const TextField = ({
-    name,
-    label,
-    placeHolder,
-    helperText,
-    value,
-    error,
-    noError,
-    disabled,
-    type = 'text',
-    min,
-    max,
-    size = 'p-3 text-md',
-    rows,
-    required,
+export const FormBuilder = ({
+    form,
+    call,
+    buttonText,
+    buttonClass,
     layoutClass,
-    format: _,
-    options = [],
-    length = 4,
-    startIcon,
-    endIcon,
-    onChange,
-    className,
-}: Pick<
-    IFormField,
-    | 'label'
-    | 'placeHolder'
-    | 'helperText'
-    | 'value'
-    | 'error'
-    | 'disabled'
-    | 'min'
-    | 'max'
-    | 'size'
-    | 'rows'
-    | 'required'
-    | 'layoutClass'
-    | 'format'
-    | 'options'
-    | 'startIcon'
-    | 'endIcon'
-    | 'className'
-    | 'noError'
-    | 'length'
-    | 'onChange'
-> &
-    Required<Pick<IFormField, 'name' | 'type' | 'onChange'>>) => {
-    const [show, setShow] = useState(
-        ['date', 'datetime-local', 'time'].includes(type) || false
+    formTop,
+    formBottom,
+}: {
+    form: Record<string, IFormField>;
+    call: (...args: ILargeRecord) => Promise<boolean>;
+    buttonText?: string;
+    buttonClass?: string;
+    layoutClass?: string;
+    formTop?: ReactNode;
+    formBottom?: ReactNode;
+}) => {
+    const [data, setData] = useState<Record<string, IFormField>>({});
+    const [initialData, setInitialData] = useState<Record<string, IFormField>>(
+        {}
     );
-    const [showMenu, setShowMenu] = useState(false);
-    const [otp, setOTP] = useState<string[]>([]);
+    const [loading, setLoading] = useState(false);
+    const [debounceTimer, setDebounceTimer] = useState(0);
 
     //
-    const filterOptions = useMemo(
-        () =>
-            type === 'select'
-                ? options || []
-                : options?.filter((option) =>
-                      `${option.id} ${option.label}`
-                          .toLowerCase()
-                          .includes(`${value}`.toLowerCase())
-                  ) || [],
-        [options?.length, value]
-    );
 
-    //
-    const handleInput = (
-        e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-    ) => {
-        onChange({
-            name,
-            value: e.target.value,
+    const getPayload = () => {
+        const payload: Record<string, ILargeRecord> = {};
+        for (const key in data) {
+            if (data[key].ref) {
+                const refKey = data[key].ref;
+                if (!payload[refKey]) payload[refKey] = [];
+                payload[refKey].push(data[key].value);
+            } else
+                payload[key] =
+                    data[key].type === 'tag'
+                        ? getTagValues(data[key].value)
+                        : data[key].value;
+        }
+        return payload;
+    };
+
+    const onFieldChange = async (field: IFieldChange) => {
+        setData((_data) => {
+            _data[field.name] = field.ref
+                ? { ..._data[field.ref], ref: field.ref, value: field.value }
+                : { ..._data[field.name], value: field.value };
+
+            return _data;
+        });
+
+        if (!field.ignoreValidation) {
+            if (debounceTimer) clearTimeout(debounceTimer);
+
+            setDebounceTimer(
+                setTimeout(() => {
+                    setData((currentData) => {
+                        const fieldData = currentData[field.name];
+                        validateField(field.name, fieldData);
+
+                        return currentData;
+                    });
+                }, 500)
+            );
+        }
+    };
+
+    const validateField = async (name: string, fieldData: IFormField) => {
+        let errorMessage = '';
+        const value = fieldData.value || '';
+
+        if (
+            fieldData.required &&
+            (fieldData.type === 'tag'
+                ? !value
+                      .split(/( |;|,)/g)
+                      .filter((t: string) =>
+                          t.replaceAll(/(\s|;|,)/g, '').trim()
+                      ).length
+                : typeof value === 'object'
+                  ? !value.length
+                  : !`${value}`.trim())
+        ) {
+            errorMessage =
+                fieldData.requiredLabel ||
+                `${fieldData.label || 'field'} is required`;
+        } else if (fieldData.validations) {
+            for (const key in fieldData.validations) {
+                const validation = fieldData.validations[key];
+                const regex = new RegExp(validation.validate as string);
+                if (validation.type === 'function') {
+                    const payload = getPayload();
+                    const call = validation.validate as (
+                        values: ILargeRecord,
+                        name: string
+                    ) => Promise<string> | string;
+                    errorMessage = await call(payload, name);
+                } else if (
+                    (validation.type === 'regex' &&
+                        typeof value === 'object' &&
+                        value.filter((v: ILargeRecord) => !regex.test(v))
+                            .length) ||
+                    (fieldData.type === 'tag'
+                        ? value.split(/( |;|,)/g).filter((t: string) => {
+                              const data = t.replaceAll(/(\s|;|,)/g, '').trim();
+                              if (data) return !regex.test(data);
+                              return false;
+                          }).length
+                        : !regex.test(value))
+                ) {
+                    errorMessage = validation.message || 'Invalid value';
+                }
+                if (errorMessage) break;
+            }
+        }
+        setData((_data) => {
+            _data[name].error = errorMessage;
+            return _data;
         });
     };
 
-    const handleInputChange = (
-        event: FormEvent<HTMLInputElement>,
-        index: number
-    ) => {
-        const target = event.target as unknown as { value: string };
-        const otpInputs = document.querySelectorAll(
-            '[data-ref="otpInputs"]'
-        ) as unknown as HTMLInputElement[];
-        if (/^\d$/.test(target.value)) {
-            setOTP((_otp) => {
-                _otp[index] = target.value;
-                return _otp;
-            });
-            onChange({
-                name,
-                value: Object.values(otp).join(''),
-            });
+    const validate = async () => {
+        for (const field in data) {
             if (
-                (event as unknown as { inputType: string }).inputType ===
-                    'deleteContentBackward' &&
-                index > 0
-            ) {
-                setOTP((_otp) => {
-                    _otp[index] = '';
-                    return _otp;
-                });
-                const previousInput = otpInputs[index - 1];
-                if (previousInput) {
-                    previousInput.focus();
-                }
-            } else if (index < otpInputs.length - 1) {
-                const nextInput = otpInputs[index + 1];
-                if (nextInput) {
-                    nextInput.focus();
-                }
-            }
-        } else if (
-            (event as unknown as { key: string }).key === 'Backspace' &&
-            index > 0
-        ) {
-            setOTP((_otp) => {
-                _otp[index] = '';
-                return _otp;
-            });
-            const previousInput = otpInputs[index - 1];
-            if (previousInput) {
-                previousInput.focus();
-            }
-        } else {
-            (event.target as unknown as { value: string }).value = '';
+                data[field].type !== 'label' &&
+                (data[field].type !== 'multiTextField' ||
+                    (data[field].type === 'multiTextField' && data[field].ref))
+            )
+                await validateField(field, data[field]);
         }
+        return !Object.values(data).filter((f) => Boolean(f.error)).length;
     };
 
-    const handleKeyDown = (
-        event: KeyboardEvent<HTMLInputElement>,
-        index: number
-    ) => {
-        const otpInputs = document.querySelectorAll(
-            '[data-ref="otpInputs"]'
-        ) as unknown as HTMLInputElement[];
-        if (index > 0 && event.key === 'Backspace' && !otpInputs[index].value) {
-            const previousInput = otpInputs[index - 1];
-            if (previousInput) {
-                previousInput.focus();
-            }
+    const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        setLoading(true);
+        const payload = getPayload();
+        if (await validate()) {
+            const success = await call(payload);
+            if (success) setData(initialData);
         }
+        setLoading(false);
     };
 
-    const limitInput = (event: ChangeEvent<HTMLInputElement>) => {
-        const target = event.target as HTMLInputElement;
-        if (type === 'number' && target.value.length >= 19) {
-            target.value = target.value.slice(0, 19);
-            onChange({
-                name,
-                value: target.value,
-            });
-        }
-    };
-
-    const filterNumericInput = (event: KeyboardEvent<HTMLInputElement>) => {
-        if (type === 'number') {
-            const char = String.fromCharCode(event.charCode);
-            if (
-                !/[0-9]/.test(char) &&
-                ![8, 9, 13, 37, 39].includes(event.charCode)
-            ) {
-                event.preventDefault();
-            }
-        }
-    };
-
-    const filterPaste = (event: ClipboardEvent<HTMLInputElement>) => {
-        if (type === 'number') {
-            const pasteData = event.clipboardData?.getData('text');
-            if (pasteData && !/^\d+$/.test(pasteData)) {
-                event.preventDefault();
-            }
-        }
-    };
-
-    const toggle = () => {
-        setShow((prev) => !prev);
-    };
-
-    const toggleMenu = () => {
-        if (['autocomplete', 'select'].includes(type)) {
-            setShowMenu((prev) => !prev);
-            if (showMenu)
-                setTimeout(() => {
-                    document.removeEventListener('click', handleOutsideClick);
-                    document.addEventListener('click', handleOutsideClick);
-                }, 100);
-            else document.removeEventListener('click', handleOutsideClick);
-        }
-    };
-
-    const handleOutsideClick = () => {
-        if (showMenu) {
-            setShowMenu(false);
-            onChange({
-                name,
-                value,
-            });
-            document.removeEventListener('click', handleOutsideClick);
-        }
-    };
-
-    const selectOption = (value: string) => {
-        onChange({ name, value });
-        setShowMenu(false);
-        document.removeEventListener('click', handleOutsideClick);
-    };
-
-    const focus = () => {
-        if (['date', 'datetime-local', 'time'].includes(type)) setShow(false);
-    };
-
-    const blur = () => {
-        if (['date', 'datetime-local', 'time'].includes(type)) setShow(true);
-    };
+    //
+    useEffect(() => {
+        setData({ ...form });
+        setInitialData({ ...form });
+    }, [form]);
 
     return (
-        <div className={`w-full ${className}`}>
-            <label
-                htmlFor={name}
-                className="block mb-1 text-sm font-bold text-gray-600 dark:text-white"
-            >
-                {label}
-                {label && required && (
-                    <span v-show="" className="text-red-400 font-bold text-xs">
-                        *
-                    </span>
-                )}
-            </label>
-            {type === 'otp' ? (
-                <div className={`flex gap-3 justify-between ${layoutClass}`}>
-                    {new Array(length).fill(null).map((_, i) => (
-                        <input
-                            key={i + 1}
-                            data-ref="otpInputs"
-                            name={name + i + 1}
-                            data-testid={name + i + 1}
-                            type={type}
-                            disabled={disabled}
-                            placeholder={placeHolder}
-                            className={`text-md rounded-xl outline-none bg-transparent text-center w-10 h-10 ${size} ${
-                                disabled
-                                    ? 'bg-gray-400 text-gray-400 dark:text-gray-300'
-                                    : 'border hover:border-gray-500'
-                            }`}
-                            maxLength={1}
-                            onInput={(e) => handleInputChange(e, i)}
-                            onKeyDown={(e) => handleKeyDown(e, i)}
+        <form
+            className={`grid gap-1 w-auto relative ${layoutClass}`}
+            onSubmit={onSubmit}
+        >
+            {formTop}
+            {Object.entries(data || {})
+                .filter(([_, field]) => !field.ref)
+                .map(([fieldName, field]) => (
+                    <div
+                        key={fieldName}
+                        className={`w-full ${field.alignClass}`}
+                    >
+                        <FormElements
+                            fieldName={fieldName}
+                            field={field}
+                            onFieldChange={onFieldChange}
                         />
-                    ))}
-                </div>
+                    </div>
+                ))}
+            {formBottom ? (
+                formBottom
             ) : (
-                <div
-                    className={`flex text-md border hover:border-gray-500 text-md w-full rounded-xl relative items-center gap-1 transition-border duration-300 ${layoutClass} ${disabled ? 'bg-gray-200 dark:bg-gray-600 text-gray-400 dark:text-gray-300' : ''}`}
+                <button
+                    disabled={loading}
+                    type="submit"
+                    data-testid="SUBMIT"
+                    className={`app-button ${loading ? 'text-gray-400' : ''} ${buttonClass}`}
+                    onContextMenu={() => {
+                        return false;
+                    }}
                 >
-                    {startIcon}
-                    {['date', 'datetime-local'].includes(type) && (
-                        <SvgIcon
-                            path="/icons/svg/calendar.svg"
-                            className="!w-6 !h-6 m-auto ml-2 !text-current"
-                        ></SvgIcon>
-                    )}
-                    {type === 'time' && (
-                        <SvgIcon
-                            path="/icons/svg/time.svg"
-                            className="!w-6 !h-6 m-auto ml-2 !text-current"
-                        ></SvgIcon>
-                    )}
-                    {type === 'textarea' ? (
-                        <textarea
-                            data-testid={name}
-                            name={name}
-                            placeholder={placeHolder}
-                            disabled={disabled}
-                            rows={rows}
-                            className={`w-full rounded-xl outline-none bg-transparent ${size}`}
-                            style={{ resize: 'none' }}
-                            onChange={handleInput}
-                            value={value}
-                        />
-                    ) : (
-                        <input
-                            data-testid={name}
-                            name={name}
-                            type={
-                                ['autocomplete', 'select'].includes(type)
-                                    ? 'text'
-                                    : show
-                                      ? 'text'
-                                      : type
-                            }
-                            placeholder={placeHolder}
-                            disabled={disabled || type === 'select'}
-                            min={min}
-                            max={max}
-                            // format={format}
-                            className={`text-md w-full rounded-xl outline-none bg-transparent ${size}`}
-                            autoComplete="off"
-                            onInput={limitInput}
-                            onKeyPress={filterNumericInput}
-                            onPaste={filterPaste}
-                            onFocus={focus}
-                            onBlur={blur}
-                            onClick={toggleMenu}
-                            onChange={handleInput}
-                            value={
-                                ['autocomplete', 'select'].includes(type)
-                                    ? options.find((o) => o.id === value)?.label
-                                    : value
-                            }
-                        />
-                    )}
-                    {type === 'select' && (
-                        <div
-                            data-testid={`${name}-select`}
-                            className="absolute top-0 left-0 w-full h-full"
-                            onClick={toggleMenu}
-                        ></div>
-                    )}
-                    {type === 'password' && (
-                        <button
-                            type="button"
-                            className="mr-3"
-                            onContextMenu={() => {
-                                return false;
-                            }}
-                            onClick={toggle}
-                        >
-                            {show ? (
-                                <SvgIcon
-                                    path="/icons/svg/visibility.svg"
-                                    className="!h-5 !w-5 !text-current"
-                                ></SvgIcon>
-                            ) : (
-                                <SvgIcon
-                                    path="/icons/svg/visibility_off.svg"
-                                    className="!h-5 !w-5 !text-current"
-                                ></SvgIcon>
-                            )}
-                        </button>
-                    )}
-                    {['autocomplete', 'select'].includes(type) && (
-                        <button
-                            type="button"
-                            className="mr-3"
-                            onContextMenu={() => {
-                                return false;
-                            }}
-                            onClick={toggleMenu}
-                        >
-                            <SvgIcon
-                                path="/icons/svg/arrow.svg"
-                                className={`!h-3 !w-3 !text-current transition-transform duration-300 ${showMenu ? '' : 'rotate-180'}`}
-                            ></SvgIcon>
-                        </button>
-                    )}
-                    {endIcon}
-                    {['autocomplete', 'select'].includes(type) && showMenu && (
-                        <ul
-                            data-testid={`${name}-menu`}
-                            className="absolute bg-white dark:bg-black border shadow-[0_0_5px_#00000050] dark:shadow-[#ffffff50] rounded-lg w-full max-h-32 h-fit overflow-auto z-10 top-[100%] max-md:fixed max-md:left-[50%] max-md:top-[50%] max-md:-translate-x-[50%] max-md:-translate-y-[50%] max-md:max-w-sm max-sm:w-[90%]"
-                        >
-                            {filterOptions.map((option, index) => (
-                                <li
-                                    key={index}
-                                    data-testid={option}
-                                    className="app-menu-item capitalize"
-                                    onClick={() => selectOption(option.id)}
-                                >
-                                    {option.label}
-                                </li>
-                            ))}
-                            {filterOptions.length === 0 && (
-                                <li
-                                    className="app-menu-item"
-                                    onClick={() => selectOption('')}
-                                >
-                                    No options found
-                                </li>
-                            )}
-                        </ul>
-                    )}
+                    {buttonText}
+                </button>
+            )}
+            {loading && (
+                <div className="bg-gray-100 bg-opacity-50 dark:bg-transparent absolute w-full h-full rounded-lg flex items-center justify-center">
+                    <div className="dot-pulse"></div>
                 </div>
             )}
-            {!noError && (
-                <p
-                    data-testid={`${name}-error`}
-                    className={`mt-1 text-xs italic min-h-4 ${error ? 'text-red-500' : 'text-gray-400'}`}
-                >
-                    {type === 'tag' && (
-                        <>
-                            <span
-                                data-testid={`${name}-error`}
-                                className="mt-1 text-xs italic min-h-4 text-gray-400"
-                            >
-                                separated by commas, semicolons, or newlines{' '}
-                            </span>
-                            <br />
-                        </>
-                    )}
-
-                    {error || helperText}
-                </p>
-            )}
-            {type === 'tag' && (
-                <div className="block max-h-20 overflow-y-auto no-scrollbar">
-                    {getTagValues(value).map((tag) => (
-                        <p
-                            key={tag}
-                            className="text-xs rounded-full border w-fit px-2 pb-0.5 m-0.5 truncate max-w-[250px] float-left"
-                        >
-                            {tag}
-                        </p>
-                    ))}
-                </div>
-            )}
-        </div>
+        </form>
     );
+};
+
+export const FormElements = ({
+    fieldName,
+    field,
+    onFieldChange,
+}: {
+    fieldName: string;
+    field: IFormField;
+    onFieldChange: (field: IFieldChange) => void;
+}) => {
+    if (field.type === 'custom') return field.element;
+    else if (field.type === 'label')
+        return (
+            <label className={field.layoutClass}>
+                {field.label}
+                <span
+                    v-show="field.label && field.required"
+                    className="text-red-400 font-bold text-xs"
+                >
+                    *
+                </span>
+                {field.icon}
+            </label>
+        );
+    // else if (field.type === 'calendar')
+    //     return (
+    //         <Calendar
+    //             name={fieldName}
+    //             label={field.label}
+    //             value={field.value}
+    //             error={field.error}
+    //             required={field.required}
+    //             disabled={field.disabled}
+    //             onChange={onFieldChange}
+    //         />
+    //     );
+    else if (field.type === 'checkbox')
+        return (
+            <CheckBox
+                name={fieldName}
+                label={field.label}
+                value={field.value}
+                error={field.error}
+                required={field.required}
+                disabled={field.disabled}
+                helperText={field.helperText}
+                layoutClass={field.layoutClass}
+                options={field.options || []}
+                customField={field.customField}
+                onChange={onFieldChange}
+            />
+        );
+    // else if (field.type === 'chip')
+    //     return (
+    //         <ChipMenu
+    //             name={fieldName}
+    //             label={field.label}
+    //             value={field.value}
+    //             error={field.error}
+    //             required={field.required}
+    //             disabled={field.disabled}
+    //             helperText={field.helperText}
+    //             layoutClass={field.layoutClass}
+    //             options={field.options || []}
+    //             onChange={onFieldChange}
+    //         />
+    //     );
+    // else if (field.type === 'file')
+    //     return (
+    //         <FileUpload
+    //             name={fieldName}
+    //             label={field.label}
+    //             value={field.value}
+    //             error={field.error}
+    //             required={field.required}
+    //             disabled={field.disabled}
+    //             placeHolder={field.placeHolder}
+    //             imageSize={field.imageSize}
+    //             accept={field.accept}
+    //             size={field.size}
+    //             max={field.max}
+    //             className={field.class}
+    //             layoutClass={field.layoutClass}
+    //             fileSize={field.fileSize}
+    //             cropper={field.cropper}
+    //             onChange={onFieldChange}
+    //             icon={field.icon}
+    //         />
+    //     );
+    // else if (field.type === 'multiTextField')
+    //     return (
+    //         <MultiField
+    //             buttonText={field.buttonText}
+    //             buttonSize={field.buttonSize}
+    //             name={fieldName}
+    //             label={field.label}
+    //             form={form}
+    //             required={field.required}
+    //             disabled={field.disabled}
+    //             placeHolder={field.placeHolder}
+    //             type={field.type}
+    //             size={field.size}
+    //             rows={field.rows}
+    //             min={field.min}
+    //             max={field.max}
+    //             className={field.class}
+    //             layoutClass={field.layoutClass}
+    //             format={field.format}
+    //             initialFieldCount={field.initialFieldCount}
+    //             remove={field.remove!}
+    //             onChange={onFieldChange}
+    //             startIcon={field.startIcon}
+    //             endIcon={field.endIcon}
+    //         />
+    //     );
+    // else if (field.type === 'radio')
+    //     return (
+    //         <RadioButton
+    //             name={fieldName}
+    //             label={field.label}
+    //             value={field.value}
+    //             error={field.error}
+    //             required={field.required}
+    //             disabled={field.disabled}
+    //             helperText={field.helperText}
+    //             layoutClass={field.layoutClass}
+    //             options={field.options || []}
+    //             customField={field.customField}
+    //             onChange={onFieldChange}
+    //         />
+    //     );
+    // else if (field.type === 'toggle')
+    //     return (
+    //         <Toggle
+    //             name={fieldName}
+    //             label={field.label}
+    //             value={field.value}
+    //             error={field.error}
+    //             required={field.required}
+    //             disabled={field.disabled}
+    //             helperText={field.helperText}
+    //             layoutClass={field.layoutClass}
+    //             onChange={onFieldChange}
+    //         />
+    //     );
+    else {
+        return (
+            <TextField
+                name={fieldName}
+                label={field.label}
+                value={field.value}
+                options={field.options || []}
+                error={field.error}
+                required={field.required}
+                disabled={field.disabled}
+                placeHolder={field.placeHolder}
+                helperText={field.helperText}
+                type={field.type!}
+                size={field.size}
+                rows={field.rows}
+                min={field.min}
+                max={field.max}
+                maxLength={field.maxLength}
+                className={field.className}
+                layoutClass={field.layoutClass}
+                format={field.format}
+                onChange={(data) => {
+                    onFieldChange(data);
+                    field?.onChange?.(data);
+                }}
+                startIcon={field.startIcon}
+                endIcon={field.endIcon}
+                noError={field.noError}
+                length={field.length}
+                disableFilter={field.disableFilter}
+            />
+        );
+    }
 };

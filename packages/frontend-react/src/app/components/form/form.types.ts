@@ -63,6 +63,8 @@ export interface IFormField {
     cropper?: boolean;
     length?: number;
     noError?: boolean;
+    disableFilter?: boolean;
+    maxLength?: number;
 
     //
     startIcon?: ReactNode;
@@ -77,4 +79,5 @@ export type IFieldChange = {
     value: ILargeRecord;
     ignoreValidation?: boolean;
     ref?: string;
+    id?: boolean;
 };

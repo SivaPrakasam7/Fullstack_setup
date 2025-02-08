@@ -17,6 +17,18 @@ module.exports = {
                     from: path.resolve(__dirname, 'templates'),
                     to: path.resolve(__dirname, 'out/templates'),
                 },
+                {
+                    from: path.resolve(__dirname, 'package.json'),
+                    to: path.resolve(__dirname, 'out/package.json'),
+                },
+                {
+                    from: path.resolve(__dirname, 'migrate.js'),
+                    to: path.resolve(__dirname, 'out/migrate.js'),
+                },
+                {
+                    from: path.resolve(__dirname, 'migrations'),
+                    to: path.resolve(__dirname, 'out/migrations'),
+                },
             ],
         }),
     ],
