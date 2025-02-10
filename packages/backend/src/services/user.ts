@@ -209,8 +209,7 @@ export const requestVerificationService: IService<string> = async (data) => {
             ? otp
             : messages.responses.otpSent;
     }
-
-    return JSON.stringify(response);
+    return Object.values(response).join(' ').trim();
 };
 
 export const verificationEmailService = async (payload: {

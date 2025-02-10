@@ -15,7 +15,11 @@ import { logAccess } from '../src/handler/logger';
 import { swaggerSpec } from '../src/swagger';
 import userRotes from '../src/routes/user';
 import securityRoutes from '../src/routes/security';
-import { clientHandler, decryptPayload } from '../src/handler/security';
+import {
+    clientHandler,
+    decryptPayload,
+    inputValidationMiddleware,
+} from '../src/handler/security';
 
 //
 const app = express();
@@ -28,11 +32,15 @@ const limiter = rateLimit({
     legacyHeaders: false, // Disable the `X-RateLimit-*` headers.
 });
 
-app.use(limiter);
+if (process.env.MODE !== 'development') {
+    app.use(limiter);
+}
+if (process.env.MODE === 'development') {
+    app.use(cors({ origin: process.env.CORS_ORIGIN, credentials: true }));
+}
 app.use(bodyParser.json({ limit: '5MB' }));
 app.use(bodyParser.urlencoded({ limit: '5MB', extended: true }));
 app.use(cookieParser());
-app.use(cors({ origin: process.env.CORS_ORIGIN, credentials: true }));
 app.use(express.json());
 app.disable('x-powered-by');
 // app.use(helmet());
@@ -48,6 +56,7 @@ app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerSpec));
 
 app.use(decryptPayload);
 app.use(logAccess);
+app.use(inputValidationMiddleware);
 
 app.use('/v1/user', userRotes);
 app.use('/v1/security', securityRoutes);

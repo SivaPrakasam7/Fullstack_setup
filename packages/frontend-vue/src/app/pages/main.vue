@@ -12,7 +12,7 @@
                     : 'User need to login'
             }}
         </p>
-        <button v-if="isSignedIn" class="app-button" @click="logout">
+        <button v-if="isSignedIn" class="app-button" @click="() => logout">
             Logout
         </button>
         <div v-else class="flex gap-2">

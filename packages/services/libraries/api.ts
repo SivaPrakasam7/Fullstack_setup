@@ -41,7 +41,7 @@ export const Request = async (
                     return { error: true, message: 'No internet connection' };
                 }
 
-                if (e.response.status === 429) {
+                if (e.response?.status === 429) {
                     window.showToast({
                         type: 'error',
                         message: e.response?.data,
@@ -54,7 +54,7 @@ export const Request = async (
 
                 if (
                     e.config.baseURL == baseURL &&
-                    e.response.status === 401 &&
+                    e.response?.status === 401 &&
                     window.signedIn
                 ) {
                     window.logout();

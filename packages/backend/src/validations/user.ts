@@ -40,7 +40,7 @@ export const updatePasswordValidation = yup
 export const createUserValidation = yup
     .object()
     .shape({
-        name: yup.string().required('First name is required'),
+        name: yup.string().required('Name is required'),
         password: yup.string(),
         providerId: yup.string(),
         profileURL: yup.string(),

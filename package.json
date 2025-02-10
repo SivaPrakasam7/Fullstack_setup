@@ -5,8 +5,8 @@
         "packages/*"
     ],
     "engines": {
-        "npm": "10.7.0",
-        "node": "v20.14.0"
+        "npm": "10.9.2",
+        "node": "v22.13.1"
     },
     "scripts": {
         "lint": "eslint .",

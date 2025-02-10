@@ -121,7 +121,6 @@ export const headerTokenChecker: IMiddleWare = async (req, _, next) => {
             ...result,
             ...req.body,
         };
-
         next();
     } catch {
         return next(createError(401, messages.responses.unauthorized));

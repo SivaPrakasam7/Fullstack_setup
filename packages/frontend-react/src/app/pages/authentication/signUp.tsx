@@ -92,7 +92,7 @@ export default () => {
                 <div className="w-full border-t border-gray-600"></div>
                 <div
                     onClick={() => navigate(routes.signIn)}
-                    className="text-md underline text-gray-500 hover:text-current"
+                    className="text-md underline text-gray-500 hover:text-current cursor-pointer"
                 >
                     Already have an account?
                 </div>

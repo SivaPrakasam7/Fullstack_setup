@@ -7,6 +7,7 @@ import { getTagValues } from 'services/constants';
 import { IFieldChange, IFormField } from './form.types';
 import { TextField } from './textField';
 import { CheckBox } from './checkBox';
+import { FileUpload } from './fileUpload';
 
 //
 export const FormBuilder = ({
@@ -65,12 +66,8 @@ export const FormBuilder = ({
 
             setDebounceTimer(
                 setTimeout(() => {
-                    setData((currentData) => {
-                        const fieldData = currentData[field.name];
-                        validateField(field.name, fieldData);
-
-                        return currentData;
-                    });
+                    const fieldData = data[field.name];
+                    validateField(field.name, fieldData);
                 }, 500)
             );
         }
@@ -125,21 +122,27 @@ export const FormBuilder = ({
             }
         }
         setData((_data) => {
-            _data[name].error = errorMessage;
-            return _data;
+            const updatedData = { ..._data };
+            updatedData[name] = {
+                ...updatedData[name],
+                error: errorMessage,
+            };
+            return updatedData;
         });
+        return errorMessage;
     };
 
     const validate = async () => {
+        const errors: Record<string, string> = {};
         for (const field in data) {
             if (
                 data[field].type !== 'label' &&
                 (data[field].type !== 'multiTextField' ||
                     (data[field].type === 'multiTextField' && data[field].ref))
             )
-                await validateField(field, data[field]);
+                errors[field] = await validateField(field, data[field]);
         }
-        return !Object.values(data).filter((f) => Boolean(f.error)).length;
+        return !Object.values(errors).filter(Boolean).length;
     };
 
     const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -269,28 +272,27 @@ export const FormElements = ({
     //             onChange={onFieldChange}
     //         />
     //     );
-    // else if (field.type === 'file')
-    //     return (
-    //         <FileUpload
-    //             name={fieldName}
-    //             label={field.label}
-    //             value={field.value}
-    //             error={field.error}
-    //             required={field.required}
-    //             disabled={field.disabled}
-    //             placeHolder={field.placeHolder}
-    //             imageSize={field.imageSize}
-    //             accept={field.accept}
-    //             size={field.size}
-    //             max={field.max}
-    //             className={field.class}
-    //             layoutClass={field.layoutClass}
-    //             fileSize={field.fileSize}
-    //             cropper={field.cropper}
-    //             onChange={onFieldChange}
-    //             icon={field.icon}
-    //         />
-    //     );
+    else if (field.type === 'file')
+        return (
+            <FileUpload
+                name={fieldName}
+                label={field.label}
+                value={field.value}
+                error={field.error}
+                required={field.required}
+                disabled={field.disabled}
+                imageSize={field.imageSize}
+                accept={field.accept}
+                size={field.size}
+                max={field.max}
+                className={field.className}
+                layoutClass={field.layoutClass}
+                fileSize={field.fileSize}
+                cropper={field.cropper}
+                onChange={onFieldChange}
+                icon={field.icon}
+            />
+        );
     // else if (field.type === 'multiTextField')
     //     return (
     //         <MultiField

@@ -64,13 +64,13 @@ export default () => {
                 <div className="flex flex-row justify-between">
                     <a
                         onClick={() => navigate(routes.signUp)}
-                        className="text-md underline text-gray-500 hover:text-current"
+                        className="text-md underline text-gray-500 hover:text-current cursor-pointer"
                     >
                         Create new account
                     </a>
                     <a
                         onClick={() => navigate(routes.forgotPassword)}
-                        className="text-md underline text-gray-500 hover:text-current"
+                        className="text-md underline text-gray-500 hover:text-current cursor-pointer"
                     >
                         Forgot password?
                     </a>

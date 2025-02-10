@@ -30,8 +30,8 @@ export const generateToken: IGenerateToken = (data, verification = false) => {
     const { exp: _, iat: __, ...payload } = data;
     const token = jwt.sign(payload, process.env.SECRET_KEY!, {
         expiresIn: verification
-            ? process.env.EXPIRES_IN
-            : process.env.REFRESH_TOKEN_EXPIRES_IN,
+            ? +process.env.EXPIRES_IN!
+            : +process.env.REFRESH_TOKEN_EXPIRES_IN!,
     });
     return token;
 };

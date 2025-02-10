@@ -2,6 +2,10 @@
     "name": "frontend-react",
     "private": true,
     "version": "0.0.0",
+    "engines": {
+        "npm": "10.9.2",
+        "node": "v22.13.1"
+    },
     "scripts": {
         "dev": "vite",
         "build": "tsc -b && vite build",

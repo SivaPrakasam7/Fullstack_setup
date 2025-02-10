@@ -5,6 +5,7 @@ import { Navigate, useRoutes } from 'react-router-dom';
 import { routes } from 'services/constants/routes';
 import { UserContext } from 'src/providers/context';
 import { CommonPage } from 'src/app/components/page';
+import { Loading } from 'src/app/components/loading';
 
 //
 const Private = ({
@@ -16,7 +17,7 @@ const Private = ({
 }) => {
     const user = useContext(UserContext);
 
-    if (user?.loading) return <>Loading</>;
+    if (user?.loading) return <Loading />;
 
     if (
         (Boolean(user?.signedIn) && protect) ||

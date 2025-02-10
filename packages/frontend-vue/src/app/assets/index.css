@@ -143,6 +143,20 @@ input[type='datetime-local']::-webkit-calendar-picker-indicator {
     }
 }
 
+@layer utilities {
+    .w-screen {
+        width: calc(100vw * var(--scale-factor));
+    }
+
+    .h-screen {
+        height: calc(100vh * var(--scale-factor));
+    }
+
+    .sticky-fix {
+        will-change: transform;
+    }
+}
+
 * {
     padding: 0;
     margin: 0;

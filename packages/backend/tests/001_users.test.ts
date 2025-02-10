@@ -76,9 +76,7 @@ describe('Users API', () => {
         await executeQuery('ALTER TABLE verifications AUTO_INCREMENT = 1');
 
         // Fetch public key and set clientId
-        const response = await request(app)
-            .get('/v1/security/publicKey')
-            .send();
+        const response = await request(app).get('/v1/security/keyPair').send();
         expect(response.status).toBe(200);
         clientId =
             (response.headers['set-cookie'] as unknown as string[])
@@ -112,9 +110,10 @@ describe('Users API', () => {
             .set('Cookie', `clientId=${clientId}`)
             .send(await encrypt(payload));
         expect(response.status).toBe(400);
-        expect(response.body.message).toEqual('Email is required');
+        expect(response.body.message).toEqual('Name is required');
 
         payload = {
+            name: user.name,
             email: user.name,
             password: user.password,
         };
@@ -126,7 +125,7 @@ describe('Users API', () => {
         expect(response.body.message).toEqual('Email must be valid');
 
         payload = {
-            email: user.email,
+            name: user.name,
             password: user.password,
         };
         response = await request(app)
@@ -134,7 +133,7 @@ describe('Users API', () => {
             .set('Cookie', `clientId=${clientId}`)
             .send(await encrypt(payload));
         expect(response.status).toBe(400);
-        expect(response.body.message).toEqual('Name is required');
+        expect(response.body.message).toEqual('Email is required');
 
         payload = {
             email: user.email,
@@ -176,7 +175,9 @@ describe('Users API', () => {
             .set('Cookie', `clientId=${clientId}`)
             .send(await encrypt(payload));
         expect(response.status).toBe(400);
-        expect(response.body.message).toEqual('Invalid credential');
+        expect(response.body.message).toEqual(
+            'Invalid credentials. Please check and try again'
+        );
 
         payload = {
             email: user.email,
@@ -187,7 +188,18 @@ describe('Users API', () => {
             .set('Cookie', `clientId=${clientId}`)
             .send(await encrypt(payload));
         expect(response.status).toBe(400);
-        expect(response.body.message).toEqual('Account not verified');
+        expect(response.body.message).toEqual(
+            'Your account has not been verified'
+        );
+
+        payload = {
+            email: user.email,
+        };
+        response = await request(app)
+            .post('/v1/user/request-verification')
+            .set('Cookie', `clientId=${clientId}`)
+            .send(await encrypt(payload));
+        expect(response.status).toBe(200);
 
         // After email verification
         const verificationEmail = await waitForEmail();
@@ -196,12 +208,19 @@ describe('Users API', () => {
         )![1];
 
         response = await request(app)
-            .get('/v1/user/verify')
+            .get('/v1/user/verify-email')
             .set('Cookie', `clientId=${clientId}`)
             .set('Authorization', `Bearer ${verificationToken}`)
             .send();
         expect(response.status).toBe(200);
-        expect(response.body.message).toEqual('Account verified');
+        expect(response.body.message).toEqual(
+            'Your account has been successfully verified'
+        );
+
+        payload = {
+            email: user.email,
+            password: user.password,
+        };
 
         response = await request(app)
             .post('/v1/user/login')
@@ -229,7 +248,9 @@ describe('Users API', () => {
             .set('Cookie', `clientId=${clientId}`)
             .send(await encrypt(payload));
         expect(response.status).toBe(200);
-        expect(response.body.message).toEqual('Mail sent successfully!');
+        expect(response.body.message).toEqual(
+            'Email has been sent successfully!'
+        );
 
         const resetLinkEmail = await waitForEmail();
 
@@ -268,7 +289,7 @@ describe('Users API', () => {
             .set('Authorization', `Bearer ${resetToken}`)
             .send(await encrypt(payload));
         expect(response.status).toBe(200);
-        expect(response.body.message).toEqual('Password changed successfully');
+        expect(response.body.message).toEqual('Password updated successfully');
 
         payload = {
             email: user.email,
@@ -279,7 +300,9 @@ describe('Users API', () => {
             .set('Cookie', `clientId=${clientId}`)
             .send(await encrypt(payload));
         expect(response.status).toBe(400);
-        expect(response.body.message).toEqual('Invalid credential');
+        expect(response.body.message).toEqual(
+            'Invalid credentials. Please check and try again'
+        );
     }, 10000);
 
     test('Login and get profile', async () => {
@@ -302,7 +325,9 @@ describe('Users API', () => {
             .set('Cookie', `clientId=${clientId}`)
             .send();
         expect(response.status).toBe(401);
-        expect(response.body.message).toEqual('Unauthorized');
+        expect(response.body.message).toEqual(
+            'You do not have permission to perform this action'
+        );
 
         const cookies = `clientId=${clientId};accessToken=${accessToken};refreshToken=${refreshToken}`;
 

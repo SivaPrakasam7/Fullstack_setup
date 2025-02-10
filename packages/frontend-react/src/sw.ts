@@ -1,4 +1,6 @@
-const CACHE_NAME = import.meta.env.VITE_APP_NAME;
+const CACHE_NAME = `${import.meta.env.VITE_APP_NAME}`
+    .replaceAll("\\'", '')
+    .replaceAll(' ', '_');
 
 self.addEventListener('install', (event) => {
     console.info('Service Worker installing');
@@ -23,7 +25,7 @@ self.addEventListener('activate', (event) => {
 
 self.addEventListener('fetch', (event) => {
     if (
-        !event.request.url.match(new RegExp(import.meta.env.VITE_CDN_DOMAIN)) &&
+        // !event.request.url.match(new RegExp(import.meta.env.VITE_CDN_DOMAIN)) &&
         event.request.url.match(/\.(jpe?g|png|gif|webp|svg|otf|json|svg|mp4)$/i)
     ) {
         event.respondWith(handleOtherRequests(event.request));

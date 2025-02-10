@@ -37,6 +37,16 @@ export default {
     created() {
         document.getElementsByTagName('title')[0]!.innerText =
             import.meta.env.VITE_APP_NAME;
+
+        document.documentElement.style.setProperty(
+            '--scale-factor',
+            window.devicePixelRatio.toString()
+        );
+        if (window.devicePixelRatio >= 1) {
+            const scale = 1 / window.devicePixelRatio;
+            document.body.style.zoom = `${scale}`;
+        }
+
         window.logout = () => {
             store.commit('clearUser');
             router.push({ path: routes.root });

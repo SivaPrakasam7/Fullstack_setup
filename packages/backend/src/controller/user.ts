@@ -88,10 +88,8 @@ export const requestVerifyController: IMiddleWare = async (req, res, next) => {
     try {
         const data = req.body;
         const result = await requestVerificationService(data);
-
         res.status(200).json({
-            message: messages.responses.success,
-            data: result,
+            message: result,
         });
     } catch (e) {
         next(e as IError);
