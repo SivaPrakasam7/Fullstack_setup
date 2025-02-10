@@ -16,9 +16,9 @@ export const verifyPassword: IVerifyPassword = (
     requestPassword,
     dbPassword
 ) => {
-    return new Promise((resolve, rejected) => {
+    return new Promise((resolve) => {
         bcryptjs.compare(requestPassword, dbPassword, (error, isMatch) => {
-            if (error) rejected(!error);
+            if (error) resolve(false);
             resolve(isMatch);
         });
     });

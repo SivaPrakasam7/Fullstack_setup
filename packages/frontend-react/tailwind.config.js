@@ -1089,6 +1089,10 @@ module.exports = {
                     '@apply px-4 py-2 rounded-xl w-fit flex items-center border justify-center hover:bg-black hover:text-white hover:dark:bg-white hover:dark:text-black hover:shadow-[0_0_10px_5px_#ffffff50] transition-all duration-300':
                         {},
                 },
+                '.app-button-fill': {
+                    '@apply px-4 py-2 rounded-xl w-fit flex items-center border justify-center bg-black text-white dark:bg-white dark:text-black hover:shadow-[0_0_10px_5px_#ffffff50] transition-all duration-300':
+                        {},
+                },
                 '.app-menu': {
                     '@apply origin-top-right absolute right-1 rounded-md shadow-xl bg-white dark:bg-black border overflow-hidden z-10':
                         {},

@@ -121,7 +121,7 @@ export const loginService: IService<{
 
     const isPasswordVerified = await verifyPassword(
         data.password,
-        user.passwordHash
+        user.passwordHash?.toString()
     );
     if (!isPasswordVerified) {
         await increaseFailedAttemptRepo(user.userId);

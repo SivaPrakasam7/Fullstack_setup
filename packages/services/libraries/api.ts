@@ -66,7 +66,7 @@ export const Request = async (
 
                 return {
                     error: true,
-                    message: e.response?.data?.message,
+                    message: e.response?.data?.message || 'API not found',
                     code: e.response?.status,
                 };
             });
