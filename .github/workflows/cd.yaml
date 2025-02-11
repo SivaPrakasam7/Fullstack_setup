@@ -54,7 +54,7 @@ jobs:
                   key: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
                   port: ${{ secrets.PROD_SSH_PORT }}
                   source: 'packages/backend/dist/'
-                  target: ${{ secrets.PROD_REMOTE_DIRECTORY_PATH }}
+                  target: ${{ secrets.PROD_REMOTE_BACKEND_DIRECTORY_PATH }}
                   rm: true
                   strip_components: 3
 
@@ -96,7 +96,7 @@ jobs:
                   key: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
                   port: ${{ secrets.PROD_SSH_PORT }}
                   source: 'packages/frontend-react/dist/'
-                  target: ${{ secrets.PROD_REMOTE_DIRECTORY_PATH }}
+                  target: ${{ secrets.PROD_REMOTE_REACT_WEB_DIRECTORY_PATH }}
                   rm: true
                   strip_components: 3
 
@@ -138,6 +138,6 @@ jobs:
                   key: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
                   port: ${{ secrets.PROD_SSH_PORT }}
                   source: 'packages/frontend-vue/dist/'
-                  target: ${{ secrets.PROD_REMOTE_DIRECTORY_PATH }}
+                  target: ${{ secrets.PROD_REMOTE_VUE_WEB_DIRECTORY_PATH }}
                   rm: true
                   strip_components: 3

@@ -17,7 +17,7 @@ function App() {
             '--scale-factor',
             window.devicePixelRatio.toString()
         );
-        if (window.devicePixelRatio >= 1) {
+        if (window.devicePixelRatio >= 1 && window.innerWidth > 768) {
             const scale = 1 / window.devicePixelRatio;
             document.body.style.zoom = `${scale}`;
         }
