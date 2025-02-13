@@ -286,7 +286,7 @@ export const changePasswordService: IService<string> = async (data) => {
 
     const isPasswordVerified = await verifyPassword(
         data.password,
-        user.passwordHash
+        user.passwordHash?.toString()
     );
 
     if (isPasswordVerified)
@@ -314,7 +314,7 @@ export const updatePasswordService: IService<string> = async (data) => {
 
     const isPasswordVerified = await verifyPassword(
         data.currentPassword,
-        user.passwordHash
+        user.passwordHash?.toString()
     );
 
     if (!isPasswordVerified)
