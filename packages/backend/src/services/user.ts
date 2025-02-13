@@ -205,9 +205,10 @@ export const requestVerificationService: IService<string> = async (data) => {
 
         if (!result) throw createError(400, messages.responses.otpFailed);
 
-        return process.env.MODE === 'development'
-            ? otp
-            : messages.responses.otpSent;
+        response.phoneNumber =
+            process.env.MODE === 'development'
+                ? otp
+                : messages.responses.otpSent;
     }
     return Object.values(response).join(' ').trim();
 };
