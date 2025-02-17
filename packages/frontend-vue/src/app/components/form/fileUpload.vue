@@ -248,7 +248,7 @@ export default {
                 ? file
                 : file.type.includes('image')
                   ? URL.createObjectURL(file)
-                  : '/images/svg/file.svg';
+                  : '/icons/svg/file.svg';
         },
         removeLocalImages(index: number) {
             this.files = this.files.filter((_, i) => i !== index);

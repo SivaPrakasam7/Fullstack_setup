@@ -393,7 +393,7 @@ export const TextField = ({
                             {filterOptions.map((option, index) => (
                                 <li
                                     key={index}
-                                    data-testid={option}
+                                    data-testid={`${name}-option`}
                                     className="app-menu-item capitalize"
                                     onClick={() => selectOption(option.id)}
                                 >
@@ -423,8 +423,7 @@ export const TextField = ({
                                 data-testid={`${name}-error`}
                                 className="mt-1 text-xs italic min-h-4 text-gray-400"
                             >
-                                separated by commas, semicolons, or
-                                newlines{' '}
+                                separated by commas, semicolons, or newlines
                             </span>
                             <br />
                         </>

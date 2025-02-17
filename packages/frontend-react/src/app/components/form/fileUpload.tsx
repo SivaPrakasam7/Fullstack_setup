@@ -113,7 +113,7 @@ export const FileUpload = ({
             ? file
             : file.type.includes('image')
               ? URL.createObjectURL(file)
-              : '/images/svg/file.svg';
+              : '/icons/svg/file.svg';
     };
     const removeLocalImages = (index: number) => {
         setFiles((prev) => {

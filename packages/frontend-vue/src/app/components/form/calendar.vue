@@ -17,7 +17,7 @@
                 @click="prevMonth"
             >
                 <SvgIcon
-                    path="/images/svg/arrowCurve.svg"
+                    path="/icons/svg/arrowCurve.svg"
                     class="!text-black -rotate-90 !w-6 !h-6"
                     disable-hover="true"
                 ></SvgIcon>
@@ -29,7 +29,7 @@
                 @click="nextMonth"
             >
                 <SvgIcon
-                    path="/images/svg/arrowCurve.svg"
+                    path="/icons/svg/arrowCurve.svg"
                     class="!text-black rotate-90 !w-6 !h-6"
                     disable-hover="true"
                 ></SvgIcon>

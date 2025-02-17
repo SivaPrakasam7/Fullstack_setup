@@ -12,7 +12,7 @@ export const updatePublicKey = async () => {
         method: 'get',
         url: `v1/security/keyPair`,
     }).then((data) => {
-        localStorage.setItem('publicKey', data.publicKey);
+        if (data.publicKey) localStorage.setItem('publicKey', data.publicKey);
         return data;
     });
 };

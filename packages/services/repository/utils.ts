@@ -56,6 +56,34 @@ export const encrypt = async (data: ILargeRecord) => {
     return data;
 };
 
+export const calculateFileChecksum = (file: File) => {
+    const fileReader = new FileReader();
+
+    return new Promise((resolve, reject) => {
+        fileReader.onload = async (event) => {
+            try {
+                const fileArrayBuffer = event.target!.result as ArrayBuffer;
+
+                const hashBuffer = await crypto.subtle.digest(
+                    'SHA-256',
+                    fileArrayBuffer
+                );
+
+                const hashArray = Array.from(new Uint8Array(hashBuffer));
+                const hashHex = hashArray
+                    .map((byte) => byte.toString(16).padStart(2, '0'))
+                    .join('');
+
+                resolve(hashHex);
+            } catch (error) {
+                reject('Error calculating checksum: ' + error);
+            }
+        };
+
+        fileReader.readAsArrayBuffer(file);
+    });
+};
+
 export const byteFormat = (bytes: number, decimals: number) => {
     if (!+bytes) return '0 Bytes';
 
@@ -66,4 +94,8 @@ export const byteFormat = (bytes: number, decimals: number) => {
     const i = Math.floor(Math.log(bytes) / Math.log(k));
 
     return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
+};
+
+export const generateKey = () => {
+    return Math.random().toString(36).substring(2, 12);
 };

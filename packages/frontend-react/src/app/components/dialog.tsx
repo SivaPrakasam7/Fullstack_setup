@@ -30,7 +30,6 @@ export const DialogView = ({
                 onClick={(e) => e.stopPropagation()}
             >
                 <div
-                    v-if="show"
                     className={`w-full max-sm:w-[90dvw] h-auto rounded-2xl relative bg-white dark:bg-black border ${contentClass}`}
                 >
                     {!hideClose && (

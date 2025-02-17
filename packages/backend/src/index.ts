@@ -13,8 +13,9 @@ dotenv.config();
 import { errorHandler } from '../src/handler/error';
 import { logAccess } from '../src/handler/logger';
 import { swaggerSpec } from '../src/swagger';
-import userRotes from '../src/routes/user';
+import userRoutes from '../src/routes/user';
 import securityRoutes from '../src/routes/security';
+import utilRoutes from '../src/routes/utils';
 import {
     clientHandler,
     decryptPayload,
@@ -49,6 +50,8 @@ app.disable('x-powered-by');
 // app.use(helmet.hidePoweredBy());
 app.use(clientHandler);
 
+app.use('/files', express.static('../assets/files'));
+
 app.get('/', (_, res) => {
     res.send('API running successfully!');
 });
@@ -58,8 +61,9 @@ app.use(decryptPayload);
 app.use(logAccess);
 app.use(inputValidationMiddleware);
 
-app.use('/v1/user', userRotes);
+app.use('/v1/user', userRoutes);
 app.use('/v1/security', securityRoutes);
+app.use('/v1/utils', utilRoutes);
 
 app.use(errorHandler);
 

@@ -9,7 +9,11 @@ export const sendMail: ISendMail = async (templatePath, data, config) => {
         ...config,
     };
     const template = await readFileData(templatePath);
-    mailConfigurations.html = renderHTML(template, data);
+    mailConfigurations.html = renderHTML(template, {
+        ...data,
+        year: new Date().getFullYear(),
+        companyName: process.env.APP_NAME!,
+    });
 
     const _transporter =
         process.env.MODE === 'development' && testTransporter

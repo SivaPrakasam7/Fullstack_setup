@@ -47,12 +47,12 @@
             <slot name="startIcon" />
             <SvgIcon
                 v-if="['date', 'datetime-local'].includes(type)"
-                path="/images/svg/calendar.svg"
+                path="/icons/svg/calendar.svg"
                 class="!w-6 !h-6 m-auto ml-2 !text-gray-400"
             ></SvgIcon>
             <SvgIcon
                 v-if="type === 'time'"
-                path="/images/svg/time.svg"
+                path="/icons/svg/time.svg"
                 class="!w-6 !h-6 m-auto ml-2 !text-gray-400"
             ></SvgIcon>
             <textarea
@@ -116,12 +116,12 @@
             >
                 <SvgIcon
                     v-if="show"
-                    path="/images/svg/visibility.svg"
+                    path="/icons/svg/visibility.svg"
                     class="!h-5 !w-5 !text-current"
                 ></SvgIcon>
                 <SvgIcon
                     v-else
-                    path="/images/svg/visibility_off.svg"
+                    path="/icons/svg/visibility_off.svg"
                     class="!h-5 !w-5 !text-current"
                 ></SvgIcon>
             </button>
@@ -133,7 +133,7 @@
                 @click="toggleMenu()"
             >
                 <SvgIcon
-                    path="/images/svg/arrow.svg"
+                    path="/icons/svg/arrow.svg"
                     :class="[
                         '!h-3 !w-3 !text-current transition-transform duration-300',
                         showMenu ? '' : 'rotate-180',
