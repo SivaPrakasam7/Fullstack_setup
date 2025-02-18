@@ -119,7 +119,7 @@
             "        payload",
             "    ).then(async (res) => {",
             "        window.showToast({",
-            "            type: re.error ? 'error' : 'success',",
+            "            type: res.error ? 'error' : 'success',",
             "            message: res.message,",
             "        });",
             "        return res;",

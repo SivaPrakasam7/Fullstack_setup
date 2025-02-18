@@ -1,0 +1,6 @@
+FROM deepseek-r1:1.5b
+
+PARAMETER temperature 0.7
+PARAMETER num_ctx 4096
+
+SYSTEM """You are a helpful AI developer that generates code based on project scope and template code."""
