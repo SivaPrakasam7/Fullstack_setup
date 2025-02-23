@@ -5,6 +5,8 @@ import {
     FormEvent,
     useMemo,
     useState,
+    useEffect,
+    useRef,
 } from 'react';
 
 //
@@ -37,6 +39,7 @@ export const TextField = ({
     startIcon,
     endIcon,
     onChange,
+    onKeyPress,
     className,
     disableFilter = false,
     maxLength = 19,
@@ -64,13 +67,16 @@ export const TextField = ({
     | 'onChange'
     | 'disableFilter'
     | 'maxLength'
+    | 'onKeyPress'
 > &
     Required<Pick<IFormField, 'name' | 'type' | 'onChange'>>) => {
     const [show, setShow] = useState(
         ['date', 'datetime-local', 'time'].includes(type) || false
     );
     const [showMenu, setShowMenu] = useState(false);
+    const [filterMenu, setFilterMenu] = useState(false);
     const [otp, setOTP] = useState<string[]>([]);
+    const menuRef = useRef<HTMLUListElement>(null);
 
     //
     const filterOptions = useMemo(
@@ -78,7 +84,7 @@ export const TextField = ({
             type === 'select' || disableFilter
                 ? options || []
                 : options?.filter((option) =>
-                      value
+                      value && filterMenu
                           ? `${option.id} ${option.label}`
                                 .toLowerCase()
                                 .includes(`${value}`.toLowerCase())
@@ -91,7 +97,10 @@ export const TextField = ({
     const handleInput = (
         e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
     ) => {
-        if (['autocomplete', 'select'].includes(type)) setShowMenu(true);
+        if (['autocomplete', 'select'].includes(type)) {
+            setShowMenu(true);
+            setFilterMenu(true);
+        }
         onChange({
             name,
             value: e.target.value,
@@ -178,6 +187,7 @@ export const TextField = ({
     };
 
     const filterNumericInput = (event: KeyboardEvent<HTMLInputElement>) => {
+        onKeyPress?.(event);
         if (type === 'number') {
             const char = String.fromCharCode(event.charCode);
             if (
@@ -205,6 +215,7 @@ export const TextField = ({
     const toggleMenu = () => {
         if (['autocomplete', 'select'].includes(type)) {
             setShowMenu((prev) => !prev);
+            setFilterMenu(false);
             if (showMenu)
                 setTimeout(() => {
                     document.removeEventListener('click', handleOutsideClick);
@@ -217,6 +228,7 @@ export const TextField = ({
     const handleOutsideClick = () => {
         if (showMenu) {
             setShowMenu(false);
+            setFilterMenu(false);
             onChange({
                 name,
                 value,
@@ -228,6 +240,7 @@ export const TextField = ({
     const selectOption = (value: string) => {
         onChange({ name, value, id: true });
         setShowMenu(false);
+        setFilterMenu(false);
         document.removeEventListener('click', handleOutsideClick);
     };
 
@@ -238,6 +251,26 @@ export const TextField = ({
     const blur = () => {
         if (['date', 'datetime-local', 'time'].includes(type)) setShow(true);
     };
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (
+                showMenu &&
+                menuRef.current &&
+                event.target &&
+                !menuRef.current?.contains(event.target as Node)
+            ) {
+                setShowMenu(false);
+                setFilterMenu(false);
+            }
+        };
+
+        if (showMenu)
+            document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [showMenu]);
 
     return (
         <div className={`w-full ${className}`}>
@@ -387,6 +420,7 @@ export const TextField = ({
                     {endIcon}
                     {['autocomplete', 'select'].includes(type) && showMenu && (
                         <ul
+                            ref={menuRef}
                             data-testid={`${name}-menu`}
                             className="absolute bg-white dark:bg-black border shadow-[0_0_5px_#00000050] dark:shadow-[#ffffff50] rounded-lg w-full max-h-32 h-fit overflow-auto z-10 top-[100%] max-md:fixed max-md:left-[50%] max-md:top-[50%] max-md:-translate-x-[50%] max-md:-translate-y-[50%] max-md:max-w-sm max-sm:w-[90%]"
                         >

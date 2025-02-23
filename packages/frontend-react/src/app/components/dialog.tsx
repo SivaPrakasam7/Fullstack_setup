@@ -18,9 +18,9 @@ export const DialogView = ({
     return (
         <div
             data-testid="DIALOG_BACKGROUND"
-            className={`fixed bottom-0 left-1/2 -translate-x-1/2 no-scrollbar flex items-center justify-center overflow-hidden duration-500 bg-black bg-opacity-50 ${
+            className={`fixed top-0 left-1/2 -translate-x-1/2 no-scrollbar flex items-center justify-center overflow-hidden duration-500 bg-black bg-opacity-50 ${
                 open
-                    ? '!w-screen !h-dvh opacity-100 z-40 backdrop-blur-sm'
+                    ? '!w-screen !h-screen opacity-100 z-40 backdrop-blur-sm'
                     : '!w-0 !h-0 !opacity-0 -z-0'
             }`}
             onClick={close}

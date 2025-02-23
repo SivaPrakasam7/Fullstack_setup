@@ -1098,7 +1098,7 @@ module.exports = {
                         {},
                 },
                 '.app-menu-item': {
-                    '@apply flex gap-2 justify-between items-center w-full p-2 px-4 text-gray-700 dark:text-gray-300 hover:bg-gray-100 hover:dark:text-black':
+                    '@apply flex gap-2 justify-between items-center w-full p-2 px-4 text-gray-700 dark:text-gray-300 hover:bg-gray-100 hover:dark:text-black cursor-pointer':
                         {},
                 },
             });

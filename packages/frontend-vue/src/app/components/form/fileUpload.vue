@@ -242,6 +242,7 @@ export default {
                     }
                 } else this.localError = `Maximum allowed files : ${this.max}`;
             }
+            fileInput.value = '';
         },
         getObjectURL(file: File | string) {
             return typeof file === 'string'

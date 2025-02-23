@@ -53,7 +53,7 @@ export const Request = async (
                     return { error: true, message: e.response?.data?.message };
 
                 if (
-                    e.config.baseURL == baseURL &&
+                    e.config?.baseURL == baseURL &&
                     e.response?.status === 401 &&
                     window.signedIn
                 ) {

@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { ReactNode, KeyboardEvent } from 'react';
 
 export interface IFormField {
     name?: string;
@@ -72,6 +72,7 @@ export interface IFormField {
     element?: ReactNode;
     icon?: ReactNode;
     onChange?: (field: IFieldChange) => void;
+    onKeyPress?: (e: KeyboardEvent<HTMLInputElement>) => void;
 }
 
 export type IFieldChange = {

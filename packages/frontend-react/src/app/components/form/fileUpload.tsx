@@ -73,7 +73,7 @@ export const FileUpload = ({
     const loadFile = async (event: ChangeEvent<HTMLInputElement>) => {
         const files = [];
         setLocalError('');
-        const fileInput = event.target as unknown as { files: File[] };
+        const fileInput = event.target;
 
         if (fileInput.files && fileInput.files.length > 0) {
             if (fileInput.files.length <= +max) {
@@ -106,6 +106,7 @@ export const FileUpload = ({
             } else setLocalError(`Maximum allowed files : ${max}`);
         }
         setFiles(files);
+        fileInput.value = '';
     };
 
     const getObjectURL = (file: File | string) => {
