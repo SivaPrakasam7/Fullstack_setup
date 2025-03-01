@@ -3,7 +3,7 @@ import { ChangeEvent, DragEvent, useEffect, useState } from 'react';
 //
 import { DialogView } from '../dialog';
 import { IFormField } from './form.types';
-import { byteFormat } from 'services/repository/utils';
+import { byteFormat, formatAcceptTypes } from 'services/repository/utils';
 import { CropperView } from '../cropper';
 import SvgIcon from '../svg';
 
@@ -232,7 +232,9 @@ export const FileUpload = ({
                                     className="rounded-lg border-white object-cover h-full w-full pointer-events-none"
                                 />
                             )}
-
+                            <p className="text-[10px] text-gray-500 mt-2">
+                                {image.name}
+                            </p>
                             <button
                                 aria-label="close-information"
                                 data-testid="REMOVE_FILE"
@@ -253,7 +255,10 @@ export const FileUpload = ({
                 data-testid="`${name}-error`"
                 className={`mt-1 text-xs italic min-h-4 ${error || localError ? 'text-red-500' : 'text-gray-400'}`}
             >
-                {localError || error || helperText}
+                {localError ||
+                    error ||
+                    helperText ||
+                    `File types ${formatAcceptTypes(accept)}. Upload limit maximum ${byteFormat(fileSize, 0)} allowed`}
             </p>
             <DialogView
                 open={showCropper}

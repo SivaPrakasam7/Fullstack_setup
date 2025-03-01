@@ -18,7 +18,7 @@
             <input
                 v-for="(i, index) in length"
                 :key="i"
-                ref="otpInputs"
+                :ref="`${name}-otpInputs`"
                 :name="name + i"
                 :data-testid="name + i"
                 :type="type"
@@ -400,7 +400,9 @@ export default {
         // OTP
         handleInputChange(event: Event, index: number) {
             const target = event.target as unknown as { value: string };
-            const otpInputs = this.$refs.otpInputs as HTMLInputElement[];
+            const otpInputs = this.$refs[
+                `${this.name}-otpInputs`
+            ] as HTMLInputElement[];
             if (/^\d$/.test(target.value)) {
                 this.otp[index] = target.value;
                 this.$emit('onchange', {
@@ -437,7 +439,9 @@ export default {
             }
         },
         handleKeyDown(event: KeyboardEvent, index: number) {
-            const otpInputs = this.$refs.otpInputs as HTMLInputElement[];
+            const otpInputs = this.$refs[
+                `${this.name}-otpInputs`
+            ] as HTMLInputElement[];
             if (
                 index > 0 &&
                 event.key === 'Backspace' &&

@@ -5,8 +5,8 @@ import {
     FormEvent,
     useMemo,
     useState,
-    useEffect,
     useRef,
+    useEffect,
 } from 'react';
 
 //
@@ -113,7 +113,7 @@ export const TextField = ({
     ) => {
         const target = event.target as unknown as { value: string };
         const otpInputs = document.querySelectorAll(
-            '[data-ref="otpInputs"]'
+            `[data-ref="${name}-otpInputs"]`
         ) as unknown as HTMLInputElement[];
         if (/^\d$/.test(target.value)) {
             setOTP((_otp) => {
@@ -165,7 +165,7 @@ export const TextField = ({
         index: number
     ) => {
         const otpInputs = document.querySelectorAll(
-            '[data-ref="otpInputs"]'
+            `[data-ref="${name}-otpInputs"]`
         ) as unknown as HTMLInputElement[];
         if (index > 0 && event.key === 'Backspace' && !otpInputs[index].value) {
             const previousInput = otpInputs[index - 1];
@@ -277,7 +277,7 @@ export const TextField = ({
             {label && (
                 <label
                     htmlFor={name}
-                    className="block mb-1 text-sm font-bold text-gray-600 dark:text-white"
+                    className="block mb-1 text-sm text-gray-600 dark:text-white"
                 >
                     {label}
                     {label && required && (
@@ -295,12 +295,11 @@ export const TextField = ({
                     {new Array(length).fill(null).map((_, i) => (
                         <input
                             key={i + 1}
-                            data-ref="otpInputs"
+                            data-ref={`${name}-otpInputs`}
                             name={name + i + 1}
                             data-testid={name + i + 1}
                             type={type}
                             disabled={disabled}
-                            placeholder={placeHolder}
                             className={`text-md rounded-md outline-none bg-transparent text-center w-10 h-10 bg-gray-100 dark:bg-none ${size} ${
                                 disabled
                                     ? 'bg-gray-400 text-gray-400 dark:text-gray-300'
@@ -367,7 +366,8 @@ export const TextField = ({
                             onClick={toggleMenu}
                             onChange={handleInput}
                             value={
-                                ['autocomplete', 'select'].includes(type)
+                                ['autocomplete', 'select'].includes(type) &&
+                                value
                                     ? options.find((o) => o.id === value)?.label
                                     : value
                             }

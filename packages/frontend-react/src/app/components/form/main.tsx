@@ -1,4 +1,4 @@
-import { FormEvent, ReactNode, useEffect, useState } from 'react';
+import { FormEvent, ReactNode, useEffect, useMemo, useState } from 'react';
 
 //
 import { getTagValues } from 'services/constants';
@@ -156,6 +156,14 @@ export const FormBuilder = ({
         setLoading(false);
     };
 
+    const fields = useMemo(
+        () =>
+            Object.entries(initialData || {}).filter(
+                ([_, field]) => !field.ref
+            ),
+        [initialData]
+    );
+
     //
     useEffect(() => {
         setData({ ...form });
@@ -168,20 +176,19 @@ export const FormBuilder = ({
             onSubmit={onSubmit}
         >
             {formTop}
-            {Object.entries(data || {})
-                .filter(([_, field]) => !field.ref)
-                .map(([fieldName, field]) => (
-                    <div
-                        key={fieldName}
-                        className={`w-full ${field.alignClass}`}
-                    >
-                        <FormElements
-                            fieldName={fieldName}
-                            field={field}
-                            onFieldChange={onFieldChange}
-                        />
-                    </div>
-                ))}
+            {fields.map(([fieldName, field]) => (
+                <div
+                    key={`${fieldName}-holder`}
+                    className={`w-full ${field.alignClass}`}
+                >
+                    <FormElements
+                        fieldName={fieldName}
+                        field={data[fieldName]}
+                        onFieldChange={onFieldChange}
+                    />
+                </div>
+            ))}
+            {/* <div className="h-5" /> */}
             {formBottom ? (
                 formBottom
             ) : (
@@ -189,7 +196,7 @@ export const FormBuilder = ({
                     disabled={loading}
                     type="submit"
                     data-testid="SUBMIT"
-                    className={`app-button ${loading ? 'text-gray-400' : ''} ${buttonClass}`}
+                    className={`app-button-fill ${loading ? 'text-gray-400' : ''} ${buttonClass}`}
                     onContextMenu={() => {
                         return false;
                     }}
@@ -220,12 +227,14 @@ export const FormElements = ({
         return (
             <label className={field.layoutClass}>
                 {field.label}
-                <span
-                    v-show="field.label && field.required"
-                    className="text-red-400 font-bold text-xs"
-                >
-                    *
-                </span>
+                {field.required && (
+                    <span
+                        v-show="field.label && field.required"
+                        className="text-red-400 font-bold text-xs"
+                    >
+                        *
+                    </span>
+                )}
                 {field.icon}
             </label>
         );

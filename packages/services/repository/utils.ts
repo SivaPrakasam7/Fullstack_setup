@@ -96,6 +96,21 @@ export const byteFormat = (bytes: number, decimals: number) => {
     return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
 };
 
+export const formatAcceptTypes = (accept: string): string => {
+    const mimeMap: { [key: string]: string } = {
+        'image/jpeg': 'JPEG',
+        'image/png': 'PNG',
+        'image/gif': 'GIF',
+        'application/pdf': 'PDF',
+    };
+    return accept
+        .split(',')
+        .map(
+            (mime) => mimeMap[mime] || mime.split('/')[1]?.toUpperCase() || mime
+        )
+        .join(', ');
+};
+
 export const generateKey = () => {
     return Math.random().toString(36).substring(2, 12);
 };

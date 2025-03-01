@@ -84,7 +84,7 @@ export const Table = ({ data, columns }: ITable) => {
                             <td
                                 scope="row"
                                 colSpan={columns.length}
-                                className="px-6 py-4 font-medium col-span-6 text-center text-2xl text-gray-400"
+                                className="px-6 py-10 font-medium col-span-6 text-center text-2xl text-gray-400"
                             >
                                 No data found
                             </td>
