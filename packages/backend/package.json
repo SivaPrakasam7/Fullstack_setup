@@ -3,7 +3,7 @@
     "version": "1.0.0",
     "engines": {
         "npm": "10.9.2",
-        "node": "v22.13.1"
+        "node": "v22.14.0"
     },
     "scripts": {
         "test": "MODE=test jest --detectOpenHandles --verbose",
