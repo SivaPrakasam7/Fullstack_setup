@@ -34,7 +34,7 @@ const router = express.Router();
 // Create user API
 /**
  * @swagger
- * /create:
+ * /v1/user/create:
  *   post:
  *     summary: Create a new user
  *     description: Creates a new user with the provided details. Either a password or providerId must be specified.
@@ -117,7 +117,7 @@ router
 // User login API
 /**
  * @swagger
- * /login:
+ * /v1/user/login:
  *   post:
  *     summary: User login
  *     description: Authenticates a user with their email and password.
@@ -200,7 +200,7 @@ router.route('/login').post(validator(loginValidation), loginController);
 // Get user profile API
 /**
  * @swagger
- * /profile:
+ * /v1/user/profile:
  *   get:
  *     summary: Get user profile
  *     description: Retrieves the authenticated user's profile information. Requires a valid authentication token stored in a cookie.
@@ -257,7 +257,7 @@ router.route('/profile').get(tokenChecker, userController);
 // Request email verification mail
 /**
  * @swagger
- * /request-verification:
+ * /v1/user/request-verification:
  *   post:
  *     summary: Request verification
  *     description: Requests verification for a user by providing either an email or phone number.
@@ -319,7 +319,7 @@ router
 // Email and Phone verification API
 /**
  * @swagger
- * /verify-email:
+ * /v1/user/verify-email:
  *   get:
  *     summary: Verify email
  *     description: Verifies a user's email address using a token provided in the Authorization header.
@@ -362,7 +362,7 @@ router.route('/verify-email').get(headerTokenChecker, verifyEmailController);
 
 /**
  * @swagger
- * /verify-phone:
+ * /v1/user/verify-phone:
  *   post:
  *     summary: Verify phone number
  *     description: Verifies a user's phone number using an OTP and phone number.
@@ -423,7 +423,7 @@ router
 // Generate reset password link API
 /**
  * @swagger
- * /request-reset-password:
+ * /v1/user/request-reset-password:
  *   post:
  *     summary: Request password reset
  *     description: Initiates a password reset process by sending a reset link or code to the provided email.
@@ -478,7 +478,7 @@ router
 // Change password API
 /**
  * @swagger
- * /change-password:
+ * /v1/user/change-password:
  *   post:
  *     summary: Change user password
  *     description: Changes the user's password using a new password provided in the request body. Requires a valid authentication token in the Authorization header.
@@ -548,7 +548,7 @@ router
 
 /**
  * @swagger
- * /update-password:
+ * /v1/user/update-password:
  *   put:
  *     summary: Update user password
  *     description: Updates the user's password by verifying the current password and setting a new one. Requires a valid authentication token stored in a cookie.
@@ -635,7 +635,7 @@ router
 // Logout user
 /**
  * @swagger
- * /logout:
+ * /v1/user/logout:
  *   post:
  *     summary: Log out user
  *     description: Logs out the authenticated user by invalidating their session or token. Requires a valid authentication token stored in a cookie.
@@ -679,7 +679,7 @@ router.route('/logout').post(tokenChecker, logoutController);
 // Update profile
 /**
  * @swagger
- * /update:
+ * /v1/user/update:
  *   put:
  *     summary: Update user profile
  *     description: Updates the authenticated user's profile information, such as name or profile URL. Requires a valid authentication token stored in a cookie.
