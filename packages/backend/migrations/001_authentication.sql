@@ -34,7 +34,7 @@ CREATE INDEX idx_email ON `users` (`email`);
 CREATE TABLE
     `verifications` (
         `id` INT (11) AUTO_INCREMENT,
-        `source` VARCHAR(255) NOT NULL, -- The actual source (email)
+        `source` VARCHAR(255) NOT NULL UNIQUE, -- The actual source (email)
         `verified` INT (11) NOT NULL DEFAULT 0,
         `code` CHAR(6),
         `isDeleted` INT (11) NOT NULL DEFAULT 0,

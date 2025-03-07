@@ -160,7 +160,8 @@ const runMigrations = async () => {
 
         // Filter out migrations that haven't been applied yet
         const newMigrations = migrationFiles.filter(
-            (file) => !appliedMigrations.includes(file)
+            (file) =>
+                file === 'procedures.sql' || !appliedMigrations.includes(file)
         );
 
         // Apply new migrations
