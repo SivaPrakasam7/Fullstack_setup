@@ -65,6 +65,7 @@ jobs:
                   script: |
                       cd ${{ secrets.PROD_REMOTE_BACKEND_DIRECTORY_PATH }}
                       npm i
+                      npm run migrate
                       pm2 reload ${{ secrets.PROD_BACKEND_APP_NAME }}
 
     build-react-frontend:
