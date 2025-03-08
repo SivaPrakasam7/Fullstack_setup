@@ -2,7 +2,6 @@ import express from 'express';
 import { rateLimit } from 'express-rate-limit';
 import cors from 'cors';
 import dotenv from 'dotenv';
-// import helmet from 'helmet';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import swaggerUI from 'swagger-ui-express';
@@ -44,10 +43,6 @@ app.use(bodyParser.urlencoded({ limit: '5MB', extended: true }));
 app.use(cookieParser());
 app.use(express.json());
 app.disable('x-powered-by');
-// app.use(helmet());
-// app.use(helmet.xssFilter());
-// app.use(helmet.noSniff());
-// app.use(helmet.hidePoweredBy());
 app.use(clientHandler);
 
 app.use('/files', express.static('../assets/files'));
