@@ -40,8 +40,8 @@ jobs:
             - name: Build backend
               working-directory: packages/backend
               run: |
-                  echo "${{ secrets.PRODUCTION_BACKEND_ENV }}" > .env
                   npm run build
+                  echo "${{ secrets.PRODUCTION_BACKEND_ENV }}" > out/.env
 
             - name: Upload to Server
               uses: appleboy/scp-action@v0.1.7
