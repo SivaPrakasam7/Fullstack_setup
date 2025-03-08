@@ -43,6 +43,7 @@ app.use(bodyParser.urlencoded({ limit: '5MB', extended: true }));
 app.use(cookieParser());
 app.use(express.json());
 app.disable('x-powered-by');
+app.set('trust proxy', 1);
 app.use(clientHandler);
 
 app.use('/files', express.static('../assets/files'));
