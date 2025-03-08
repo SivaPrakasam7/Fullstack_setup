@@ -24,7 +24,7 @@ jobs:
 
             - uses: actions/setup-node@v4
               with:
-                  node-version: '20.14.0'
+                  node-version: '22.14.0'
 
             - name: Cache npm dependencies
               uses: actions/cache@v4
@@ -55,6 +55,18 @@ jobs:
                   rm: true
                   strip_components: 3
 
+            - name: Setup Server
+              uses: appleboy/ssh-action@master
+              with:
+                host: ${{ secrets.PROD_SSH_HOST }}
+                username: ${{ secrets.PROD_SSH_USERNAME }}
+                key: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
+                port: ${{ secrets.PROD_SSH_PORT }}
+                script: |
+                  cd ${{ secrets.PROD_REMOTE_BACKEND_DIRECTORY_PATH }}
+                  npm i
+                  pm2 reload ${{ secrets.PROD_BACKEND_APP_NAME }}
+
     build-react-frontend:
         runs-on: ubuntu-latest
         steps:
@@ -63,7 +75,7 @@ jobs:
 
             - uses: actions/setup-node@v4
               with:
-                  node-version: '20.14.0'
+                  node-version: '22.14.0'
 
             - name: Cache npm dependencies
               uses: actions/cache@v4
@@ -102,7 +114,7 @@ jobs:
 
     #         - uses: actions/setup-node@v4
     #           with:
-    #               node-version: '20.14.0'
+    #               node-version: '22.14.0'
 
     #         - name: Cache npm dependencies
     #           uses: actions/cache@v4
