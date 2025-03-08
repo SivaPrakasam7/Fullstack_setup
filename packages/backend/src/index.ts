@@ -8,7 +8,7 @@ import swaggerUI from 'swagger-ui-express';
 
 dotenv.config();
 
-// Files imports here
+//
 import { errorHandler } from '../src/handler/error';
 import { logAccess } from '../src/handler/logger';
 import { swaggerSpec } from '../src/swagger';
