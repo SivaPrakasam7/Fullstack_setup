@@ -184,10 +184,112 @@ This repository provides a **common project setup** for web apps using **React**
     pm2 start INITIAL_FILE --name APP_NAME --time
     ```
 
-3. **Server configuration**
+3. **Server Configuration**
 
-- Nginx: `setup/config/nginx.conf`
-- Apache: `setup/config/apache.conf`
+    - **Nginx**: `setup/config/nginx.conf`
+    - **Apache**: `setup/config/apache.conf`
+
+    ```bash
+    # Update and upgrade system packages
+    sudo apt update && sudo apt upgrade -y
+
+    # Install Apache
+    sudo apt install apache2 -y
+    sudo systemctl enable apache2
+    sudo systemctl start apache2
+
+    # Install NVM and Node.js
+    curl -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.4/install.sh | bash
+    source ~/.bashrc
+    nvm install --lts
+
+    # Install PM2
+    npm i -g pm2
+    sudo ln -s /home/ubuntu/.nvm/versions/node/$(nvm current)/bin/node /usr/bin/node
+    sudo ln -s /home/ubuntu/.nvm/versions/node/$(nvm current)/bin/npm /usr/bin/npm
+    sudo ln -s /home/ubuntu/.nvm/versions/node/$(nvm current)/bin/pm2 /usr/bin/pm2
+
+    # Install MySQL
+    sudo apt install mysql-server -y
+    sudo mysql_secure_installation
+    sudo mysql -u root
+    CREATE USER 'username'@'localhost' IDENTIFIED BY 'password';
+    GRANT ALL PRIVILEGES ON database_name.* TO 'username'@'localhost';
+    FLUSH PRIVILEGES;
+
+    # Start pm2 app
+    pm2 serve web 3000 --name web --spa
+    pm2 start bundle.js --name backend
+    pm2 save
+    pm2 startup
+
+    # Configure Apache for proxy and SSL
+    sudo a2enmod proxy proxy_http proxy_wstunnel rewrite headers
+    sudo a2ensite domain.conf
+    sudo a2dissite 000-default.conf
+
+    # Install and configure Certbot for SSL
+    sudo apt install certbot python3-certbot-apache -y
+    sudo certbot --apache -d domain -d www.domain
+    sudo certbot renew --dry-run
+    ```
+
+    - **Simple node app**
+
+        - npm init -y
+        - npm install express
+        - nano bundle.js
+
+        ```bash
+        const express = require('express');
+        const app = express();
+        const port = 3006;
+
+        // Define a simple route
+        app.get('/', (req, res) => {
+        res.send('Hello, World! This is a simple Node.js app.');
+        });
+
+        // Start the server
+        app.listen(port, () => {
+        console.log(`Server running at http://localhost:${port}`);
+        });
+        ```
+
+        - node bundle.js
+
+    - **Simple web app**
+
+        - nano index.html
+
+        ```bash
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Simple Web App</title>
+            <style>
+                body {
+                    margin: 0;
+                    height: 100vh;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    font-family: Arial, sans-serif;
+                    background-color: #f0f0f0;
+                }
+                h1 {
+                    font-size: 48px;
+                    color: #333;
+                }
+            </style>
+        </head>
+        <body>
+            <h1>APPNAME</h1>
+        </body>
+        </html>
+        ```
 
 ## GitHub Actions Workflow
 
