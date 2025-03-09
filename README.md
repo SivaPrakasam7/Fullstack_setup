@@ -232,8 +232,9 @@ This repository provides a **common project setup** for web apps using **React**
     sudo apt install certbot python3-certbot-apache -y
     sudo certbot --apache -d domain -d www.domain
     sudo certbot renew --dry-run
-    
+
     ```
+
 - **Simple node app**
 
     - npm init -y
