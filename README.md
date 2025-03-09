@@ -232,64 +232,64 @@ This repository provides a **common project setup** for web apps using **React**
     sudo apt install certbot python3-certbot-apache -y
     sudo certbot --apache -d domain -d www.domain
     sudo certbot renew --dry-run
+    
+    ```
+- **Simple node app**
+
+    - npm init -y
+    - npm install express
+    - nano bundle.js
+
+    ```bash
+    const express = require('express');
+    const app = express();
+    const port = 3006;
+
+    // Define a simple route
+    app.get('/', (req, res) => {
+    res.send('Hello, World! This is a simple Node.js app.');
+    });
+
+    // Start the server
+    app.listen(port, () => {
+    console.log(`Server running at http://localhost:${port}`);
+    });
     ```
 
-    - **Simple node app**
+    - node bundle.js
 
-        - npm init -y
-        - npm install express
-        - nano bundle.js
+- **Simple web app**
 
-        ```bash
-        const express = require('express');
-        const app = express();
-        const port = 3006;
+    - nano index.html
 
-        // Define a simple route
-        app.get('/', (req, res) => {
-        res.send('Hello, World! This is a simple Node.js app.');
-        });
-
-        // Start the server
-        app.listen(port, () => {
-        console.log(`Server running at http://localhost:${port}`);
-        });
-        ```
-
-        - node bundle.js
-
-    - **Simple web app**
-
-        - nano index.html
-
-        ```bash
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Simple Web App</title>
-            <style>
-                body {
-                    margin: 0;
-                    height: 100vh;
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    font-family: Arial, sans-serif;
-                    background-color: #f0f0f0;
-                }
-                h1 {
-                    font-size: 48px;
-                    color: #333;
-                }
-            </style>
-        </head>
-        <body>
-            <h1>APPNAME</h1>
-        </body>
-        </html>
-        ```
+    ```bash
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Simple Web App</title>
+        <style>
+            body {
+                margin: 0;
+                height: 100vh;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                font-family: Arial, sans-serif;
+                background-color: #f0f0f0;
+            }
+            h1 {
+                font-size: 48px;
+                color: #333;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>APPNAME</h1>
+    </body>
+    </html>
+    ```
 
 ## GitHub Actions Workflow
 
