@@ -1,5 +1,5 @@
 import Cropper from 'cropperjs';
-import 'cropperjs/dist/cropper.css';
+// import 'cropperjs/dist/cropper.css';
 import { useEffect, useState } from 'react';
 import SvgIcon from './svg';
 

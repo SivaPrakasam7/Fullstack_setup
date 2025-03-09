@@ -4,7 +4,7 @@ use `fullstack`;
 CREATE TABLE
     `users` (
         `id` INT (11) AUTO_INCREMENT,
-        `userId` VARCHAR(100) NOT NULL, -- Store generated userId 
+        `userId` CHAR(40) NOT NULL, -- Store generated userId 
         `email` VARCHAR(100) NOT NULL UNIQUE, -- Email address its optional 
         `phoneNumber` VARCHAR(40), -- Phone number 
         `name` VARCHAR(250), -- Name of user
