@@ -7,4 +7,5 @@ export const routes = {
     forgotPassword: `${baseURL}forgot-password`,
     resetPassword: `${baseURL}reset-password`,
     verify: `${baseURL}verify`,
+    settings: `${baseURL}settings`,
 };

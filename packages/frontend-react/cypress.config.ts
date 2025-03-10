@@ -7,7 +7,10 @@ export default defineConfig({
         setupNodeEvents() {
             // implement node event listeners here
         },
-        specPattern: ['cypress/e2e/authentication.cy.ts'],
+        specPattern: [
+            'cypress/e2e/authentication.cy.ts',
+            'cypress/e2e/settings.cy.ts',
+        ],
     },
     component: {
         devServer: {

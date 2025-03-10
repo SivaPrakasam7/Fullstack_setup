@@ -45,70 +45,30 @@ const router = express.Router();
  *         application/json:
  *           schema:
  *             type: object
- *             required:
- *               - name
  *             properties:
  *               name:
  *                 type: string
- *                 description: The name of the user
- *                 example: John Doe
  *               password:
  *                 type: string
- *                 description: The user's password (required if providerId is not provided)
- *                 example: securepassword123
  *               providerId:
  *                 type: string
- *                 description: The provider ID for external authentication (required if password is not provided)
- *                 example: google12345
  *               profileURL:
  *                 type: string
- *                 description: URL to the user's profile picture
- *                 example: https://example.com/profile.jpg
  *               email:
  *                 type: string
- *                 description: The user's email address
- *                 example: john.doe@example.com
- *             oneOf:
- *               - required: [password]
- *               - required: [providerId]
+ *             example:
+ *               name: "John Doe"
+ *               password: "securepassword123"
+ *               providerId: "google12345"
+ *               profileURL: "https://example.com/profile.jpg"
+ *               email: "john.doe@example.com"
  *     responses:
- *       201:
+ *       200:
  *         description: User created successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 id:
- *                   type: string
- *                   description: The ID of the created user
- *                   example: 12345
- *                 name:
- *                   type: string
- *                   example: John Doe
- *                 email:
- *                   type: string
- *                   example: john.doe@example.com
  *       400:
  *         description: Bad request - Validation failed
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   example: Either password or providerId is required
  *       500:
  *         description: Internal server error
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   example: Something went wrong
  */
 router
     .route('/create')
@@ -128,72 +88,23 @@ router
  *         application/json:
  *           schema:
  *             type: object
- *             required:
- *               - email
- *               - password
  *             properties:
  *               email:
  *                 type: string
- *                 description: The user's email address
- *                 example: john.doe@example.com
  *               password:
  *                 type: string
- *                 description: The user's password
- *                 example: securepassword123
+ *             example:
+ *               email: "john.doe@example.com"
+ *               password: "securepassword123"
  *     responses:
  *       200:
  *         description: Login successful
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 token:
- *                   type: string
- *                   description: Authentication token
- *                   example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
- *                 user:
- *                   type: object
- *                   properties:
- *                     id:
- *                       type: string
- *                       example: 12345
- *                     email:
- *                       type: string
- *                       example: john.doe@example.com
- *                     name:
- *                       type: string
- *                       example: John Doe
  *       400:
  *         description: Bad request - Validation failed
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   example: Password is required
  *       401:
  *         description: Unauthorized - Invalid credentials
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   example: Invalid email or password
  *       500:
  *         description: Internal server error
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   example: Something went wrong
  */
 router.route('/login').post(validator(loginValidation), loginController);
 
@@ -210,47 +121,10 @@ router.route('/login').post(validator(loginValidation), loginController);
  *     responses:
  *       200:
  *         description: User profile retrieved successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 id:
- *                   type: string
- *                   description: The user's ID
- *                   example: 12345
- *                 name:
- *                   type: string
- *                   description: The user's name
- *                   example: John Doe
- *                 email:
- *                   type: string
- *                   description: The user's email address
- *                   example: john.doe@example.com
- *                 profileURL:
- *                   type: string
- *                   description: URL to the user's profile picture
- *                   example: https://example.com/profile.jpg
  *       401:
  *         description: Unauthorized - Missing or invalid token
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   example: Authentication token required
  *       500:
  *         description: Internal server error
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   example: Something went wrong
  */
 router.route('/profile').get(tokenChecker, userController);
 
@@ -271,46 +145,18 @@ router.route('/profile').get(tokenChecker, userController);
  *             properties:
  *               email:
  *                 type: string
- *                 description: The user's email address (required if phoneNumber is not provided)
- *                 example: john.doe@example.com
  *               phoneNumber:
  *                 type: string
- *                 description: The user's phone number (required if email is not provided)
- *                 example: +1234567890
- *             oneOf:
- *               - required: [email]
- *               - required: [phoneNumber]
+ *             example:
+ *               email: "john.doe@example.com"
+ *               phoneNumber: "+1234567890"
  *     responses:
  *       200:
  *         description: Verification request sent successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Verification request sent
  *       400:
  *         description: Bad request - Validation failed
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   example: Either email or phoneNumber is required
  *       500:
  *         description: Internal server error
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   example: Something went wrong
  */
 router
     .route('/request-verification')
@@ -329,34 +175,10 @@ router
  *     responses:
  *       200:
  *         description: Email verified successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Email verified successfully
  *       401:
  *         description: Unauthorized - Missing or invalid token
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   example: Invalid or missing authorization token
  *       500:
  *         description: Internal server error
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   example: Something went wrong
  */
 router.route('/verify-email').get(headerTokenChecker, verifyEmailController);
 
@@ -373,48 +195,21 @@ router.route('/verify-email').get(headerTokenChecker, verifyEmailController);
  *         application/json:
  *           schema:
  *             type: object
- *             required:
- *               - otp
  *             properties:
  *               otp:
  *                 type: string
- *                 description: The one-time password (OTP) sent to the user's phone
- *                 example: 123456
  *               phoneNumber:
  *                 type: string
- *                 description: The user's phone number to verify
- *                 example: +1234567890
+ *             example:
+ *               otp: "123456"
+ *               phoneNumber: "+1234567890"
  *     responses:
  *       200:
  *         description: Phone number verified successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Phone number verified successfully
  *       400:
  *         description: Bad request - Validation failed
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   example: OTP is required
  *       500:
  *         description: Internal server error
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   example: Something went wrong
  */
 router
     .route('/verify-phone')
@@ -437,39 +232,15 @@ router
  *             properties:
  *               email:
  *                 type: string
- *                 description: The user's email address to send the reset instructions
- *                 example: john.doe@example.com
+ *             example:
+ *               email: "john.doe@example.com"
  *     responses:
  *       200:
  *         description: Password reset request sent successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Password reset instructions sent to your email
  *       400:
  *         description: Bad request - Validation failed
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   example: Invalid email format
  *       500:
  *         description: Internal server error
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   example: Something went wrong
  */
 router
     .route('/request-reset-password')
@@ -494,49 +265,17 @@ router
  *             properties:
  *               password:
  *                 type: string
- *                 description: The new password for the user
- *                 example: newsecurepassword123
+ *             example:
+ *               password: "newsecurepassword123"
  *     responses:
  *       200:
  *         description: Password changed successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Password changed successfully
  *       400:
  *         description: Bad request - Validation failed
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   example: Password is required
  *       401:
  *         description: Unauthorized - Missing or invalid token
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   example: Invalid or missing authorization token
  *       500:
  *         description: Internal server error
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   example: Something went wrong
  */
 router
     .route('/change-password')
@@ -561,68 +300,25 @@ router
  *         application/json:
  *           schema:
  *             type: object
- *             required:
- *               - currentPassword
  *             properties:
  *               currentPassword:
  *                 type: string
- *                 description: The user's current password for verification
- *                 example: oldsecurepassword123
  *               password:
  *                 type: string
- *                 description: The new password to set
- *                 example: newsecurepassword123
+ *             example:
+ *               currentPassword: "oldsecurepassword123"
+ *               password: "newsecurepassword123"
  *     responses:
  *       200:
  *         description: Password updated successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Password updated successfully
  *       400:
  *         description: Bad request - Validation failed
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   example: Current password is required
  *       401:
  *         description: Unauthorized - Missing or invalid token
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   example: Authentication token required
  *       403:
  *         description: Forbidden - Current password incorrect
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   example: Incorrect current password
  *       500:
  *         description: Internal server error
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   example: Something went wrong
  */
 router
     .route('/update-password')
@@ -645,34 +341,10 @@ router
  *     responses:
  *       200:
  *         description: Logout successful
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Logged out successfully
  *       401:
  *         description: Unauthorized - Missing or invalid token
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   example: Authentication token required
  *       500:
  *         description: Internal server error
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   example: Something went wrong
  */
 router.route('/logout').post(tokenChecker, logoutController);
 
@@ -695,65 +367,20 @@ router.route('/logout').post(tokenChecker, logoutController);
  *             properties:
  *               name:
  *                 type: string
- *                 description: The user's updated name
- *                 example: John Doe
  *               profileURL:
  *                 type: string
- *                 description: The updated URL to the user's profile picture
- *                 example: https://example.com/newprofile.jpg
+ *             example:
+ *               name: "John Doe"
+ *               profileURL: "https://example.com/newprofile.jpg"
  *     responses:
  *       200:
  *         description: User profile updated successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Profile updated successfully
- *                 user:
- *                   type: object
- *                   properties:
- *                     id:
- *                       type: string
- *                       example: 12345
- *                     name:
- *                       type: string
- *                       example: John Doe
- *                     profileURL:
- *                       type: string
- *                       example: https://example.com/newprofile.jpg
  *       400:
  *         description: Bad request - Validation failed
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   example: Invalid input data
  *       401:
  *         description: Unauthorized - Missing or invalid token
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   example: Authentication token required
  *       500:
  *         description: Internal server error
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   example: Something went wrong
  */
 router
     .route('/update')

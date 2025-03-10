@@ -42,6 +42,7 @@ const ResetPasswordPage = lazy(
 const VerificationPage = lazy(
     () => import('src/app/pages/authentication/verification')
 );
+const SettingsPage = lazy(() => import('src/app/pages/settings'));
 
 const Router = () =>
     useRoutes([
@@ -86,6 +87,14 @@ const Router = () =>
             element: (
                 <Private>
                     <VerificationPage />
+                </Private>
+            ),
+        },
+        {
+            path: routes.settings,
+            element: (
+                <Private protect>
+                    <SettingsPage />
                 </Private>
             ),
         },

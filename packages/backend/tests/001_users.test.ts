@@ -3,67 +3,15 @@ import nodemailerMock from 'nodemailer-mock';
 import app from 'src';
 import { executeQuery, MYSQLConnection } from '../src/handler/db.ts';
 import { user } from './data';
-import { waitForEmail } from './utils';
+import { encrypt, waitForEmail } from './utils';
 
 let clientId: string;
 let storedPublicKey: string;
-
-export const encrypt = async (data: Record<string, string>) => {
-    if (storedPublicKey) {
-        const binaryString = atob(storedPublicKey);
-        const binaryData = Uint8Array.from(binaryString, (char) =>
-            char.charCodeAt(0)
-        );
-        const publicKey = await crypto.subtle.importKey(
-            'spki',
-            binaryData,
-            { name: 'RSA-OAEP', hash: 'SHA-256' },
-            false,
-            ['encrypt']
-        );
-
-        const symmetricKey = await crypto.subtle.generateKey(
-            { name: 'AES-GCM', length: 256 },
-            true,
-            ['encrypt', 'decrypt']
-        );
-
-        const symmetricKeyRaw = await crypto.subtle.exportKey(
-            'raw',
-            symmetricKey
-        );
-
-        const encryptedSymmetricKey = await crypto.subtle.encrypt(
-            { name: 'RSA-OAEP' },
-            publicKey,
-            symmetricKeyRaw
-        );
-
-        const encoder = new TextEncoder();
-        const encodedData = encoder.encode(JSON.stringify(data));
-        const iv = crypto.getRandomValues(new Uint8Array(12));
-        const encryptedData = await crypto.subtle.encrypt(
-            { name: 'AES-GCM', iv },
-            symmetricKey,
-            encodedData
-        );
-
-        const encryptedSymmetricKeyBase64 = btoa(
-            String.fromCharCode(...new Uint8Array(encryptedSymmetricKey))
-        );
-        const encryptedDataBase64 = btoa(
-            String.fromCharCode(...new Uint8Array(encryptedData))
-        );
-        const ivBase64 = btoa(String.fromCharCode(...iv));
-
-        return {
-            encryptedSymmetricKey: encryptedSymmetricKeyBase64,
-            encryptedData: encryptedDataBase64,
-            iv: ivBase64,
-        };
-    }
-    return data;
-};
+let accessToken: string = '';
+let refreshToken: string = '';
+let cookies: string = '';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+let userDetail: Record<string, string> = {};
 
 describe('Users API', () => {
     let payload = {};
@@ -96,7 +44,7 @@ describe('Users API', () => {
         let response = await request(app)
             .post('/v1/user/create')
             .set('Cookie', `clientId=${clientId}`)
-            .send(await encrypt(payload));
+            .send(await encrypt(payload, storedPublicKey));
         expect(response.status).toBe(400);
         expect(response.body.message).toEqual(
             'Either password or providerId is required'
@@ -108,7 +56,7 @@ describe('Users API', () => {
         response = await request(app)
             .post('/v1/user/create')
             .set('Cookie', `clientId=${clientId}`)
-            .send(await encrypt(payload));
+            .send(await encrypt(payload, storedPublicKey));
         expect(response.status).toBe(400);
         expect(response.body.message).toEqual('Name is required');
 
@@ -120,7 +68,7 @@ describe('Users API', () => {
         response = await request(app)
             .post('/v1/user/create')
             .set('Cookie', `clientId=${clientId}`)
-            .send(await encrypt(payload));
+            .send(await encrypt(payload, storedPublicKey));
         expect(response.status).toBe(400);
         expect(response.body.message).toEqual('Email must be valid');
 
@@ -131,7 +79,7 @@ describe('Users API', () => {
         response = await request(app)
             .post('/v1/user/create')
             .set('Cookie', `clientId=${clientId}`)
-            .send(await encrypt(payload));
+            .send(await encrypt(payload, storedPublicKey));
         expect(response.status).toBe(400);
         expect(response.body.message).toEqual('Email is required');
 
@@ -143,7 +91,7 @@ describe('Users API', () => {
         response = await request(app)
             .post('/v1/user/create')
             .set('Cookie', `clientId=${clientId}`)
-            .send(await encrypt(payload));
+            .send(await encrypt(payload, storedPublicKey));
         expect(response.status).toBe(200);
     }, 10000);
 
@@ -152,7 +100,7 @@ describe('Users API', () => {
         let response = await request(app)
             .post('/v1/user/login')
             .set('Cookie', `clientId=${clientId}`)
-            .send(await encrypt(payload));
+            .send(await encrypt(payload, storedPublicKey));
         expect(response.status).toBe(400);
         expect(response.body.message).toEqual('Password is required');
 
@@ -162,7 +110,7 @@ describe('Users API', () => {
         response = await request(app)
             .post('/v1/user/login')
             .set('Cookie', `clientId=${clientId}`)
-            .send(await encrypt(payload));
+            .send(await encrypt(payload, storedPublicKey));
         expect(response.status).toBe(400);
         expect(response.body.message).toEqual('Email is required');
 
@@ -173,7 +121,7 @@ describe('Users API', () => {
         response = await request(app)
             .post('/v1/user/login')
             .set('Cookie', `clientId=${clientId}`)
-            .send(await encrypt(payload));
+            .send(await encrypt(payload, storedPublicKey));
         expect(response.status).toBe(400);
         expect(response.body.message).toEqual(
             'Invalid credentials. Please check and try again'
@@ -186,7 +134,7 @@ describe('Users API', () => {
         response = await request(app)
             .post('/v1/user/login')
             .set('Cookie', `clientId=${clientId}`)
-            .send(await encrypt(payload));
+            .send(await encrypt(payload, storedPublicKey));
         expect(response.status).toBe(400);
         expect(response.body.message).toEqual(
             'Your account has not been verified'
@@ -198,7 +146,7 @@ describe('Users API', () => {
         response = await request(app)
             .post('/v1/user/request-verification')
             .set('Cookie', `clientId=${clientId}`)
-            .send(await encrypt(payload));
+            .send(await encrypt(payload, storedPublicKey));
         expect(response.status).toBe(200);
 
         // After email verification
@@ -225,7 +173,7 @@ describe('Users API', () => {
         response = await request(app)
             .post('/v1/user/login')
             .set('Cookie', `clientId=${clientId}`)
-            .send(await encrypt(payload));
+            .send(await encrypt(payload, storedPublicKey));
         expect(response.status).toBe(200);
         expect(response.body.data.accessToken).not.toBeNull();
         expect(response.body.data.refreshToken).not.toBeNull();
@@ -236,7 +184,7 @@ describe('Users API', () => {
         let response = await request(app)
             .post('/v1/user/request-reset-password')
             .set('Cookie', `clientId=${clientId}`)
-            .send(await encrypt(payload));
+            .send(await encrypt(payload, storedPublicKey));
         expect(response.status).toBe(400);
         expect(response.body.message).toEqual('Email is required');
 
@@ -246,7 +194,7 @@ describe('Users API', () => {
         response = await request(app)
             .post('/v1/user/request-reset-password')
             .set('Cookie', `clientId=${clientId}`)
-            .send(await encrypt(payload));
+            .send(await encrypt(payload, storedPublicKey));
         expect(response.status).toBe(200);
         expect(response.body.message).toEqual(
             'Email has been sent successfully!'
@@ -263,7 +211,7 @@ describe('Users API', () => {
             .post('/v1/user/change-password')
             .set('Cookie', `clientId=${clientId}`)
             .set('Authorization', `Bearer ${resetToken}`)
-            .send(await encrypt(payload));
+            .send(await encrypt(payload, storedPublicKey));
         expect(response.status).toBe(400);
         expect(response.body.message).toEqual('Password is required');
 
@@ -274,7 +222,7 @@ describe('Users API', () => {
             .post('/v1/user/change-password')
             .set('Cookie', `clientId=${clientId}`)
             .set('Authorization', `Bearer ${resetToken}`)
-            .send(await encrypt(payload));
+            .send(await encrypt(payload, storedPublicKey));
         expect(response.status).toBe(400);
         expect(response.body.message).toEqual(
             'New password cannot be the same as the old password'
@@ -287,7 +235,7 @@ describe('Users API', () => {
             .post('/v1/user/change-password')
             .set('Cookie', `clientId=${clientId}`)
             .set('Authorization', `Bearer ${resetToken}`)
-            .send(await encrypt(payload));
+            .send(await encrypt(payload, storedPublicKey));
         expect(response.status).toBe(200);
         expect(response.body.message).toEqual('Password updated successfully');
 
@@ -298,7 +246,7 @@ describe('Users API', () => {
         response = await request(app)
             .post('/v1/user/login')
             .set('Cookie', `clientId=${clientId}`)
-            .send(await encrypt(payload));
+            .send(await encrypt(payload, storedPublicKey));
         expect(response.status).toBe(400);
         expect(response.body.message).toEqual(
             'Invalid credentials. Please check and try again'
@@ -313,12 +261,12 @@ describe('Users API', () => {
         let response = await request(app)
             .post('/v1/user/login')
             .set('Cookie', `clientId=${clientId}`)
-            .send(await encrypt(payload));
+            .send(await encrypt(payload, storedPublicKey));
         expect(response.status).toBe(200);
         expect(response.body.data.accessToken).not.toBeNull();
         expect(response.body.data.refreshToken).not.toBeNull();
-        const accessToken = response.body.data.accessToken;
-        const refreshToken = response.body.data.refreshToken;
+        accessToken = response.body.data.accessToken;
+        refreshToken = response.body.data.refreshToken;
 
         response = await request(app)
             .get('/v1/user/profile')
@@ -329,14 +277,96 @@ describe('Users API', () => {
             'You do not have permission to perform this action'
         );
 
-        const cookies = `clientId=${clientId};accessToken=${accessToken};refreshToken=${refreshToken}`;
+        cookies = `clientId=${clientId};accessToken=${accessToken};refreshToken=${refreshToken}`;
 
         response = await request(app)
             .get('/v1/user/profile')
             .set('Cookie', cookies)
             .send();
         expect(response.status).toBe(200);
+        userDetail = response.body.data.user;
         expect(response.body.data.user.userId).not.toBeNull();
         expect(response.body.data.user.email).toEqual(user.email);
+    }, 10000);
+
+    test('Login, Update profile', async () => {
+        payload = {
+            name: user.newName,
+        };
+
+        let response = await request(app)
+            .put('/v1/user/update')
+            .set('Cookie', `clientId=${clientId}`)
+            .send(await encrypt(payload, storedPublicKey));
+        expect(response.status).toBe(401);
+        expect(response.body.message).toEqual(
+            'You do not have permission to perform this action'
+        );
+
+        response = await request(app)
+            .put('/v1/user/update')
+            .set('Cookie', cookies)
+            .send(await encrypt(payload, storedPublicKey));
+        expect(response.status).toBe(200);
+        expect(response.body.message).toEqual(
+            'User details updated successfully'
+        );
+    }, 10000);
+
+    test('Login and Update password', async () => {
+        payload = {};
+
+        let response = await request(app)
+            .put('/v1/user/update-password')
+            .set('Cookie', `clientId=${clientId}`)
+            .send(await encrypt(payload, storedPublicKey));
+        expect(response.status).toBe(401);
+        expect(response.body.message).toEqual(
+            'You do not have permission to perform this action'
+        );
+
+        response = await request(app)
+            .put('/v1/user/update-password')
+            .set('Cookie', cookies)
+            .send(await encrypt(payload, storedPublicKey));
+        expect(response.status).toBe(400);
+        expect(response.body.message).toEqual('Current password is required');
+
+        payload = {
+            currentPassword: user.newPassword,
+        };
+
+        response = await request(app)
+            .put('/v1/user/update-password')
+            .set('Cookie', cookies)
+            .send(await encrypt(payload, storedPublicKey));
+        expect(response.status).toBe(400);
+        expect(response.body.message).toEqual('Password is required');
+
+        payload = {
+            currentPassword: user.password,
+            password: user.newPassword,
+        };
+
+        response = await request(app)
+            .put('/v1/user/update-password')
+            .set('Cookie', cookies)
+            .send(await encrypt(payload, storedPublicKey));
+        expect(response.status).toBe(400);
+        expect(response.body.message).toEqual(
+            'Passwords do not match. Please try again'
+        );
+
+        payload = {
+            currentPassword: user.newPassword,
+            password: user.password,
+        };
+
+        response = await request(app)
+            .put('/v1/user/update-password')
+            .set('Cookie', cookies)
+            .send(await encrypt(payload, storedPublicKey));
+        expect(response.status).toBe(200);
+        expect(response.body.message).toEqual('Password updated successfully');
     }, 10000);
 });
