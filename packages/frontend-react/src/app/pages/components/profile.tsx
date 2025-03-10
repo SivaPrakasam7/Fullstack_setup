@@ -51,7 +51,7 @@ export const Profile = () => {
                             handleOpen();
                             navigate(routes.settings, {
                                 state: {
-                                    menu: 'profile',
+                                    menu: 'profile_tab',
                                 },
                             });
                         }}
@@ -66,7 +66,7 @@ export const Profile = () => {
                             handleOpen();
                             navigate(routes.settings, {
                                 state: {
-                                    menu: 'password',
+                                    menu: 'change_password_tab',
                                 },
                             });
                         }}
@@ -81,7 +81,7 @@ export const Profile = () => {
                             handleOpen();
                             navigate(routes.settings, {
                                 state: {
-                                    menu: 'setting',
+                                    menu: 'setting_tab',
                                 },
                             });
                         }}
