@@ -1086,20 +1086,23 @@ module.exports = {
         function ({ addUtilities }) {
             addUtilities({
                 '.app-button': {
-                    '@apply px-4 py-2 rounded-xl w-fit flex items-center border justify-center hover:bg-black hover:text-white hover:dark:bg-white hover:dark:text-black hover:shadow-[0_0_10px_5px_#00000025] dark:hover:shadow-[0_0_10px_5px_#ffffff50] transition-all duration-300':
+                    '@apply px-4 py-2 rounded-xl w-fit flex items-center border justify-center hover:bg-black hover:text-white hover:dark:bg-white hover:dark:text-black hover:shadow-[0_0_10px_5px_#00000020] dark:hover:shadow-[0_0_10px_5px_#ffffff20] transition-all duration-300':
                         {},
                 },
                 '.app-button-fill': {
-                    '@apply px-4 py-2 rounded-xl w-fit flex items-center border justify-center bg-black text-white dark:bg-white dark:text-black hover:shadow-[0_0_10px_5px_#00000025] dark:hover:shadow-[0_0_10px_5px_#ffffff50] transition-all duration-300':
+                    '@apply px-4 py-2 rounded-xl w-fit flex items-center border justify-center bg-black text-white dark:bg-white dark:text-black hover:shadow-[0_0_10px_#00000030] dark:hover:shadow-[0_0_10px_#ffffff30] transition-all duration-300':
                         {},
                 },
                 '.app-menu': {
-                    '@apply origin-top-right absolute right-1 rounded-md shadow-xl bg-white dark:bg-black border overflow-hidden z-10':
+                    '@apply origin-top-right absolute right-1 rounded-md shadow-[0_0_10px_#00000020] dark:shadow-[0_0_10px_#ffffff20] bg-white dark:bg-black border overflow-hidden z-30':
                         {},
                 },
                 '.app-menu-item': {
-                    '@apply flex gap-2 justify-between items-center w-full p-2 px-4 text-gray-700 dark:text-gray-300 hover:bg-gray-100 hover:dark:text-black cursor-pointer':
+                    '@apply flex gap-2 justify-between items-center w-full p-2 px-4 text-gray-700 dark:text-gray-300 hover:bg-black hover:bg-opacity-5 hover:dark:bg-gray-100 hover:dark:text-black cursor-pointer':
                         {},
+                },
+                '.app-height': {
+                    '@apply h-[calc(100dvh-60px)]': {},
                 },
             });
         },

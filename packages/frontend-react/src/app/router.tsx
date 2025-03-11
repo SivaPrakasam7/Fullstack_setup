@@ -30,6 +30,7 @@ const Private = ({
 };
 
 //
+const Layout = lazy(() => import('src/app/pages/layout'));
 const MainPage = lazy(() => import('src/app/pages/main'));
 const SignInPage = lazy(() => import('src/app/pages/authentication/signIn'));
 const SignUpPage = lazy(() => import('src/app/pages/authentication/signUp'));
@@ -42,65 +43,80 @@ const ResetPasswordPage = lazy(
 const VerificationPage = lazy(
     () => import('src/app/pages/authentication/verification')
 );
+const AppPage = lazy(() => import('src/app/pages/app'));
 const SettingsPage = lazy(() => import('src/app/pages/settings'));
 
 const Router = () =>
     useRoutes([
         {
             path: routes.root,
-            element: <MainPage />,
-        },
-        {
-            path: routes.signIn,
-            element: (
-                <Private>
-                    <SignInPage />
-                </Private>
-            ),
-        },
-        {
-            path: routes.signUp,
-            element: (
-                <Private>
-                    <SignUpPage />
-                </Private>
-            ),
-        },
-        {
-            path: routes.forgotPassword,
-            element: (
-                <Private>
-                    <ForgotPasswordPage />
-                </Private>
-            ),
-        },
-        {
-            path: routes.resetPassword,
-            element: (
-                <Private>
-                    <ResetPasswordPage />
-                </Private>
-            ),
-        },
-        {
-            path: routes.verify,
-            element: (
-                <Private>
-                    <VerificationPage />
-                </Private>
-            ),
-        },
-        {
-            path: routes.settings,
-            element: (
-                <Private protect>
-                    <SettingsPage />
-                </Private>
-            ),
-        },
-        {
-            path: '*',
-            element: <CommonPage content="404 Page Not Found" />,
+            element: <Layout />,
+            children: [
+                {
+                    path: routes.root,
+                    element: <MainPage />,
+                },
+                {
+                    path: routes.signIn,
+                    element: (
+                        <Private>
+                            <SignInPage />
+                        </Private>
+                    ),
+                },
+                {
+                    path: routes.signUp,
+                    element: (
+                        <Private>
+                            <SignUpPage />
+                        </Private>
+                    ),
+                },
+                {
+                    path: routes.forgotPassword,
+                    element: (
+                        <Private>
+                            <ForgotPasswordPage />
+                        </Private>
+                    ),
+                },
+                {
+                    path: routes.resetPassword,
+                    element: (
+                        <Private>
+                            <ResetPasswordPage />
+                        </Private>
+                    ),
+                },
+                {
+                    path: routes.verify,
+                    element: (
+                        <Private>
+                            <VerificationPage />
+                        </Private>
+                    ),
+                },
+                {
+                    path: routes.app,
+                    element: (
+                        <Private protect>
+                            <AppPage />
+                        </Private>
+                    ),
+                },
+                {
+                    path: routes.settings,
+                    element: (
+                        <Private protect>
+                            <SettingsPage />
+                        </Private>
+                    ),
+                },
+                {
+                    path: '*',
+                    element: <CommonPage content="404 Page Not Found" />,
+                },
+            ],
         },
     ]);
 

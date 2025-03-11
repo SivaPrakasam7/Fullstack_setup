@@ -32,7 +32,7 @@ export default () => {
     };
 
     return (
-        <div className="flex flex-col gap-5 items-center justify-center h-screen w-screen">
+        <div className="flex flex-col gap-5 items-center justify-center app-height w-screen">
             <h1
                 data-testid="MESSAGE"
                 className={`text-3xl font-bold flex gap-2 items-center justify-center ${response?.error ? 'text-red-500' : 'text-green-500'}`}

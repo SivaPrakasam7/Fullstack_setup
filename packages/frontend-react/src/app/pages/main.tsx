@@ -5,7 +5,6 @@ import { useNavigate } from 'react-router-dom';
 import { routes } from 'services/constants/routes';
 import { logout } from 'services/repository/authentication';
 import { UserContext } from 'src/providers/context';
-import { Profile } from './components/profile';
 
 //
 export default () => {
@@ -26,12 +25,7 @@ export default () => {
     };
 
     return (
-        <div className="flex flex-col gap-5 items-center justify-center h-screen w-screen">
-            {user?.signedIn && (
-                <div className="fixed top-2 right-2">
-                    <Profile />
-                </div>
-            )}
+        <div className="flex flex-col gap-5 items-center justify-center app-height w-screen">
             <h1 data-testid="INIT" className="text-3xl font-bold">
                 {import.meta.env.VITE_APP_NAME}
             </h1>

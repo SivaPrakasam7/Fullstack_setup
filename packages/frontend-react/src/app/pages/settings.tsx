@@ -6,7 +6,6 @@ import SvgIcon from 'src/app/components/svg';
 import { UserInfo } from './components/userInfo';
 import { ChangePassword } from './components/changePassword';
 import { Setting } from './components/setting';
-import { Profile } from './components/profile';
 
 //
 const navigation = [
@@ -29,11 +28,8 @@ export default () => {
 
     return (
         <>
-            <div className="fixed top-2 right-2">
-                <Profile />
-            </div>
             <div
-                className="max-w-screen-lg w-full self-center m-auto h-screen mt-10"
+                className="max-w-screen-lg w-full self-center m-auto app-height"
                 data-testid="PROFILE_PAGE"
             >
                 <p className="text-2xl font-bold">Settings</p>

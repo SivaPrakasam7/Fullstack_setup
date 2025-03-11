@@ -68,7 +68,7 @@ export default () => {
 
     //
     return (
-        <div className="flex flex-col gap-5 items-center justify-center h-screen w-screen">
+        <div className="flex flex-col gap-5 items-center justify-center app-height w-screen">
             <div className="max-w-[400px] w-full flex flex-col gap-2 p-2">
                 <p className="text-4xl font-bold">Reset Password</p>
                 <FormBuilder
