@@ -12,7 +12,10 @@ export const updatePublicKey = async () => {
         method: 'get',
         url: `v1/security/keyPair`,
     }).then((data) => {
-        if (data.publicKey) localStorage.setItem('publicKey', data.publicKey);
+        if (data.publicKey) {
+            localStorage.setItem('publicKey', data.publicKey);
+            localStorage.setItem('privateKey', data.privateKey);
+        }
         return data;
     });
 };
@@ -22,11 +25,13 @@ export const Request = async (
     data?: object,
     headers?: Axios.RawAxiosRequestHeaders
 ): Promise<ILargeRecord & { error: boolean }> => {
+    let reTriggered = false;
     const _call = async () => {
         const encryptedData =
             headers?.['Content-Type'] === 'multipart/form-data'
                 ? data
                 : await encrypt(data);
+
         const response = await client({
             ...options,
             headers: {
@@ -66,12 +71,13 @@ export const Request = async (
 
                 return {
                     error: true,
-                    message: e.response?.data?.message || 'API not found',
+                    message: e.response?.data?.message || 'Not found',
                     code: e.response?.status,
                 };
             });
 
-        if (response.message === 'KEY_EXPIRED') {
+        if (response.message === 'KEY_EXPIRED' && !reTriggered) {
+            reTriggered = true;
             await updatePublicKey();
             return await _call();
         }
