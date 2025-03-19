@@ -6,6 +6,7 @@ import { IFormField } from './form.types';
 import { byteFormat, formatAcceptTypes } from 'services/repository/utils';
 import { CropperView } from '../cropper';
 import SvgIcon from '../svg';
+import { Thumbnail } from '../thumbnail';
 
 //
 export const FileUpload = ({
@@ -20,13 +21,13 @@ export const FileUpload = ({
     layoutClass,
     className,
     onChange,
-    accept = 'image/*',
+    accept = 'image/png,image/jpg,image/jpeg',
     multiple,
     cropper = false,
     fileSize = 52428800,
     imageSize = 'h-24 w-24',
     icon,
-    value,
+    value = [],
 }: Pick<
     IFormField,
     | 'label'
@@ -110,11 +111,7 @@ export const FileUpload = ({
     };
 
     const getObjectURL = (file: File | string) => {
-        return typeof file === 'string'
-            ? file
-            : file.type.includes('image')
-              ? URL.createObjectURL(file)
-              : '/icons/svg/file.svg';
+        return typeof file === 'string' ? file : URL.createObjectURL(file);
     };
     const removeLocalImages = (index: number) => {
         setFiles((prev) => {
@@ -152,7 +149,7 @@ export const FileUpload = ({
 
     useEffect(() => {
         setFiles(value);
-    }, [value]);
+    }, [value.length]);
 
     return (
         <div className={`w-full ${className}`}>
@@ -174,7 +171,7 @@ export const FileUpload = ({
                 >
                     {label}
                     {label && required && (
-                        <span v-show="" className="font-bold text-xs">
+                        <span className="text-gray-600/50 dark:text-white/50 font-bold text-xs">
                             *
                         </span>
                     )}
@@ -185,7 +182,7 @@ export const FileUpload = ({
             >
                 <label
                     htmlFor={`${name}-browse`}
-                    className={`flex flex-col gap-1 items-center justify-center rounded-lg border-gray-300 border border-dashed cursor-pointer h-full ${size} ${
+                    className={`flex flex-col gap-1 items-center justify-center rounded-lg cursor-pointer h-full app-inner-shadow ${size} ${
                         disabled
                             ? 'shadow-[_0px_0px_20px_inset] shadow-gray-400'
                             : isDragging
@@ -221,18 +218,11 @@ export const FileUpload = ({
                             data-testid="SELECTED_FILE"
                             className={`float-left m-1 relative border border-gray-300 rounded-lg ${imageSize}`}
                         >
-                            {accept === 'image/*' ? (
-                                <img
-                                    src={getObjectURL(image)}
-                                    className="rounded-lg border-white object-cover h-full w-full pointer-events-none"
-                                />
-                            ) : (
-                                <object
-                                    data={getObjectURL(image)}
-                                    className="rounded-lg border-white object-cover h-full w-full pointer-events-none"
-                                />
-                            )}
-                            <p className="text-[10px] text-gray-500 mt-2">
+                            <Thumbnail
+                                url={getObjectURL(image)}
+                                className={`rounded-lg border-white object-cover pointer-events-none ${imageSize}`}
+                            />
+                            <p className="text-[10px] absolute bottom-0 right-0 bg-white px-3 py-1 rounded-full text-black">
                                 {image.name}
                             </p>
                             <button

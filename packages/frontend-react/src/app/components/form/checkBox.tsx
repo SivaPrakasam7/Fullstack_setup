@@ -46,7 +46,10 @@ export const CheckBox = ({
             >
                 {label}
                 {label && required && (
-                    <span v-show="" className="text-red-400 font-bold text-xs">
+                    <span
+                        v-show=""
+                        className="text-gray-600/50 dark:text-white/50 font-bold text-xs"
+                    >
                         *
                     </span>
                 )}

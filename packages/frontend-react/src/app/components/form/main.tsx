@@ -1,4 +1,11 @@
-import { FormEvent, ReactNode, useEffect, useMemo, useState } from 'react';
+import {
+    createElement,
+    FormEvent,
+    ReactNode,
+    useEffect,
+    useMemo,
+    useState,
+} from 'react';
 
 //
 import { getTagValues } from 'services/constants';
@@ -222,7 +229,8 @@ export const FormElements = ({
     field: IFormField;
     onFieldChange: (field: IFieldChange) => void;
 }) => {
-    if (field.type === 'custom') return field.element;
+    if (field.type === 'custom' && field.element)
+        return createElement(field.element, { onFieldChange });
     else if (field.type === 'label')
         return (
             <label className={field.layoutClass}>
@@ -230,7 +238,7 @@ export const FormElements = ({
                 {field.required && (
                     <span
                         v-show="field.label && field.required"
-                        className="text-red-400 font-bold text-xs"
+                        className="text-gray-600/50 dark:text-white/50 font-bold text-xs"
                     >
                         *
                     </span>
@@ -238,18 +246,6 @@ export const FormElements = ({
                 {field.icon}
             </label>
         );
-    // else if (field.type === 'calendar')
-    //     return (
-    //         <Calendar
-    //             name={fieldName}
-    //             label={field.label}
-    //             value={field.value}
-    //             error={field.error}
-    //             required={field.required}
-    //             disabled={field.disabled}
-    //             onChange={onFieldChange}
-    //         />
-    //     );
     else if (field.type === 'checkbox')
         return (
             <CheckBox
@@ -266,21 +262,6 @@ export const FormElements = ({
                 onChange={onFieldChange}
             />
         );
-    // else if (field.type === 'chip')
-    //     return (
-    //         <ChipMenu
-    //             name={fieldName}
-    //             label={field.label}
-    //             value={field.value}
-    //             error={field.error}
-    //             required={field.required}
-    //             disabled={field.disabled}
-    //             helperText={field.helperText}
-    //             layoutClass={field.layoutClass}
-    //             options={field.options || []}
-    //             onChange={onFieldChange}
-    //         />
-    //     );
     else if (field.type === 'file')
         return (
             <FileUpload
@@ -302,62 +283,6 @@ export const FormElements = ({
                 icon={field.icon}
             />
         );
-    // else if (field.type === 'multiTextField')
-    //     return (
-    //         <MultiField
-    //             buttonText={field.buttonText}
-    //             buttonSize={field.buttonSize}
-    //             name={fieldName}
-    //             label={field.label}
-    //             form={form}
-    //             required={field.required}
-    //             disabled={field.disabled}
-    //             placeHolder={field.placeHolder}
-    //             type={field.type}
-    //             size={field.size}
-    //             rows={field.rows}
-    //             min={field.min}
-    //             max={field.max}
-    //             className={field.class}
-    //             layoutClass={field.layoutClass}
-    //             format={field.format}
-    //             initialFieldCount={field.initialFieldCount}
-    //             remove={field.remove!}
-    //             onChange={onFieldChange}
-    //             startIcon={field.startIcon}
-    //             endIcon={field.endIcon}
-    //         />
-    //     );
-    // else if (field.type === 'radio')
-    //     return (
-    //         <RadioButton
-    //             name={fieldName}
-    //             label={field.label}
-    //             value={field.value}
-    //             error={field.error}
-    //             required={field.required}
-    //             disabled={field.disabled}
-    //             helperText={field.helperText}
-    //             layoutClass={field.layoutClass}
-    //             options={field.options || []}
-    //             customField={field.customField}
-    //             onChange={onFieldChange}
-    //         />
-    //     );
-    // else if (field.type === 'toggle')
-    //     return (
-    //         <Toggle
-    //             name={fieldName}
-    //             label={field.label}
-    //             value={field.value}
-    //             error={field.error}
-    //             required={field.required}
-    //             disabled={field.disabled}
-    //             helperText={field.helperText}
-    //             layoutClass={field.layoutClass}
-    //             onChange={onFieldChange}
-    //         />
-    //     );
     else {
         return (
             <TextField

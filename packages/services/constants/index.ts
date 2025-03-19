@@ -3,7 +3,7 @@ export const baseURL = `${import.meta.env.VITE_ENCRYPTION}://${import.meta.env.V
 export const getTagValues = (v: string) => {
     return [
         ...new Set(
-            `${v}`
+            `${v || ''}`
                 .split(/( |;|,)/g)
                 .filter((t) => !!t.replaceAll(/(\s|;|,)/g, '').trim())
         ),

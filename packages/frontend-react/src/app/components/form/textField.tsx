@@ -281,17 +281,16 @@ export const TextField = ({
                 >
                     {label}
                     {label && required && (
-                        <span
-                            v-show=""
-                            className="text-red-400 font-bold text-xs"
-                        >
+                        <span className="text-gray-600/50 dark:text-white/50 font-bold text-xs">
                             *
                         </span>
                     )}
                 </label>
             )}
             {type === 'otp' ? (
-                <div className={`flex gap-3 justify-between ${layoutClass}`}>
+                <div
+                    className={`flex gap-3 justify-between  w-fit ${layoutClass}`}
+                >
                     {new Array(length).fill(null).map((_, i) => (
                         <input
                             key={i + 1}
@@ -299,11 +298,12 @@ export const TextField = ({
                             name={name + i + 1}
                             data-testid={name + i + 1}
                             type={type}
+                            placeholder={placeHolder}
                             disabled={disabled}
-                            className={`text-md rounded-md outline-none bg-transparent text-center w-10 h-10 bg-gray-100 dark:bg-none ${size} ${
+                            className={`text-md rounded-md outline-none bg-transparent text-center w-10 h-10 app-inner-shadow ${size} ${
                                 disabled
                                     ? 'bg-gray-400 text-gray-400 dark:text-gray-300'
-                                    : 'border hover:border-gray-500'
+                                    : 'border border-transparent hover:border-gray-500'
                             }`}
                             maxLength={1}
                             onInput={(e) => handleInputChange(e, i)}
