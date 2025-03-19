@@ -3,8 +3,7 @@ name: Production deployment CD
 on:
     push:
         branches: [master]
-        paths:
-            [
+        paths: [
                 'packages/backend/**',
                 'packages/frontend-react/**',
                 # 'packages/frontend-vue/**',
