@@ -102,11 +102,7 @@ const Router = () =>
                 },
                 {
                     path: routes.app,
-                    element: (
-                        <Private protect>
-                            <AppPage />
-                        </Private>
-                    ),
+                    element: <AppPage />,
                 },
                 {
                     path: routes.settings,

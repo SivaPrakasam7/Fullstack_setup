@@ -42,7 +42,11 @@ export const Profile = () => {
         <div className="relative cursor-pointer">
             <Avatar name={user!.name!} onClick={handleOpen} />
             {open && (
-                <div ref={menuRef} className="app-menu mt-2 w-44" role="menu">
+                <div
+                    ref={menuRef}
+                    className="app-menu app-shadow border-transparent mt-2 w-44"
+                    role="menu"
+                >
                     <div
                         className="app-menu-item"
                         role="menuitem"

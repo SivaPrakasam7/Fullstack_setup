@@ -28,7 +28,7 @@ export default () => {
                 >
                     <Logo className="w-8 h-8" /> {import.meta.env.VITE_APP_NAME}
                 </button>
-                {user?.signedIn && (
+                {user?.signedIn ? (
                     <div className="flex gap-2 items-center">
                         <button
                             className="app-button border-transparent app-shadow"
@@ -38,9 +38,26 @@ export default () => {
                         </button>
                         <Profile />
                     </div>
+                ) : (
+                    <div className="flex gap-2">
+                        <button
+                            className="app-button"
+                            onClick={() => navigate(routes.signIn)}
+                        >
+                            Sign In
+                        </button>
+                        <button
+                            className="app-button app-shadow"
+                            onClick={() => navigate(routes.signUp)}
+                        >
+                            Sign Up
+                        </button>
+                    </div>
                 )}
             </div>
-            <Outlet />
+            <div className="flex flex-col gap-3 px-3">
+                <Outlet />
+            </div>
             <div className="min-h-24 flex-1 w-full" />
             <div className="py-10 border-t border-black/10 dark:border-white/10 px-5">
                 <div className="flex flex-col sm:flex-row gap-5 justify-between max-w-screen-xl mx-auto">

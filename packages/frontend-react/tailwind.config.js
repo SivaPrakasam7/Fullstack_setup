@@ -1094,7 +1094,7 @@ module.exports = {
                         {},
                 },
                 '.app-menu': {
-                    '@apply origin-top-right absolute right-1 rounded-md shadow-[0_0_10px_#00000020] dark:shadow-[0_0_10px_#ffffff20] bg-white dark:bg-black border overflow-hidden z-30':
+                    '@apply origin-top-right absolute right-1 rounded-md bg-gray-100 dark:bg-neutral-900 overflow-hidden z-30':
                         {},
                 },
                 '.app-menu-item': {
@@ -1114,7 +1114,7 @@ module.exports = {
                         {},
                 },
                 '.app-height': {
-                    '@apply h-[calc(100dvh-60px)]': {},
+                    '@apply h-[calc(100dvh-74px)]': {},
                 },
             });
         },
