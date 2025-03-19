@@ -1,6 +1,6 @@
 export default () => {
     return (
-        <div className="max-w-3xl mx-auto p-6 mt-10">
+        <div className="max-w-3xl mx-auto p-6 mt-10 w-full">
             <h1 className="text-3xl font-bold mb-4">Privacy Policy</h1>
             <p className="mb-4">
                 Your privacy is important to us. This policy explains how we
