@@ -1116,6 +1116,9 @@ module.exports = {
                 '.app-height': {
                     '@apply h-[calc(100dvh-74px)]': {},
                 },
+                '.app-width': {
+                    '@apply w-[calc(100dvw-24px)]': {},
+                },
             });
         },
     ],

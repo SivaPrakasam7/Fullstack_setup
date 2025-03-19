@@ -2,7 +2,7 @@ import { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 //
-import { routes } from 'services/constants/routes';
+import { links, routes } from 'services/constants/routes';
 import { UserContext } from 'src/providers/context';
 import { Avatar } from '../components/avatar';
 import SvgIcon from '../components/svg';
@@ -78,7 +78,7 @@ export default () => {
     };
 
     return (
-        <div className="max-w-screen-xl  flex flex-col gap-3 mx-auto">
+        <div className="max-w-screen-xl app-width flex flex-col gap-3 mx-auto">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 w-full app-height items-center justify-center">
                 <div className="flex flex-col gap-7">
                     <p className="text-6xl font-bold">Full-Stack Developer</p>
@@ -105,24 +105,36 @@ export default () => {
                         </button>
                     </div>
                     <div className="flex gap-3">
-                        <button className="app-shadow p-2.5 rounded-full">
+                        <a
+                            href={links.github}
+                            target="_blank"
+                            className="app-shadow p-2.5 rounded-full"
+                        >
                             <SvgIcon
                                 path="/icons/svg/github.svg"
                                 className="w-7 h-7"
                             />
-                        </button>
-                        <button className="app-shadow p-2.5 rounded-full">
+                        </a>
+                        <a
+                            href={links.linkedIn}
+                            target="_blank"
+                            className="app-shadow p-2.5 rounded-full"
+                        >
                             <SvgIcon
                                 path="/icons/svg/linkedIn.svg"
                                 className="w-7 h-7"
                             />
-                        </button>
-                        <button className="app-shadow p-2.5 rounded-full">
+                        </a>
+                        <a
+                            href={links.mail}
+                            target="_blank"
+                            className="app-shadow p-2.5 rounded-full"
+                        >
                             <SvgIcon
                                 path="/icons/svg/mail.svg"
                                 className="w-7 h-7"
                             />
-                        </button>
+                        </a>
                     </div>
                 </div>
                 <Avatar

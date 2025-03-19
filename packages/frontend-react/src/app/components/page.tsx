@@ -9,7 +9,7 @@ export const CommonPage = ({ content }: { content: string }) => {
     };
 
     return (
-        <div className="flex flex-col gap-5 items-center justify-center h-screen w-screen">
+        <div className="flex flex-col gap-5 items-center justify-center h-screen app-width">
             <h1 data-testid="INIT" className="text-3xl font-bold">
                 {content}
             </h1>

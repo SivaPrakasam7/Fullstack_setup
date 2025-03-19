@@ -1,7 +1,7 @@
 //
 export const Maintenance = () => {
     return (
-        <div className="flex flex-col gap-5 items-center justify-center h-screen w-screen">
+        <div className="flex flex-col gap-5 items-center justify-center h-screen app-width">
             <img
                 src="/images/maintenance.png"
                 className="w-full max-w-[300px]"

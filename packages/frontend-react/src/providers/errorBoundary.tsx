@@ -6,7 +6,7 @@ export const ErrorBoundaryProvider = (props: { children: ReactNode }) => (
 );
 
 const ErrorHandler = ({ error, resetErrorBoundary }: FallbackProps) => (
-    <div className="flex items-center justify-center h-screen w-screen">
+    <div className="flex items-center justify-center h-screen app-width">
         <div className="flex flex-col items-center gap-3">
             <p className="text-2xl font-bold">{error.name}</p>
             <p className="text-lg">{error.message}</p>

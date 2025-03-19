@@ -12,3 +12,10 @@ export const routes = {
     privacyPolicy: `${baseURL}privacy-policy`,
     termsAndConditions: `${baseURL}terms-and-condition`,
 };
+
+export const links = {
+    github: 'https://github.com/SivaPrakasam7',
+    linkedIn: 'https://linkedin.com/in/siva-prakasam',
+    mail: 'mailto:prakasams22@gmail.com',
+    contact: 'tel:+6382657699',
+};
