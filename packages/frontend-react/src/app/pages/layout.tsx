@@ -67,7 +67,7 @@ export default () => {
                             {import.meta.env.VITE_APP_NAME}
                         </p>
                         <p className="text-black/50 dark:text-white/50">
-                            © {new Date().getFullYear()} {import.meta.env.VITE}
+                            © {new Date().getFullYear()} {import.meta.env.VITE_APP_NAME}
                             . All rights reserved.
                         </p>
                     </div>
