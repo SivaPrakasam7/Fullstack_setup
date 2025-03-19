@@ -422,7 +422,7 @@ export const TextField = ({
                         <ul
                             ref={menuRef}
                             data-testid={`${name}-menu`}
-                            className="absolute bg-white dark:bg-black border shadow-[0_0_5px_#00000050] dark:shadow-[#ffffff50] rounded-lg w-full max-h-32 h-fit overflow-auto z-10 top-[100%] max-md:fixed max-md:left-[50%] max-md:top-[50%] max-md:-translate-x-[50%] max-md:-translate-y-[50%] max-md:max-w-sm max-sm:w-[90%]"
+                            className="absolute bg-gray-100 dark:bg-neutral-900 border rounded-lg w-full max-h-32 h-fit overflow-auto z-10 top-[100%] max-md:fixed max-md:left-[50%] max-md:top-[50%] max-md:-translate-x-[50%] max-md:-translate-y-[50%] max-md:max-w-sm max-sm:w-[90%]"
                         >
                             {filterOptions.map((option, index) => (
                                 <li

@@ -6,9 +6,9 @@ import { links, routes } from 'services/constants/routes';
 import { UserContext } from 'src/providers/context';
 import { Avatar } from '../components/avatar';
 import SvgIcon from '../components/svg';
-import { FormBuilder } from '../components/form/main';
-import { IFormField } from '../components/form/form.types';
-import { emailRegex } from 'services/constants/regex';
+// import { FormBuilder } from '../components/form/main';
+// import { IFormField } from '../components/form/form.types';
+// import { emailRegex } from 'services/constants/regex';
 
 //
 const skills = [
@@ -31,51 +31,51 @@ const skills = [
 
 const projects: ILargeRecord[] = [];
 
-const contactForm = {
-    name: {
-        label: 'Name',
-        type: 'text',
-        required: true,
-        requiredLabel: 'Please enter your name',
-    },
-    email: {
-        label: 'Email',
-        type: 'text',
-        required: true,
-        requiredLabel: 'Please enter your email',
-        validations: [
-            {
-                type: 'regex',
-                validate: emailRegex,
-            },
-        ],
-    },
-    subject: {
-        label: 'Subject',
-        type: 'text',
-        required: true,
-        requiredLabel: 'Please enter your subject',
-        alignClass: 'col-span-1 sm:col-span-2',
-    },
-    message: {
-        label: 'Message',
-        type: 'textarea',
-        rows: 4,
-        required: true,
-        requiredLabel: 'Please enter your message',
-        alignClass: 'col-span-1 sm:col-span-2',
-    },
-} as Record<string, IFormField>;
+// const contactForm = {
+//     name: {
+//         label: 'Name',
+//         type: 'text',
+//         required: true,
+//         requiredLabel: 'Please enter your name',
+//     },
+//     email: {
+//         label: 'Email',
+//         type: 'text',
+//         required: true,
+//         requiredLabel: 'Please enter your email',
+//         validations: [
+//             {
+//                 type: 'regex',
+//                 validate: emailRegex,
+//             },
+//         ],
+//     },
+//     subject: {
+//         label: 'Subject',
+//         type: 'text',
+//         required: true,
+//         requiredLabel: 'Please enter your subject',
+//         alignClass: 'col-span-1 sm:col-span-2',
+//     },
+//     message: {
+//         label: 'Message',
+//         type: 'textarea',
+//         rows: 4,
+//         required: true,
+//         requiredLabel: 'Please enter your message',
+//         alignClass: 'col-span-1 sm:col-span-2',
+//     },
+// } as Record<string, IFormField>;
 
 //
 export default () => {
     const user = useContext(UserContext);
     const navigate = useNavigate();
 
-    const call = async (payload: ILargeRecord) => {
-        console.log(payload);
-        return false;
-    };
+    // const call = async (payload: ILargeRecord) => {
+    //     console.log(payload);
+    //     return false;
+    // };
 
     return (
         <div className="max-w-screen-xl app-width flex flex-col gap-3 mx-auto">
@@ -226,7 +226,7 @@ export default () => {
                     )}
                 </div>
             </div>
-            <div className="flex flex-col gap-10 items-center my-10">
+            {/* <div className="flex flex-col gap-10 items-center my-10">
                 <p className="text-5xl font-bold text-center">Get In Touch</p>
                 <div className="app-container app-shadow w-full max-w-screen-lg">
                     <FormBuilder
@@ -249,7 +249,7 @@ export default () => {
                         }
                     />
                 </div>
-            </div>
+            </div> */}
         </div>
     );
 };

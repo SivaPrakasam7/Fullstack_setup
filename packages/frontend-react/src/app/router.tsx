@@ -49,6 +49,7 @@ const PrivacyPolicy = lazy(() => import('src/app/pages/privacyPolicy'));
 const TermsAndConditions = lazy(
     () => import('src/app/pages/termsAndCondition')
 );
+const Maintenance = lazy(() => import('src/app/components/maintenance'));
 
 const Router = () =>
     useRoutes([
@@ -119,6 +120,10 @@ const Router = () =>
                 {
                     path: routes.termsAndConditions,
                     element: <TermsAndConditions />,
+                },
+                {
+                    path: routes.maintenance,
+                    element: <Maintenance />,
                 },
                 {
                     path: '*',

@@ -1,5 +1,5 @@
 //
-export const Maintenance = () => {
+export default () => {
     return (
         <div className="flex flex-col gap-5 items-center justify-center h-screen app-width">
             <img

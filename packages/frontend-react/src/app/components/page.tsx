@@ -13,7 +13,7 @@ export const CommonPage = ({ content }: { content: string }) => {
             <h1 data-testid="INIT" className="text-3xl font-bold">
                 {content}
             </h1>
-            <button className="app-button" onClick={goToHome}>
+            <button className="app-button app-shadow" onClick={goToHome}>
                 Home
             </button>
         </div>

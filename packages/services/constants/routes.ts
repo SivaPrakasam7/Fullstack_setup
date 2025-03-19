@@ -11,6 +11,8 @@ export const routes = {
     settings: `${baseURL}settings`,
     privacyPolicy: `${baseURL}privacy-policy`,
     termsAndConditions: `${baseURL}terms-and-condition`,
+    maintenance: `${baseURL}maintenance`,
+    404: `${baseURL}404`,
 };
 
 export const links = {
