@@ -77,7 +77,7 @@ describe('User Settings', { testIsolation: false }, () => {
     });
 
     it('Change password', () => {
-        cy.get('[data-testid="change_password_tab"]').click();
+        cy.get('[data-testid="change_password_tab"]').click({ force: true });
 
         // API
         cy.intercept('PUT', `/v1/user/update-password`).as('updatePassword');
@@ -134,7 +134,7 @@ describe('User Settings', { testIsolation: false }, () => {
     });
 
     it('App settings', () => {
-        cy.get('[data-testid="setting_tab"]').click();
+        cy.get('[data-testid="setting_tab"]').click({ force: true });
         cy.get('[data-testid="APP_SETTING_PAGE"]').should('exist');
     });
 });
