@@ -92,7 +92,7 @@ module.exports = {
             ...theme('colors'),
             DEFAULT: theme('colors.gray.200', 'currentColor'),
         }),
-        borderOpacity: ({ theme }) => theme('opacity.50'),
+        borderOpacity: ({ theme }) => theme('opacity.10'),
         borderRadius: {
             none: '0px',
             sm: '0.125rem',
@@ -1086,11 +1086,11 @@ module.exports = {
         function ({ addUtilities }) {
             addUtilities({
                 '.app-button': {
-                    '@apply px-4 py-2 rounded-xl w-fit flex items-center border justify-center hover:bg-black hover:text-white hover:dark:bg-white hover:dark:text-black hover:shadow-[0_0_10px_5px_#00000020] dark:hover:shadow-[0_0_10px_5px_#ffffff20] transition-all duration-300':
+                    '@apply px-4 py-2 rounded-xl w-fit flex items-center border border-transparent justify-center hover:bg-black hover:text-white hover:dark:bg-white hover:dark:text-black hover:shadow-[0_0_10px_5px_#00000020] dark:hover:shadow-[0_0_10px_5px_#ffffff20] transition-all duration-300':
                         {},
                 },
                 '.app-button-fill': {
-                    '@apply px-4 py-2 rounded-xl w-fit flex items-center border justify-center bg-black text-white dark:bg-white dark:text-black hover:shadow-[0_0_10px_#00000030] dark:hover:shadow-[0_0_10px_#ffffff30] transition-all duration-300':
+                    '@apply px-4 py-2 rounded-xl w-fit flex items-center border border-transparent justify-center bg-black text-white dark:bg-white dark:text-black hover:shadow-[0_0_10px_#00000030] dark:hover:shadow-[0_0_10px_#ffffff30] transition-all duration-300':
                         {},
                 },
                 '.app-menu': {
@@ -1099,6 +1099,18 @@ module.exports = {
                 },
                 '.app-menu-item': {
                     '@apply flex gap-2 justify-between items-center w-full p-2 px-4 text-gray-700 dark:text-gray-300 hover:bg-black hover:bg-opacity-5 hover:dark:bg-gray-100 hover:dark:text-black cursor-pointer':
+                        {},
+                },
+                '.app-container': {
+                    '@apply rounded-lg overflow-hidden backdrop-blur-xl border border-white/5 dark:border-black/5 p-6 rounded-2xl':
+                        {},
+                },
+                '.app-shadow': {
+                    '@apply shadow-[0.3rem_0.3rem_0.5rem_0_rgb(225,226,228),-0.25rem_-0.25rem_0.6rem_0_rgb(255,255,255)] dark:shadow-[0.3rem_0.3rem_0.5rem_0_rgb(10,10,10),-0.25rem_-0.25rem_0.6rem_0_rgb(60,60,60,0.7)]':
+                        {},
+                },
+                '.app-inner-shadow': {
+                    '@apply shadow-[0.3rem_0.3rem_0.5rem_0_rgb(225,226,228)_inset,-0.25rem_-0.25rem_0.6rem_0_rgb(255,255,255)_inset] dark:shadow-[0.3rem_0.3rem_0.5rem_0_rgb(10,10,10)_inset,-0.25rem_-0.25rem_0.6rem_0_rgb(60,60,60,0.7)_inset]':
                         {},
                 },
                 '.app-height': {

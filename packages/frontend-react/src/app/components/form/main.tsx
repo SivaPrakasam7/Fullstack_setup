@@ -196,7 +196,7 @@ export const FormBuilder = ({
                     disabled={loading}
                     type="submit"
                     data-testid="SUBMIT"
-                    className={`app-button-fill ${loading ? 'text-gray-400' : ''} ${buttonClass}`}
+                    className={`app-button border-transparent app-shadow ${loading ? 'text-gray-400' : ''} ${buttonClass}`}
                     onContextMenu={() => {
                         return false;
                     }}

@@ -45,6 +45,10 @@ const VerificationPage = lazy(
 );
 const AppPage = lazy(() => import('src/app/pages/app'));
 const SettingsPage = lazy(() => import('src/app/pages/settings'));
+const PrivacyPolicy = lazy(() => import('src/app/pages/privacyPolicy'));
+const TermsAndConditions = lazy(
+    () => import('src/app/pages/termsAndCondition')
+);
 
 const Router = () =>
     useRoutes([
@@ -111,6 +115,14 @@ const Router = () =>
                             <SettingsPage />
                         </Private>
                     ),
+                },
+                {
+                    path: routes.privacyPolicy,
+                    element: <PrivacyPolicy />,
+                },
+                {
+                    path: routes.termsAndConditions,
+                    element: <TermsAndConditions />,
                 },
                 {
                     path: '*',

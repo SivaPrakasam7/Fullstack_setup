@@ -313,7 +313,7 @@ export const TextField = ({
                 </div>
             ) : (
                 <div
-                    className={`flex text-md border hover:border-gray-500 text-md w-full rounded-xl relative items-center gap-1 transition-border duration-300 ${layoutClass} ${disabled ? 'bg-gray-200 dark:bg-gray-600 text-gray-400 dark:text-gray-300' : ''}`}
+                    className={`flex text-md border border-transparent hover:border-gray-500 text-md w-full rounded-xl relative items-center gap-1 transition-border duration-300 app-inner-shadow ${layoutClass} ${disabled ? 'bg-gray-200 dark:bg-gray-600 text-gray-400 dark:text-gray-300' : ''}`}
                 >
                     {startIcon}
                     {['date', 'datetime-local'].includes(type) && (

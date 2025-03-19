@@ -22,29 +22,29 @@ export default defineConfig(({ mode }) => {
             VitePWA({
                 // Refer https://favicon.inbrowser.app/tools/favicon-generator to generate below mani fest details
                 manifest: {
-                    name: 'App Name',
-                    short_name: 'App Name',
+                    name: 'Fullstack',
+                    short_name: 'Fullstack',
                     icons: [
                         {
-                            src: '/vite.svg',
+                            src: '/icons/svg/logo.svg',
                             sizes: '192x192',
                             type: 'image/png',
                             purpose: 'any',
                         },
                         {
-                            src: '/vite.svg',
+                            src: '/icons/svg/logo.svg',
                             sizes: '512x512',
                             type: 'image/png',
                             purpose: 'any',
                         },
                         {
-                            src: '/vite.svg',
+                            src: '/icons/svg/logo.svg',
                             sizes: '192x192',
                             type: 'image/png',
                             purpose: 'maskable',
                         },
                         {
-                            src: '/vite.svg',
+                            src: '/icons/svg/logo.svg',
                             sizes: '512x512',
                             type: 'image/png',
                             purpose: 'maskable',

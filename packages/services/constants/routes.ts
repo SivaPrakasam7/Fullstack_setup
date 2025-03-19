@@ -9,4 +9,6 @@ export const routes = {
     verify: `${baseURL}verify`,
     app: `${baseURL}app`,
     settings: `${baseURL}settings`,
+    privacyPolicy: `${baseURL}privacy-policy`,
+    termsAndConditions: `${baseURL}terms-and-condition`,
 };

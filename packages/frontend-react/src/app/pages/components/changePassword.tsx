@@ -72,7 +72,7 @@ export const ChangePassword = () => {
                 call={call}
                 buttonText="Update"
                 layoutClass={`gap-1 sm:gap-2 max-w-screen-sm mt-6`}
-                buttonClass={`app-button-fill !text-[16px] !px-6`}
+                buttonClass={`app-button app-shadow !text-[16px] !px-6`}
             />
         </>
     );
