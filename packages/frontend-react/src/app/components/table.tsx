@@ -48,9 +48,9 @@ export const Table = ({ data, columns }: ITable) => {
 
     return (
         <>
-            <div className="relative overflow-x-auto !overflow-y-clip rounded-[4px] border no-scrollbar flex flex-col bg-white">
-                <table className="w-full text-sm text-left rtl:text-right rounded-[4px]">
-                    <thead className="bg-primary-200 sticky top-0 bg-gray-200 dark:bg-gray-700 dark:text-gray-400">
+            <div className="relative overflow-x-auto !overflow-y-clip rounded-lg app-shadow no-scrollbar flex flex-col">
+                <table className="w-full text-sm text-left rtl:text-right rounded-lg">
+                    <thead className="bg-primary-200 sticky top-0 bg-gray-200 dark:bg-neutral-900 dark:text-gray-400">
                         <tr>
                             {columns.map((c) => (
                                 <th
@@ -68,7 +68,11 @@ export const Table = ({ data, columns }: ITable) => {
                             paginatedData.map((row, index) => (
                                 <tr
                                     key={`tablerow-${generateKey()}`}
-                                    className={`bg-white dark:bg-gray-800 hover:bg-blue-50 border-b dark:border-gray-700 border-gray-200 odd:light:bg-white even:bg-gray-100 even:dark:bg-gray-900`}
+                                    className={`bg-gray-50 dark:bg-neutral-800 odd:light:bg-white even:bg-gray-100 even:dark:bg-neutral-900 ${
+                                        index === paginatedData.length - 1
+                                            ? ''
+                                            : 'border-b dark:border-neutral-700 border-gray-200'
+                                    }`}
                                 >
                                     {columns.map((c) => (
                                         <td
@@ -94,7 +98,7 @@ export const Table = ({ data, columns }: ITable) => {
                                 </tr>
                             ))
                         ) : (
-                            <tr className="bg-white dark:bg-gray-800 hover:bg-blue-50">
+                            <tr className="bg-gray-50 dark:bg-neutral-800">
                                 <td
                                     scope="row"
                                     colSpan={columns.length}
@@ -108,105 +112,103 @@ export const Table = ({ data, columns }: ITable) => {
                 </table>
             </div>
             {data.length > 0 && (
-                <div className="flex gap-2 items-center justify-between p-2">
-                    <p className="text-sm font-bold">Total : {data.length}</p>
-                    <nav>
-                        <ul className="flex items-center -space-x-px h-10 text-base">
-                            <li>
-                                <TextField
-                                    startIcon={
-                                        <p className="text-gray-500 text-nowrap ml-2 -mr-3">
-                                            Rows :
-                                        </p>
-                                    }
-                                    name="month"
-                                    type="select"
-                                    value={`${itemsPerPage}`}
-                                    size="p-1.5 pl-4"
-                                    layoutClass="max-w-32"
-                                    className="!w-fit mr-2"
-                                    onChange={(e) => setItemsPerPage(e.value)}
-                                    options={[
-                                        { id: '10', label: '10' },
-                                        { id: '25', label: '25' },
-                                        { id: '50', label: '50' },
-                                        { id: '100', label: '100' },
-                                    ]}
-                                    noError={true}
-                                />
-                            </li>
-                            <li>
+                <div className="flex gap-2 items-center p-2">
+                    <p className="text-sm font-bold flex-1">
+                        Total : {data.length}
+                    </p>
+                    <TextField
+                        startIcon={
+                            <p className="text-gray-500 text-nowrap ml-2 -mr-3">
+                                Rows :
+                            </p>
+                        }
+                        name="month"
+                        type="select"
+                        value={`${itemsPerPage}`}
+                        size="p-1.5 pl-4"
+                        layoutClass="max-w-32"
+                        className="!w-fit mr-2"
+                        onChange={(e) => setItemsPerPage(e.value)}
+                        options={[
+                            { id: '10', label: '10' },
+                            { id: '25', label: '25' },
+                            { id: '50', label: '50' },
+                            { id: '100', label: '100' },
+                        ]}
+                        noError={true}
+                    />
+                    <ul className="flex items-center -space-x-px h-10 text-base app-shadow rounded-lg">
+                        <li>
+                            <button
+                                onClick={goToPreviousPage}
+                                disabled={currentPage === 1}
+                                className={`flex items-center justify-center px-3 h-10 ms-0 leading-tight text-gray-500 bg-white border border-e-0 border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white ${
+                                    currentPage === 1
+                                        ? 'cursor-not-allowed opacity-50'
+                                        : ''
+                                }`}
+                            >
+                                <span className="sr-only">Previous</span>
+                                <svg
+                                    className="w-3 h-3 rtl:rotate-180"
+                                    aria-hidden="true"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 6 10"
+                                >
+                                    <path
+                                        stroke="currentColor"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth="2"
+                                        d="M5 1 1 5l4 4"
+                                    />
+                                </svg>
+                            </button>
+                        </li>
+                        {getPageNumbers().map((page) => (
+                            <li key={`page-${page}`}>
                                 <button
-                                    onClick={goToPreviousPage}
-                                    disabled={currentPage === 1}
-                                    className={`flex items-center justify-center px-3 h-10 ms-0 leading-tight text-gray-500 bg-white border border-e-0 border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white ${
-                                        currentPage === 1
-                                            ? 'cursor-not-allowed opacity-50'
-                                            : ''
+                                    onClick={() => goToPage(page)}
+                                    className={`!rounded-none !border-1 !py-1.5 !px-3 ${
+                                        currentPage === page
+                                            ? 'app-button-fill'
+                                            : 'app-button'
                                     }`}
                                 >
-                                    <span className="sr-only">Previous</span>
-                                    <svg
-                                        className="w-3 h-3 rtl:rotate-180"
-                                        aria-hidden="true"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        fill="none"
-                                        viewBox="0 0 6 10"
-                                    >
-                                        <path
-                                            stroke="currentColor"
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth="2"
-                                            d="M5 1 1 5l4 4"
-                                        />
-                                    </svg>
+                                    {page}
                                 </button>
                             </li>
-                            {getPageNumbers().map((page) => (
-                                <li key={`page-${page}`}>
-                                    <button
-                                        onClick={() => goToPage(page)}
-                                        className={`!rounded-none !border-1 ${
-                                            currentPage === page
-                                                ? 'app-button-fill '
-                                                : 'app-button'
-                                        }`}
-                                    >
-                                        {page}
-                                    </button>
-                                </li>
-                            ))}
-                            <li>
-                                <button
-                                    onClick={goToNextPage}
-                                    disabled={currentPage === totalPages}
-                                    className={`flex items-center justify-center px-3 h-10 leading-tight text-gray-500 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white ${
-                                        currentPage === totalPages
-                                            ? 'cursor-not-allowed opacity-50'
-                                            : ''
-                                    }`}
+                        ))}
+                        <li>
+                            <button
+                                onClick={goToNextPage}
+                                disabled={currentPage === totalPages}
+                                className={`flex items-center justify-center px-3 h-10 leading-tight text-gray-500 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white ${
+                                    currentPage === totalPages
+                                        ? 'cursor-not-allowed opacity-50'
+                                        : ''
+                                }`}
+                            >
+                                <span className="sr-only">Next</span>
+                                <svg
+                                    className="w-3 h-3 rtl:rotate-180"
+                                    aria-hidden="true"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 6 10"
                                 >
-                                    <span className="sr-only">Next</span>
-                                    <svg
-                                        className="w-3 h-3 rtl:rotate-180"
-                                        aria-hidden="true"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        fill="none"
-                                        viewBox="0 0 6 10"
-                                    >
-                                        <path
-                                            stroke="currentColor"
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth="2"
-                                            d="m1 9 4-4-4-4"
-                                        />
-                                    </svg>
-                                </button>
-                            </li>
-                        </ul>
-                    </nav>
+                                    <path
+                                        stroke="currentColor"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth="2"
+                                        d="m1 9 4-4-4-4"
+                                    />
+                                </svg>
+                            </button>
+                        </li>
+                    </ul>
                 </div>
             )}
         </>

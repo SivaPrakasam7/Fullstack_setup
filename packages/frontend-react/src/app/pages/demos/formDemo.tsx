@@ -65,6 +65,7 @@ const form = {
         size: 'min-h-72 w-72',
         imageSize: 'min-h-72 w-72',
         className: '!w-fit',
+        layoutClass: '!grid-cols-1 sm:!grid-cols-2',
         accept: 'image/png,image/jpg,image/jpeg,application/pdf',
     },
     tag: {
