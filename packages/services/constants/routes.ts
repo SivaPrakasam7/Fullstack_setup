@@ -19,5 +19,5 @@ export const links = {
     github: 'https://github.com/SivaPrakasam7',
     linkedIn: 'https://linkedin.com/in/siva-prakasam',
     mail: 'mailto:prakasams22@gmail.com',
-    contact: 'tel:+6382657699',
+    contact: 'https://wa.me/+916382657699',
 };

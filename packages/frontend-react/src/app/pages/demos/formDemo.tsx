@@ -4,6 +4,7 @@ import { FormBuilder } from 'src/app/components/form/main';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { darcula } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
+//
 const form = {
     label: {
         label: 'Only label',
@@ -64,7 +65,7 @@ const form = {
         size: 'min-h-72 w-72',
         imageSize: 'min-h-72 w-72',
         className: '!w-fit',
-        accept: 'application/pdf',
+        accept: 'image/png,image/jpg,image/jpeg,application/pdf',
     },
     tag: {
         label: 'Tag field',
@@ -152,7 +153,6 @@ export const FormDemo = () => {
     const [payload, setPayload] = useState(null);
 
     const call = async (payload: ILargeRecord) => {
-        console.log(payload);
         setPayload(payload); // Store the payload for display
         return false; // Assuming this controls form submission success/failure
     };

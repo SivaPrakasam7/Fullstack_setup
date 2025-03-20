@@ -40,7 +40,7 @@ export const CodeBlock = () => {
                     padding: '1rem',
                     background: 'transparent',
                     maxHeight: isExpanded ? 'none' : '200px',
-                    overflow: 'hidden',
+                    overflowY: 'hidden',
                 }}
             >
                 {displayCode}
