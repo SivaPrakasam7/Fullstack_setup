@@ -1,18 +1,18 @@
+// ./demos/codeBlock.tsx
 import { useState } from 'react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { darcula } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import FormDemo from './formDemo?raw';
 
-export const CodeBlock = () => {
+export const CodeBlock = ({ code }: { code: string }) => {
     const [isExpanded, setIsExpanded] = useState(false);
     const [isCopied, setIsCopied] = useState(false);
 
-    // Truncate code to first 5 lines for collapsed view (adjust as needed)
-    const truncatedCode = FormDemo.split('\n').slice(0, 5).join('\n');
-    const displayCode = isExpanded ? FormDemo : truncatedCode;
+    // Truncate code to first 5 lines for collapsed view
+    const truncatedCode = code.split('\n').slice(0, 5).join('\n');
+    const displayCode = isExpanded ? code : truncatedCode;
 
     const handleCopy = () => {
-        navigator.clipboard.writeText(FormDemo).then(() => {
+        navigator.clipboard.writeText(code).then(() => {
             setIsCopied(true);
             setTimeout(() => setIsCopied(false), 2000); // Reset after 2 seconds
         });
@@ -46,7 +46,7 @@ export const CodeBlock = () => {
                 {displayCode}
             </SyntaxHighlighter>
 
-            {FormDemo.split('\n').length > 5 && (
+            {code.split('\n').length > 5 && (
                 <button
                     onClick={handleToggle}
                     className="mt-2 text-sm text-neutral-300 hover:text-white underline"

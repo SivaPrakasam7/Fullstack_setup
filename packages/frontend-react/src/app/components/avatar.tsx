@@ -12,7 +12,7 @@ export const Avatar = ({
     return (
         <div
             data-testid="avatar"
-            className={`app-shadow rounded-full dark:bg-transparent bg-gray-100 flex items-center justify-center text-xl overflow-hidden ${className}`}
+            className={`app-shadow rounded-full dark:bg-transparent bg-gray-100 flex items-center justify-center text-xl overflow-hidden ${className} ${image ? '!p-0' : ''}`}
             onClick={onClick}
         >
             {image ? (

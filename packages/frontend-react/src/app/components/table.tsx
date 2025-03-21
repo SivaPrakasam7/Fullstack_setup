@@ -113,12 +113,12 @@ export const Table = ({ data, columns }: ITable) => {
             </div>
             {data.length > 0 && (
                 <div className="flex gap-2 items-center p-2">
-                    <p className="text-sm font-bold flex-1">
+                    <p className="text-sm font-bold flex-1 text-nowrap">
                         Total : {data.length}
                     </p>
                     <TextField
                         startIcon={
-                            <p className="text-gray-500 text-nowrap ml-2 -mr-3">
+                            <p className="text-gray-500 text-nowrap ml-2 -mr-3 max-sm:hidden">
                                 Rows :
                             </p>
                         }

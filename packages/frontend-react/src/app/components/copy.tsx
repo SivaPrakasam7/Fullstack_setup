@@ -25,12 +25,12 @@ export const Copy = ({
             <span onClick={contentCopy}>
                 {state ? (
                     <SvgIcon
-                        path="/icons/svg/app/check.svg"
+                        path="/icons/svg/check.svg"
                         className="w-5 h-5 text-green-500"
                     />
                 ) : (
                     <SvgIcon
-                        path="/icons/svg/app/copy.svg"
+                        path="/icons/svg/copy.svg"
                         className="w-5 h-5 text-gray-500"
                     />
                 )}
