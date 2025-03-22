@@ -130,6 +130,16 @@ const form = {
         required: true,
         requiredLabel: 'Checkbox field is required',
     },
+    radio: {
+        label: 'Radio field',
+        type: 'radio',
+        options: [
+            { id: 'option1', label: 'Option 1' },
+            { id: 'option2', label: 'Option 2' },
+        ],
+        required: true,
+        requiredLabel: 'Radio field is required',
+    },
     custom: {
         type: 'custom',
         element: ({ onFieldChange }) => (

@@ -1,11 +1,11 @@
 import { IFormField } from './form.types';
 
 //
-export const CheckBox = ({
+export const RadioButton = ({
     label,
     name,
     helperText,
-    value,
+    value = '',
     error,
     disabled,
     size,
@@ -13,7 +13,6 @@ export const CheckBox = ({
     layoutClass,
     options,
     className,
-    customField,
     onChange,
 }: Pick<
     IFormField,
@@ -27,7 +26,6 @@ export const CheckBox = ({
     | 'layoutClass'
     | 'options'
     | 'className'
-    | 'customField'
 > &
     Required<Pick<IFormField, 'name' | 'onChange'>>) => {
     const handleInput = (option: string) => {
@@ -55,7 +53,7 @@ export const CheckBox = ({
                 )}
             </label>
             <div className={`flex flex-wrap gap-3 mt-2 ${layoutClass}`}>
-                {options?.map((option, index) => (
+                {options?.map((option) => (
                     <div
                         v-for="(option, index) in options"
                         key={option.id}
@@ -63,7 +61,7 @@ export const CheckBox = ({
                         onClick={() => handleInput(option.label)}
                     >
                         <input
-                            type="checkbox"
+                            type="radio"
                             name={name}
                             data-testid={name}
                             checked={value?.includes(option.label)}
@@ -74,22 +72,6 @@ export const CheckBox = ({
                             className="text-sm"
                             dangerouslySetInnerHTML={{ __html: option.label }}
                         />
-                        {customField && index === options.length - 1 && (
-                            <input
-                                v-if=""
-                                type="text"
-                                className="outline-none border-b-[1px] border-b-gray-600 w-full"
-                                disabled={
-                                    disabled || !value?.includes(option.label)
-                                }
-                                onChange={(e) => {
-                                    if (value?.includes(option.label))
-                                        handleInput(
-                                            `${e.target.value} ${option.label}`
-                                        );
-                                }}
-                            />
-                        )}
                     </div>
                 ))}
             </div>

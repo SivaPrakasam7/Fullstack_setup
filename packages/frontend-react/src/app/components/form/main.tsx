@@ -15,6 +15,7 @@ import { IFieldChange, IFormField } from './form.types';
 import { TextField } from './textField';
 import { CheckBox } from './checkBox';
 import { FileUpload } from './fileUpload';
+import { RadioButton } from './radioButton';
 
 //
 export const FormBuilder = ({
@@ -259,6 +260,21 @@ export const FormElements = ({
                 layoutClass={field.layoutClass}
                 options={field.options || []}
                 customField={field.customField}
+                onChange={onFieldChange}
+            />
+        );
+    else if (field.type === 'radio')
+        return (
+            <RadioButton
+                name={fieldName}
+                label={field.label}
+                value={field.value}
+                error={field.error}
+                required={field.required}
+                disabled={field.disabled}
+                helperText={field.helperText}
+                layoutClass={field.layoutClass}
+                options={field.options || []}
                 onChange={onFieldChange}
             />
         );

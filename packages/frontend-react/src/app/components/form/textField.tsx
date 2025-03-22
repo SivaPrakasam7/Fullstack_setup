@@ -319,13 +319,13 @@ export const TextField = ({
                     {['date', 'datetime-local'].includes(type) && (
                         <SvgIcon
                             path="/icons/svg/calendar.svg"
-                            className="!w-6 !h-6 m-auto ml-3 !text-current"
+                            className="!w-5 !h-5 m-auto ml-3 !text-current"
                         ></SvgIcon>
                     )}
                     {type === 'time' && (
                         <SvgIcon
                             path="/icons/svg/time.svg"
-                            className="!w-6 !h-6 m-auto ml-3 !text-current"
+                            className="!w-5 !h-5 m-auto ml-3 !text-current"
                         ></SvgIcon>
                     )}
                     {type === 'textarea' ? (
