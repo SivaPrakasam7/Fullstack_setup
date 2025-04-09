@@ -55,7 +55,7 @@ export default () => {
                     </div>
                 )}
             </div>
-            <div className="flex flex-col gap-3 px-3 app-width">
+            <div className="flex flex-col gap-3 px-3 min-w-full app-width">
                 <Outlet />
             </div>
             <div className="min-h-24 flex-1 w-full" />
