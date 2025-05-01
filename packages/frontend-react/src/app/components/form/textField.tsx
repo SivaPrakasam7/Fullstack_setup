@@ -368,7 +368,8 @@ export const TextField = ({
                             value={
                                 ['autocomplete', 'select'].includes(type) &&
                                 value
-                                    ? options.find((o) => o.id === value)?.label
+                                    ? options.find((o) => o.id === value)
+                                          ?.label || value
                                     : value
                             }
                         />
