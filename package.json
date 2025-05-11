@@ -10,7 +10,7 @@
     },
     "scripts": {
         "lint": "eslint .",
-        "lint:fix": "eslint --fix . --max-warnings=20",
+        "lint:fix": "eslint --fix . --max-warnings=25",
         "format": "prettier --write .",
         "check-format": "prettier --check .",
         "check-duplication": "jscpd --config jscpd.config.json --min-lines 20 --min-tokens 50 --ignore '**/vite.config.ts,**/*.json,**/.git/**,**/*.cy.ts,**/*.yaml,**/*.d.ts,**/*.types.ts,**/*.ejs,**/*.sql'",

@@ -36,7 +36,14 @@ if (process.env.MODE !== 'development') {
     app.use(limiter);
 }
 if (process.env.MODE === 'development') {
-    app.use(cors({ origin: process.env.CORS_ORIGIN, credentials: true }));
+    app.use(
+        cors({
+            origin: process.env.CORS_ORIGIN?.split(',')?.map((url) =>
+                url.trim()
+            ),
+            credentials: true,
+        })
+    );
 }
 app.use(bodyParser.json({ limit: '5MB' }));
 app.use(bodyParser.urlencoded({ limit: '5MB', extended: true }));

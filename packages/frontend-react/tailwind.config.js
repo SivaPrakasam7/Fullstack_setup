@@ -1085,6 +1085,9 @@ module.exports = {
     plugins: [
         function ({ addUtilities }) {
             addUtilities({
+                '.app-bg': {
+                    '@apply bg-gray-100 dark:bg-neutral-900': {},
+                },
                 '.app-button': {
                     '@apply px-4 py-2 rounded-xl w-fit flex items-center border border-transparent justify-center hover:bg-black hover:text-white hover:dark:bg-white hover:dark:text-black hover:shadow-[0_0_10px_5px_#00000020] dark:hover:shadow-[0_0_10px_5px_#ffffff20] transition-all duration-300':
                         {},
@@ -1094,7 +1097,7 @@ module.exports = {
                         {},
                 },
                 '.app-menu': {
-                    '@apply origin-top-right absolute right-1 rounded-md bg-gray-100 dark:bg-neutral-900 overflow-hidden z-30':
+                    '@apply origin-top-right absolute right-1 rounded-md bg-gray-100 app-bg overflow-hidden z-30':
                         {},
                 },
                 '.app-menu-item': {
