@@ -7,19 +7,16 @@ dotenv.config();
 // Configuration
 const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
 const GROQ_API_KEY = process.env.GROQ_API_KEY || '';
-const MODEL = 'gemma2-9b-it';
+const MODEL = 'meta-llama/llama-4-scout-17b-16e-instruct';
 const PROJECT_ROOT = path.resolve(__dirname, '..');
 const PACKAGES_DIR = path.join(PROJECT_ROOT, 'packages');
-const MAX_FILE_SIZE = 5000;
-const MAX_FILES_PER_REQUEST = 2;
-const REQUEST_DELAY_MS = 2000; // 2s delay for ~15 RPM
+const REQUEST_DELAY_MS = 2000;
 const MAX_RETRIES = 3;
 const BASE_RETRY_DELAY_MS = 1000;
-const RATE_LIMIT_PAUSE_MS = 60000; // 60s pause after 429
-const TPM_LIMIT = 15000; // Tokens per minute for gemma2-9b-it
-const TPD_LIMIT = 500000; // Tokens per day
-const TPM_WARNING_THRESHOLD = 5000; // Warn if remaining tokens < 5,000
-const USE_FULL_CODEBASE = true; // Toggle to use all codebase files
+const RATE_LIMIT_PAUSE_MS = 60000;
+const TPM_LIMIT = 6000;
+const TPD_LIMIT = Infinity;
+const TPM_WARNING_THRESHOLD = 2000;
 const IGNORED_FOLDERS = [
     'node_modules',
     'dist',
@@ -45,20 +42,6 @@ const IGNORED_FILES = [
     'cypress.config.ts',
 ];
 
-// Priority files (10 files, ~5,000 tokens)
-const PRIORITY_FILES = [
-    'packages/frontend-react/src/app/components/form/form.tsx',
-    'packages/frontend-react/src/app/pages/profile.tsx',
-    'packages/frontend-react/src/app/providers/userContext.tsx',
-    'packages/services/libraries/api.ts',
-    'packages/services/repository/authentication.ts',
-    'packages/services/type.d.ts',
-    'packages/frontend-react/src/app/components/form/form.types.ts',
-    'packages/frontend-react/src/app/components/toast.tsx',
-    'packages/frontend-react/src/app/components/dialogView.tsx',
-    'packages/services/repository/user.ts',
-];
-
 // Interfaces
 interface Message {
     role: 'system' | 'user';
@@ -69,6 +52,12 @@ interface FileGenerationPrompt {
     fileName: string;
     filePurpose: string;
     content: string;
+    directory: string;
+}
+
+interface FileToGenerate {
+    fileName: string;
+    filePurpose: string;
     directory: string;
 }
 
@@ -83,158 +72,100 @@ interface GroqResponse {
 class AIPromptGenerator {
     private projectScope: string;
     public existingCode: { filePath: string; content: string }[];
-    private generatedFiles: string[] = [];
+    public generatedFiles: string[] = [];
     private context: Message[] = [];
     private requestCount: number = 0;
-    public chunkSent: boolean = false;
     private startTime: number = Date.now();
     private totalTokensUsed: number = 0;
+    public filesToGenerate: FileToGenerate[] = [];
 
     constructor(
         projectScope: string,
         existingCode: { filePath: string; content: string }[]
     ) {
         this.projectScope = projectScope;
-        // Filter to PRIORITY_FILES or use full codebase
-        this.existingCode = USE_FULL_CODEBASE
-            ? existingCode
-            : existingCode
-                  .filter((file) => PRIORITY_FILES.includes(file.filePath))
-                  .sort(
-                      (a, b) =>
-                          PRIORITY_FILES.indexOf(a.filePath) -
-                          PRIORITY_FILES.indexOf(b.filePath)
-                  )
-                  .slice(0, 10);
+        this.existingCode = existingCode;
         console.log(
-            `Filtered to ${this.existingCode.length} files: ${this.existingCode
+            `Initialized with ${this.existingCode.length} files: ${this.existingCode
                 .map((f) => f.filePath)
                 .join(', ')}`
         );
-        if (!USE_FULL_CODEBASE) {
-            const missingFiles = PRIORITY_FILES.filter(
-                (file) => !this.existingCode.some((f) => f.filePath === file)
-            );
-            if (missingFiles.length > 0) {
-                console.warn(
-                    `Missing PRIORITY_FILES in codebase: ${missingFiles.join(
-                        ', '
-                    )}`
-                );
-            }
-        }
         this.initializeContext();
         console.log(
             `Initialized with model: ${MODEL}, TPM: ${TPM_LIMIT}, RPM: 30`
         );
     }
 
-    // Initialize system prompt with few-shot examples
     private initializeContext(): void {
+        const codebaseFilePaths = this.existingCode
+            .map((f) => f.filePath)
+            .join('\n');
         this.context = [
             {
                 role: 'system',
-                content: `Generate JSON file creation prompts for a TypeScript full-stack app with JWT authentication. Scope: "${this.projectScope}".
-
-Rules:
-1. Match style:
-   - Frontend: React, TypeScript, Tailwind CSS ('rounded-lg', 'space-y-4', 'bg-gray-100', 'p-4'), use 'FormBuilder' with 'fields' array (name, label, type, value, onChange), 'UserContext' for auth, 'window.showToast' for notifications (e.g., window.showToast('Success', 'success')).
-   - Services: TypeScript, use 'Request' from '@services/libraries/api' with axios, 'ILargeRecord' from '@services/type.d' for data types, 'window.showToast' for errors.
-   - Use 'dangerouslySetInnerHTML' for form inputs, 'localStorage' for token storage (e.g., localStorage.getItem('token')).
-2. Use JWT authentication:
-   - Frontend: 'Authorization: Bearer' headers via 'UserContext' with '{ token }'.
-   - Services: 'Request' with token headers, handle 401 errors with token refresh.
-3. Place files in:
-   - 'packages/frontend-react/src/app/pages' for pages.
-   - 'packages/frontend-react/cypress/e2e' for tests.
-   - 'packages/services/task' for utilities.
-4. Use import aliases:
-   - '@app/components/form/FormBuilder' for FormBuilder.
-   - '@app/components/Toast' for Toast.
-   - '@services/libraries/api' for Request.
-   - '@services/repository/authentication' for authentication.ts.
-   - '@app/providers/userContext' for UserContext.
-   - '@services/type.d' for ILargeRecord.
-5. Output JSON:
-   {
-     "fileName": "string",
-     "filePurpose": "string",
-     "content": "string",
-     "directory": "string"
-   }
-6. Avoid files: ${this.generatedFiles.join(', ')}, TaskPage.tsx, Tasks.tsx.
-7. Use 'v1/task/*' endpoints:
-   - GET 'v1/task/all'
-   - POST 'v1/task/create'
-   - PUT 'v1/task/update/:id'
-   - DELETE 'v1/task/delete/:id'
-
-Examples:
-- Frontend:
-\`\`\`tsx
-import { useContext, useState, useEffect } from 'react';
-import { FormBuilder } from '@app/components/form/FormBuilder';
-import { UserContext } from '@app/providers/userContext';
-import { Request } from '@services/libraries/api';
-import { ILargeRecord } from '@services/type.d';
-
-const Profile = () => {
-  const { token } = useContext(UserContext);
-  const [name, setName] = useState('');
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      await Request.put('v1/user/profile', { name }, {
-        headers: { Authorization: \`Bearer \${token}\` }
-      });
-      window.showToast('Profile updated', 'success');
-    } catch (error) {
-      window.showToast('Update failed', 'error');
-    }
-  };
-  return (
-    <div className="rounded-lg space-y-4 p-4 bg-gray-100">
-      <FormBuilder
-        onSubmit={handleSubmit}
-        fields={[{ name: 'name', label: 'Name', type: 'text', value: name, onChange: (e) => setName(e.target.value) }]}
-        submitLabel="Save"
-      />
-    </div>
-  );
-};
-export default Profile;
-\`\`\`
-- Service:
-\`\`\`ts
-import { Request } from '@services/libraries/api';
-import { ILargeRecord } from '@services/type.d';
-
-export const login = async (email: string, password: string): Promise<ILargeRecord> => {
-  try {
-    const response = await Request.post('v1/auth/login', { email, password });
-    localStorage.setItem('token', response.data.token);
-    return response.data;
-  } catch (error) {
-    window.showToast('Login failed', 'error');
-    throw error;
-  }
-};
-\`\`\``,
+                content: `You are a skilled full-stack developer tasked with generating files for a TypeScript-based application. Your goal is to create files that seamlessly integrate with the existing codebase, matching its style, conventions, and architecture, based on the provided project scope.
+              
+              Project Scope:
+              "${this.projectScope}"
+              
+              Existing Codebase Files:
+              ${codebaseFilePaths}
+              
+              Instructions:
+              1. **Analyze the Project Scope and Codebase**:
+                 - Understand the required functionality based on the project scope.
+                 - Analyze the existing file structure to determine proper directory placement.
+                 - Do **not** generate files that already exist or have been previously generated: ${this.generatedFiles.join(', ')}.
+              
+              2. **Generate a File List**:
+                 - Return a JSON array of new files required to implement the feature.
+                 - Each file object must contain:
+                   {
+                     "fileName": "string",
+                     "filePurpose": "string (brief description of the file’s role)",
+                     "directory": "string (relative path, e.g., 'packages/frontend-react/src/app/pages')"
+                   }
+                 - Ensure each file is relevant, necessary, and unique within its directory.
+              
+              3. **Generate File Content**:
+                 - For each file, generate complete TypeScript code that aligns with the existing codebase in naming, structure, and conventions.
+                 - Match import styles, dependency usage, and architecture.
+                 - Ensure code is type-safe, includes error handling, and is production-ready.
+              
+              4. **Reference Existing Code**:
+                 - For each new file, use 1–2 similar files from the same directory or functional purpose to guide structure and style.
+                 - Ensure you replicate patterns (e.g., middleware, API handlers, or React components) accurately.
+              
+              5. **Output Format**:
+                 - When generating content for each file, use this structure:
+                   {
+                     "fileName": "string",
+                     "filePurpose": "string",
+                     "content": "string (valid, complete code)",
+                     "directory": "string"
+                   }
+              
+              6. **Coding Standards**:
+                 - Maintain consistency with the existing codebase in naming, organization, and formatting.
+                 - Use appropriate tech stacks: React with TypeScript for frontend, Express with TypeScript for backend.
+                 - Respect architectural boundaries and conventions (e.g., controller, service, route layers).
+              
+              Notes:
+              - For frontend additions, follow existing component and page patterns.
+              - For backend features, align with current routing, controller, service, and validation modules.
+              - Do not duplicate logic or files. Only create files truly needed to implement the scoped functionality.`,
             },
         ];
     }
 
-    // Delay function
     private async delay(ms: number): Promise<void> {
         return new Promise((resolve) => setTimeout(resolve, ms));
     }
 
-    // Estimate tokens (~4 chars per token)
     private estimateTokens(content: string): number {
         return Math.ceil(content.length / 4);
     }
 
-    // Update token usage and check limits
     private updateTokenUsage(tokens: number): void {
         this.totalTokensUsed += tokens;
         if (this.totalTokensUsed > TPD_LIMIT * 0.9 && TPD_LIMIT !== Infinity) {
@@ -249,110 +180,43 @@ export const login = async (email: string, password: string): Promise<ILargeReco
         }
     }
 
-    // Send codebase chunk with retry logic
-    private async sendCodebaseChunk(
-        chunk: { filePath: string; content: string }[],
-        attempt: number = 1
-    ): Promise<void> {
-        this.requestCount++;
-        const chunkSummary = chunk
-            .map(
-                ({ filePath, content }) =>
-                    `File: ${filePath}\n\`\`\`typescript\n${content}\n\`\`\``
-            )
-            .join('\n\n');
-        const tokens = this.estimateTokens(chunkSummary);
-        this.updateTokenUsage(tokens);
-        console.log(
-            `API Request #${this.requestCount}: Sending chunk (${chunk.length} files, ~${tokens} tokens, Total: ${this.totalTokensUsed})`
+    private selectReferenceFiles(
+        file: FileToGenerate
+    ): { filePath: string; content: string }[] {
+        const sameDirectory = this.existingCode.filter((f) =>
+            f.filePath.startsWith(file.directory)
         );
-
-        try {
-            const response = await axios.post(
-                GROQ_API_URL,
-                {
-                    model: MODEL,
-                    messages: [
-                        ...this.context,
-                        {
-                            role: 'user',
-                            content: `Codebase chunk:\n${chunkSummary}`,
-                        },
-                    ],
-                    temperature: 0.7,
-                    max_completion_tokens: 1000,
-                },
-                {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `Bearer ${GROQ_API_KEY}`,
-                    },
-                }
-            );
-            const remainingReqs = parseInt(
-                response.headers['x-ratelimit-remaining-requests'] || '30'
-            );
-            const remainingTokens = parseInt(
-                response.headers['x-ratelimit-remaining-tokens'] ||
-                    TPM_LIMIT.toString()
-            );
-            console.log(
-                `API Request #${this.requestCount}: Chunk sent (Remaining: ${remainingReqs}/30 reqs, ${remainingTokens}/${TPM_LIMIT} tokens)`
-            );
-            if (remainingTokens < TPM_WARNING_THRESHOLD) {
-                console.warn(
-                    `Low tokens remaining: ${remainingTokens}/${TPM_LIMIT}. Pausing for ${REQUEST_DELAY_MS}ms.`
-                );
-                await this.delay(REQUEST_DELAY_MS);
-            }
-            this.context.push({
-                role: 'user',
-                content: `Received chunk (${chunk.length} files).`,
-            });
-        } catch (error: any) {
-            if (error.response?.status === 429 && attempt <= MAX_RETRIES) {
-                const retryAfter = error.response?.headers['retry-after']
-                    ? parseFloat(error.response.headers['retry-after']) * 1000
-                    : BASE_RETRY_DELAY_MS * Math.pow(2, attempt - 1);
-                console.log(
-                    `API Request #${this.requestCount}: 429 Retry Attempt ${attempt}/${MAX_RETRIES}, waiting ${retryAfter}ms`
-                );
-                await this.delay(retryAfter);
-                if (attempt === MAX_RETRIES) {
-                    console.log(
-                        `Pausing for ${RATE_LIMIT_PAUSE_MS}ms to reset rate limit window`
-                    );
-                    await this.delay(RATE_LIMIT_PAUSE_MS);
-                }
-                return this.sendCodebaseChunk(chunk, attempt + 1);
-            }
-            throw new Error(
-                `Failed to send chunk: ${error.message}${error.response ? ` (Status: ${error.response.status}, Details: ${JSON.stringify(error.response.data)})` : ''}`
-            );
-        }
-        await this.delay(REQUEST_DELAY_MS);
+        const references = sameDirectory
+            .filter(
+                (f, index, self) =>
+                    self.findIndex((x) => x.filePath === f.filePath) === index
+            )
+            .slice(0, 2);
+        return references;
     }
 
-    // Call Groq API to generate file prompt
     private async callGroqAPI(
+        promptContent: string,
         attempt: number = 1
-    ): Promise<FileGenerationPrompt> {
+    ): Promise<any> {
+        const requestId = `${this.requestCount + 1}-${Date.now()}`;
+        const startTime = Date.now();
         this.requestCount++;
-        const promptContent =
-            'Generate the next file prompt for task management in JSON format.';
         const tokens = this.estimateTokens(promptContent);
         this.updateTokenUsage(tokens);
-        console.log(
-            `API Request #${this.requestCount}: Generating file prompt (~${tokens} tokens, Total: ${this.totalTokensUsed})`
-        );
 
-        // Trim context if too large
+        console.log(`=== Request #${requestId} ===`);
+        console.log(`Timestamp: ${new Date().toISOString()}`);
+        console.log(`Prompt:\n${promptContent}`);
+        console.log(`Estimated Tokens: ${tokens}`);
+        console.log(`Total Tokens Used: ${this.totalTokensUsed}`);
+
         const contextTokens = this.estimateTokens(JSON.stringify(this.context));
         if (contextTokens > TPM_LIMIT * 0.8) {
             console.warn(
                 `Context size (~${contextTokens} tokens) approaching TPM limit. Trimming older messages.`
             );
-            this.context = this.context.slice(-2); // Keep last 2 messages
+            this.context = this.context.slice(-2);
         }
 
         try {
@@ -364,8 +228,8 @@ export const login = async (email: string, password: string): Promise<ILargeReco
                         ...this.context,
                         { role: 'user', content: promptContent },
                     ],
-                    temperature: 0.7,
-                    max_completion_tokens: 1000,
+                    temperature: 0.5,
+                    max_completion_tokens: 8192,
                     response_format: { type: 'json_object' },
                 },
                 {
@@ -382,25 +246,49 @@ export const login = async (email: string, password: string): Promise<ILargeReco
                 response.headers['x-ratelimit-remaining-tokens'] ||
                     TPM_LIMIT.toString()
             );
-            console.log(
-                `API Request #${this.requestCount}: File prompt generated (Remaining: ${remainingReqs}/30 reqs, ${remainingTokens}/${TPM_LIMIT} tokens)`
+            const parsedResponse = JSON.parse(
+                response.data.choices[0].message.content
             );
+            const duration = (Date.now() - startTime) / 1000;
+
+            console.log(`=== Response #${requestId} ===`);
+            console.log(`Timestamp: ${new Date().toISOString()}`);
+            console.log(
+                `Response:\n${JSON.stringify(parsedResponse, null, 2)}`
+            );
+            console.log(`Remaining Requests: ${remainingReqs}/30`);
+            console.log(`Remaining Tokens: ${remainingTokens}/${TPM_LIMIT}`);
+            console.log(`Duration: ${duration}s`);
+            console.log(`====================`);
+
             if (remainingTokens < TPM_WARNING_THRESHOLD) {
                 console.warn(
                     `Low tokens remaining: ${remainingTokens}/${TPM_LIMIT}. Pausing for ${REQUEST_DELAY_MS}ms.`
                 );
                 await this.delay(REQUEST_DELAY_MS);
             }
-            return JSON.parse(
-                response.data.choices[0].message.content
-            ) as FileGenerationPrompt;
+            return parsedResponse;
         } catch (error: any) {
+            const duration = (Date.now() - startTime) / 1000;
+            console.error(`=== Error #${requestId} ===`);
+            console.error(`Timestamp: ${new Date().toISOString()}`);
+            console.error(`Prompt:\n${promptContent}`);
+            console.error(`Error: ${error.message}`);
+            if (error.response) {
+                console.error(`Status: ${error.response.status}`);
+                console.error(
+                    `Details: ${JSON.stringify(error.response.data, null, 2)}`
+                );
+            }
+            console.error(`Duration: ${duration}s`);
+            console.error(`====================`);
+
             if (error.response?.status === 429 && attempt <= MAX_RETRIES) {
                 const retryAfter = error.response?.headers['retry-after']
                     ? parseFloat(error.response.headers['retry-after']) * 1000
                     : BASE_RETRY_DELAY_MS * Math.pow(2, attempt - 1);
                 console.log(
-                    `API Request #${this.requestCount}: 429 Retry Attempt ${attempt}/${MAX_RETRIES}, waiting ${retryAfter}ms`
+                    `Retry Attempt ${attempt}/${MAX_RETRIES}, waiting ${retryAfter}ms`
                 );
                 await this.delay(retryAfter);
                 if (attempt === MAX_RETRIES) {
@@ -409,109 +297,170 @@ export const login = async (email: string, password: string): Promise<ILargeReco
                     );
                     await this.delay(RATE_LIMIT_PAUSE_MS);
                 }
-                return this.callGroqAPI(attempt + 1);
+                return this.callGroqAPI(promptContent, attempt + 1);
             }
-            // Fallback to parse failed_generation
             if (
                 error.response?.status === 400 &&
                 error.response?.data?.error?.failed_generation
             ) {
                 const content = error.response.data.error.failed_generation;
+                console.warn(
+                    `JSON validation failed. Attempting to recover from: ${content}`
+                );
                 try {
-                    const jsonMatch = content.match(/{[\s\S]*}/);
-                    if (jsonMatch) {
-                        const prompt = JSON.parse(
-                            jsonMatch[0]
-                        ) as FileGenerationPrompt;
-                        console.log(
-                            `Recovered prompt from failed_generation: ${prompt.fileName}`
-                        );
-                        return prompt;
-                    }
-                } catch {
+                    const fixedContent = `[${content.trim().replace(/,\s*$/, '')}]`;
+                    const parsed = JSON.parse(fixedContent);
+                    console.log(
+                        `Recovered JSON from failed_generation: ${JSON.stringify(parsed, null, 2)}`
+                    );
+                    return { files: parsed };
+                } catch (parseError) {
                     console.error(
-                        `Failed to parse failed_generation: ${content}`
+                        `Failed to parse failed_generation: ${content}. Error: ${(parseError as Error).message}`
                     );
                 }
             }
-            throw new Error(
-                `Failed to generate prompt: ${error.message}${error.response ? ` (Status: ${error.response.status}, Details: ${JSON.stringify(error.response.data)})` : ''}`
-            );
+            throw error;
         }
     }
 
-    // Generate the next file prompt and save the file
-    public async generateNextFile(totalChunks: number): Promise<void> {
+    public async generateFileList(): Promise<void> {
+        if (this.filesToGenerate.length > 0) {
+            console.log('File list already generated. Skipping.');
+            return;
+        }
+        const promptContent = `Analyze the project scope and existing codebase. Return a valid JSON array of new files that must be created to fulfill the project requirements.
+
+Instructions:
+- The output must be a **properly formatted JSON array**, enclosed in square brackets.
+- **Do not include trailing commas**.
+- Each file object must include the following fields:
+  - "fileName": a unique file name within its directory that matches the project's naming conventions (e.g., lowerCamelCase or kebab-case as found in existing files).
+  - "filePurpose": a concise description of the file’s role in fulfilling the project scope.
+  - "directory": a valid existing or conventionally inferred path (e.g., 'packages/frontend-react/src/app/pages', 'packages/backend/src/routes', 'packages/services/repository').
+
+Constraints:
+- Only suggest files that are necessary to implement the described feature.
+- Match the style, file structure, and naming conventions found in the current codebase.
+- Avoid suggesting files that already exist or duplicate functionality.
+- Suggested file paths must align with the existing folder structure.
+
+Example output:
+[
+  {
+    "fileName": "blog.ts",
+    "filePurpose": "Handles database operations for blog posts",
+    "directory": "packages/backend/src/repository"
+  },
+  {
+    "fileName": "create.tsx",
+    "filePurpose": "React component for creating blog posts",
+    "directory": "packages/frontend-react/src/app/pages/blog"
+  }
+]`;
+        console.log('Generating file list...');
         try {
-            // Send codebase chunks once
-            if (!this.chunkSent) {
-                console.log(
-                    `Sending ${totalChunks} codebase chunks (total files: ${this.existingCode.length})`
-                );
-                for (
-                    let i = 0;
-                    i < this.existingCode.length;
-                    i += MAX_FILES_PER_REQUEST
-                ) {
-                    const chunk = this.existingCode.slice(
-                        i,
-                        i + MAX_FILES_PER_REQUEST
-                    );
-                    await this.sendCodebaseChunk(chunk);
-                    console.log(
-                        `Sent ${Math.min(i + MAX_FILES_PER_REQUEST, this.existingCode.length)}/${this.existingCode.length} files`
-                    );
+            this.filesToGenerate = (
+                (await this.callGroqAPI(promptContent)) as {
+                    files: FileToGenerate[];
                 }
-                this.chunkSent = true;
+            ).files;
+            console.log(
+                `Generated ${this.filesToGenerate.length} files to create: ${this.filesToGenerate
+                    .map((f) => `${f.directory}/${f.fileName}`)
+                    .join(', ')}`
+            );
+        } catch (error) {
+            console.error(
+                `Failed to generate file list: ${(error as Error).message}`
+            );
+            throw error;
+        }
+    }
+
+    public async generateNextFile(): Promise<void> {
+        if (this.filesToGenerate.length === 0) {
+            console.log('No files left to generate.');
+            return;
+        }
+
+        const file = this.filesToGenerate.shift()!;
+        const relativePath = path.join(file.directory, file.fileName);
+        console.log(`Generating file: ${relativePath}`);
+        try {
+            const references = this.selectReferenceFiles(file);
+            if (references.length === 0) {
+                console.warn(
+                    `No reference files found for ${relativePath}. Skipping generation.`
+                );
+                return;
+            }
+            const referenceContent = references
+                .map(
+                    (ref) =>
+                        `Reference File: ${ref.filePath}\n\`\`\`typescript\n${ref.content}\n\`\`\``
+                )
+                .join('\n\n');
+            const promptContent = `Generate the file content for:
+{
+  "fileName": "${file.fileName}",
+  "filePurpose": "${file.filePurpose}",
+  "directory": "${file.directory}"
+}
+Use the following reference code to match style and conventions:\n${referenceContent}
+Return a valid JSON object with no trailing commas, following the format:
+{
+  "fileName": "${file.fileName}",
+  "filePurpose": "${file.filePurpose}",
+  "content": "string (complete, error-free code)",
+  "directory": "${file.directory}"
+}`;
+            const prompt = (await this.callGroqAPI(
+                promptContent
+            )) as FileGenerationPrompt;
+
+            if (
+                prompt.fileName !== file.fileName ||
+                prompt.directory !== file.directory
+            ) {
+                console.warn(
+                    `Generated file (${prompt.fileName}) does not match requested file (${file.fileName})`
+                );
+                return;
             }
 
-            // Generate file prompt
-            const prompt = await this.callGroqAPI();
-
-            // Validate prompt
             const fullPath = path.join(
                 PROJECT_ROOT,
                 prompt.directory,
                 prompt.fileName
             );
-            const relativePath = path.join(prompt.directory, prompt.fileName);
-            if (
-                this.generatedFiles.includes(relativePath) ||
-                this.existingCode.some((file) => file.filePath === relativePath)
-            ) {
-                console.log(
-                    `Skipped: File ${relativePath} already exists or generated`
-                );
-                return;
-            }
-
-            // Save the file
             await fs.mkdir(path.join(PROJECT_ROOT, prompt.directory), {
                 recursive: true,
             });
             await fs.writeFile(fullPath, prompt.content);
             console.log(
-                `Generated file: ${relativePath} (${(Date.now() - this.startTime) / 1000}s elapsed)`
+                `Successfully generated file: ${relativePath} (${(Date.now() - this.startTime) / 1000}s elapsed)`
             );
 
-            // Update generated files and context
             this.generatedFiles.push(relativePath);
             this.context.push({
                 role: 'user',
-                content: `Generated file: ${relativePath}. Generate the next file prompt.`,
+                content: `Generated file: ${relativePath}.`,
             });
         } catch (error) {
-            console.error(`Error generating file: ${(error as Error).message}`);
+            console.error(
+                `Failed to generate file ${relativePath}: ${(error as Error).message}`
+            );
         }
     }
 }
 
-// Utility to read existing codebase
+// readCodebase function
 async function readCodebase(): Promise<
     { filePath: string; content: string }[]
 > {
     const files: { filePath: string; content: string }[] = [];
-    const packageDirs = ['backend', 'frontend-react', 'services']; // Removed 'backend'
+    const packageDirs = ['backend', 'frontend-react', 'services'];
 
     for (const pkg of packageDirs) {
         const pkgDir = path.join(PACKAGES_DIR, pkg);
@@ -530,13 +479,12 @@ async function readCodebase(): Promise<
                         }
                     } else if (
                         (entry.name.endsWith('.ts') ||
-                            entry.name.endsWith('.tsx')) &&
+                            entry.name.endsWith('.tsx') ||
+                            entry.name.endsWith('.sql')) &&
                         !IGNORED_FILES.includes(entry.name)
                     ) {
                         const content = await fs.readFile(fullPath, 'utf-8');
-                        if (content.length < MAX_FILE_SIZE) {
-                            files.push({ filePath: relative, content });
-                        }
+                        files.push({ filePath: relative, content });
                     }
                 }
             };
@@ -549,17 +497,11 @@ async function readCodebase(): Promise<
     return files;
 }
 
-// Main function
+// main function
 async function main() {
     const projectScope = `
-    Add task management functionality to the existing full-stack application.
-    Include CRUD operations for tasks, with tasks linked to authenticated users.
-    The frontend uses React with TypeScript and Tailwind CSS, and services use TypeScript with Axios-based 'Request'.
-    All task API calls should be protected by JWT authentication using 'Authorization: Bearer' headers.
-    Place frontend files in 'packages/frontend-react/src/app/pages' or 'cypress/e2e', and shared utilities in 'packages/services/task'.
-    Use existing conventions: 'FormBuilder' for forms, 'window.showToast' for notifications, 'Request' from '@services/libraries/api', 'ILargeRecord' for types, 'dangerouslySetInnerHTML' and 'localStorage' as in existing code.
-    Match service files to 'authentication.ts' and frontend pages to 'profile.tsx'.
-    Assume task API endpoints exist at 'v1/task/*' (e.g., 'v1/task/create', 'v1/task/all', 'v1/task/update/:id', 'v1/task/delete/:id').
+    Add blogging functionality to the existing full-stack application.
+    Include CRUD operations for blog posts, with posts linked to authenticated users.
     `;
 
     const existingCode = await readCodebase();
@@ -573,16 +515,13 @@ async function main() {
             `Failed to save codebase JSON: ${(error as Error).message}`
         );
     }
-
     // const generator = new AIPromptGenerator(projectScope, existingCode);
-    // const totalChunks = Math.ceil(
-    //     generator.existingCode.length / MAX_FILES_PER_REQUEST
-    // );
-    // for (let i = 0; i < 5; i++) {
+    // await generator.generateFileList();
+    // while (generator.filesToGenerate.length > 0) {
     //     console.log(
-    //         `Generating file ${i + 1}/5 (Estimated requests: ${generator.chunkSent ? 1 : totalChunks + 1})`
+    //         `Generating file ${generator.generatedFiles.length + 1}/${generator.generatedFiles.length + generator.filesToGenerate.length}`
     //     );
-    //     await generator.generateNextFile(totalChunks);
+    //     await generator.generateNextFile();
     // }
 }
 

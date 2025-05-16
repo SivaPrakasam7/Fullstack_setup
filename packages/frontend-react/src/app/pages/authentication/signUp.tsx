@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     emailRegex,
@@ -9,8 +10,10 @@ import {
     register,
     requestVerification,
 } from 'services/repository/authentication';
+import { DialogView } from 'src/app/components/dialog';
 import { IFormField } from 'src/app/components/form/form.types';
 import { FormBuilder } from 'src/app/components/form/main';
+import SvgIcon from 'src/app/components/svg';
 
 //
 const form = {
@@ -71,12 +74,31 @@ const form = {
 } as Record<string, IFormField>;
 
 export default () => {
+    const [email, setEmail] = useState<string>('');
+    const [loading, setLoading] = useState(false);
+    const [open, setOpen] = useState(false);
     const navigate = useNavigate();
+
+    const handleOpen = () => setOpen((prev) => !prev);
 
     const call = async (payload: ILargeRecord) => {
         const res = await register(payload);
-        if (!res.error) await requestVerification({ email: payload.email });
+        if (!res.error) {
+            setEmail(payload.email);
+            await requestVerification({ email: payload.email });
+            handleOpen();
+        }
         return !res.error;
+    };
+
+    const resendEmail = async () => {
+        if (email) {
+            setLoading(true);
+            await requestVerification({
+                email,
+            });
+            setLoading(false);
+        }
     };
 
     return (
@@ -97,6 +119,29 @@ export default () => {
                     Already have an account?
                 </div>
             </div>
+            <DialogView open={open} close={handleOpen}>
+                <div className="flex flex-col items-center gap-5 rounded-lg p-7 py-10 max-w-md">
+                    <p className="text-xl font-bold flex items-center gap-2">
+                        <SvgIcon
+                            path="/icons/avg/app/check-rounded.svg"
+                            className="w-6 h-6"
+                        />
+                        Check Your Email
+                    </p>
+                    <p className="text-lg text-center">
+                        Email verify request has been sent to your email. Please
+                        check your email to verify your email. If you didn't
+                        receive
+                    </p>
+                    <button
+                        className="app-button-fill !text-base"
+                        disabled={loading}
+                        onClick={resendEmail}
+                    >
+                        Click here to resend
+                    </button>
+                </div>
+            </DialogView>
         </div>
     );
 };
