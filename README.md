@@ -186,7 +186,6 @@ This repository provides a **common project setup** for web apps using **React**
 
 3. **Server Configuration**
 
-    - **Nginx**: `setup/config/nginx.conf`
     - **Apache**: `setup/config/apache.conf`
 
     ```bash

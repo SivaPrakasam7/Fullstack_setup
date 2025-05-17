@@ -1,0 +1,63 @@
+name: Backend production deployment CD
+
+on:
+    push:
+        branches: [master]
+        paths: ['packages/backend/**']
+
+concurrency:
+    group: cd-${{ github.ref }}
+    cancel-in-progress: true
+
+jobs:
+    build-deploy-backend: # Required t3.medium or 2 CPU core and 4 GB RAM minimum to install packages and mysql migration
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout Repository
+              uses: actions/checkout@v4
+
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: '22.14.0'
+
+            - name: Cache npm dependencies
+              uses: actions/cache@v4
+              with:
+                  path: ~/.npm
+                  key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+                  restore-keys: |
+                      ${{ runner.os }}-node-
+
+            - name: Install Dependencies
+              run: npm ci
+
+            - name: Build backend
+              working-directory: packages/backend
+              run: |
+                  npm run build
+                  echo "${{ secrets.PRODUCTION_BACKEND_ENV }}" > out/.env
+
+            - name: Upload to Server
+              uses: appleboy/scp-action@v0.1.7
+              with:
+                  host: ${{ secrets.PROD_SSH_HOST }}
+                  username: ${{ secrets.PROD_SSH_USERNAME }}
+                  key: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
+                  port: ${{ secrets.PROD_SSH_PORT }}
+                  source: 'packages/backend/out/'
+                  target: ${{ secrets.PROD_REMOTE_BACKEND_DIRECTORY_PATH }}
+                  rm: true
+                  strip_components: 3
+
+            - name: Setup Server
+              uses: appleboy/ssh-action@master
+              with:
+                  host: ${{ secrets.PROD_SSH_HOST }}
+                  username: ${{ secrets.PROD_SSH_USERNAME }}
+                  key: ${{ secrets.PROD_SSH_PRIVATE_KEY }}
+                  port: ${{ secrets.PROD_SSH_PORT }}
+                  script: |
+                      cd ${{ secrets.PROD_REMOTE_BACKEND_DIRECTORY_PATH }}
+                      npm i
+                      npm run migrate
+                      pm2 reload ${{ secrets.PROD_BACKEND_APP_NAME }}

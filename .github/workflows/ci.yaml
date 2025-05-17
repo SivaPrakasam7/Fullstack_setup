@@ -8,7 +8,6 @@ on:
             [
                 'packages/backend/**',
                 'packages/frontend-react/**',
-                'packages/frontend-vue/**',
                 'packages/services/**',
             ]
 
@@ -18,7 +17,6 @@ on:
             [
                 'packages/backend/**',
                 'packages/frontend-react/**',
-                'packages/frontend-vue/**',
                 'packages/services/**',
             ]
 
@@ -253,154 +251,3 @@ jobs:
                   name: cypress-results
                   path: |
                       packages/frontend-react/cypress/screenshots
-
-    # cypress-vue-component-test:
-    #     runs-on: ubuntu-latest
-
-    #     steps:
-    #         - name: Set up Node.js
-    #           uses: actions/setup-node@v4
-    #           with:
-    #               node-version: '22.14.0'
-
-    #         - name: Checkout
-    #           uses: actions/checkout@v4
-
-    #         - name: Cache npm dependencies
-    #           uses: actions/cache@v4
-    #           with:
-    #               path: ~/.npm
-    #               key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-    #               restore-keys: |
-    #                   ${{ runner.os }}-node-
-
-    #         - name: Install dependencies
-    #           run: npm ci
-
-    #         - name: Setup Frontend
-    #           working-directory: packages/frontend-vue
-    #           run: echo "${{ secrets.TEST_FRONTEND_ENV }}" > .env
-
-    #         - name: Cypress run
-    #           working-directory: packages/frontend-vue
-    #           run: npm run cy:run -- --component --browser chrome
-
-    #         - name: Archive production artifacts
-    #           if: failure()
-    #           uses: actions/upload-artifact@v4
-    #           with:
-    #               name: cypress-results
-    #               path: |
-    #                   packages/frontend-vue/cypress/screenshots
-
-    # cypress-vue-e2e-desktop:
-    #     runs-on: ubuntu-latest
-
-    #     services:
-    #         db:
-    #             image: mysql:8.0
-    #             env:
-    #                 MYSQL_ROOT_PASSWORD: root
-    #             ports:
-    #                 - 3306:3306
-
-    #     steps:
-    #         - name: Set up Node.js
-    #           uses: actions/setup-node@v4
-    #           with:
-    #               node-version: '22.14.0'
-
-    #         - name: Checkout
-    #           uses: actions/checkout@v4
-
-    #         - name: Cache npm dependencies
-    #           uses: actions/cache@v4
-    #           with:
-    #               path: ~/.npm
-    #               key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-    #               restore-keys: |
-    #                   ${{ runner.os }}-node-
-
-    #         - name: Install dependencies
-    #           run: npm ci
-
-    #         - name: Setup Frontend
-    #           working-directory: packages/frontend-vue
-    #           run: echo "${{ secrets.TEST_FRONTEND_ENV }}" > .env
-
-    #         - name: Setup Backend
-    #           working-directory: packages/backend
-    #           run: |
-    #               echo "${{ secrets.TEST_BACKEND_ENV }}" > .env
-    #               npm run migrate
-
-    #         - name: Run Services
-    #           run: nohup lerna run dev --stream --scope=frontend-vue --scope=backend -- --mode test &
-
-    #         - name: Cypress run
-    #           working-directory: packages/frontend-vue
-    #           run: npm run cy:run -- --e2e --browser chrome
-
-    #         - name: Archive production artifacts
-    #           if: failure()
-    #           uses: actions/upload-artifact@v4
-    #           with:
-    #               name: cypress-results
-    #               path: |
-    #                   packages/frontend-vue/cypress/screenshots
-
-    # cypress-vue-e2e-mobile:
-    #     runs-on: ubuntu-latest
-
-    #     services:
-    #         db:
-    #             image: mysql:8.0
-    #             env:
-    #                 MYSQL_ROOT_PASSWORD: root
-    #             ports:
-    #                 - 3306:3306
-
-    #     steps:
-    #         - name: Set up Node.js
-    #           uses: actions/setup-node@v4
-    #           with:
-    #               node-version: '22.14.0'
-
-    #         - name: Checkout
-    #           uses: actions/checkout@v4
-
-    #         - name: Cache npm dependencies
-    #           uses: actions/cache@v4
-    #           with:
-    #               path: ~/.npm
-    #               key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-    #               restore-keys: |
-    #                   ${{ runner.os }}-node-
-
-    #         - name: Install dependencies
-    #           run: npm ci
-
-    #         - name: Setup Frontend
-    #           working-directory: packages/frontend-vue
-    #           run: echo "${{ secrets.TEST_FRONTEND_ENV }}" > .env
-
-    #         - name: Setup Backend
-    #           working-directory: packages/backend
-    #           run: |
-    #               echo "${{ secrets.TEST_BACKEND_ENV }}" > .env
-    #               npm run migrate
-
-    #         - name: Run Services
-    #           run: nohup lerna run dev --stream --scope=frontend-vue --scope=backend -- --mode test &
-
-    #         - name: Cypress run
-    #           working-directory: packages/frontend-vue
-    #           run: npm run cy:run -- --e2e --browser chrome --env viewportWidth=360,viewportHeight=800
-
-    #         - name: Archive production artifacts
-    #           if: failure()
-    #           uses: actions/upload-artifact@v4
-    #           with:
-    #               name: cypress-results
-    #               path: |
-    #                   packages/frontend-vue/cypress/screenshots
